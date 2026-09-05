@@ -1,0 +1,33 @@
+{
+  "_cosa_e": "Rosa di prova nel formato dell'app, con ballottaggi a percentuale diversa e giocatori fuori. Serve a motore/verifica_parita.py per controllare che Python e JavaScript diano gli stessi numeri. Non e' una rosa vera.",
+  "rosa": [
+    {"n": "Svilar",      "r": "P", "sq": "Roma",      "fv": 6.30, "voto": 6.30, "st": "T"},
+    {"n": "Meret",       "r": "P", "sq": "Napoli",    "fv": 5.90, "voto": 5.90, "st": "B", "pb": 0.4},
+    {"n": "Falcone",     "r": "P", "sq": "Lecce",     "fv": 5.80, "voto": 5.80, "st": "T"},
+
+    {"n": "Dimarco",     "r": "D", "sq": "Inter",     "fv": 6.80, "voto": 6.10, "st": "T"},
+    {"n": "Bastoni",     "r": "D", "sq": "Inter",     "fv": 6.40, "voto": 6.40, "st": "T"},
+    {"n": "Bremer",      "r": "D", "sq": "Juventus",  "fv": 6.30, "voto": 6.30, "st": "B", "pb": 0.6},
+    {"n": "Mancini",     "r": "D", "sq": "Roma",      "fv": 6.20, "voto": 6.20, "st": "T"},
+    {"n": "Gila",        "r": "D", "sq": "Milan",     "fv": 6.10, "voto": 6.10, "st": "T"},
+    {"n": "Kalulu",      "r": "D", "sq": "Juventus",  "fv": 6.00, "voto": 6.00, "st": "B"},
+    {"n": "Ostigard",    "r": "D", "sq": "Genoa",     "fv": 5.90, "voto": 5.90, "st": "T"},
+    {"n": "Scalvini",    "r": "D", "sq": "Atalanta",  "fv": 5.70, "voto": 5.70, "st": "F"},
+
+    {"n": "Paz N.",      "r": "C", "sq": "Como",      "fv": 7.40, "voto": 6.30, "st": "T"},
+    {"n": "Calhanoglu",  "r": "C", "sq": "Inter",     "fv": 7.00, "voto": 6.20, "st": "T"},
+    {"n": "Orsolini",    "r": "C", "sq": "Bologna",   "fv": 6.90, "voto": 6.00, "st": "B", "pb": 0.55},
+    {"n": "Barella",     "r": "C", "sq": "Inter",     "fv": 6.60, "voto": 6.30, "st": "T"},
+    {"n": "Zaccagni",    "r": "C", "sq": "Lazio",     "fv": 6.50, "voto": 6.00, "st": "T"},
+    {"n": "Vlasic",      "r": "C", "sq": "Torino",    "fv": 6.20, "voto": 6.00, "st": "T"},
+    {"n": "Fabbian",     "r": "C", "sq": "Bologna",   "fv": 6.00, "voto": 6.00, "st": "T"},
+    {"n": "Cristante",   "r": "C", "sq": "Roma",      "fv": 5.90, "voto": 6.00, "st": "B", "pb": 0.3},
+
+    {"n": "Malen",       "r": "A", "sq": "Roma",      "fv": 8.00, "voto": 6.30, "st": "T"},
+    {"n": "Kean",        "r": "A", "sq": "Fiorentina","fv": 7.40, "voto": 6.20, "st": "B", "pb": 0.7},
+    {"n": "Krstovic",    "r": "A", "sq": "Atalanta",  "fv": 6.80, "voto": 6.00, "st": "T"},
+    {"n": "Dovbyk",      "r": "A", "sq": "Bologna",   "fv": 6.60, "voto": 6.00, "st": "T"},
+    {"n": "Berardi",     "r": "A", "sq": "Sassuolo",  "fv": 6.90, "voto": 6.10, "st": "F"},
+    {"n": "Colombo",     "r": "A", "sq": "Genoa",     "fv": 6.00, "voto": 5.90, "st": "T"}
+  ]
+}

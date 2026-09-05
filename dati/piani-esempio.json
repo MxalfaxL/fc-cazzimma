@@ -1,0 +1,11 @@
+{
+  "_cosa_e": "Esempio di piani di spesa: qui c'e' solo la ripartizione media del mercato dedotta dall'FVM, senza alcuna scelta personale. Copialo in dati/piani.json e scrivi i tuoi.",
+  "piani": {
+    "mercato": {
+      "P": 31,
+      "D": 96,
+      "C": 178,
+      "A": 195
+    }
+  }
+}

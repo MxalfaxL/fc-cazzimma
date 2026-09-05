@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FC Cazzimma</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icona-180.png">
+<meta name="theme-color" content="#E3E9E2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1016" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cazzimma">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* ------------------------------------------------------------------
+   Tavolozza. Il tema chiaro è quello di partenza, lo scuro ridefinisce
+   solo i gettoni. Tutto il resto del foglio parla per gettoni.
+   ------------------------------------------------------------------ */
+:root{
+  --nebbia:#E3E9E2; --carta:#F5F7F2; --carta-2:#FFFFFF;
+  --testo:#0E1319; --testo-2:#44514B; --grigio:#79857C;
+  --linea:#C6D0C8; --linea-2:#DCE3DD;
+  --azzurro:#0B7FC4; --azzurro-cupo:#0A5E96; --azzurro-tinta:#E1EDF6;
+  --oro:#C98A06; --oro-tinta:#FBF0D8; --oro-testo:#7A5405;
+  --rosso:#C0261F; --rosso-tinta:#F7DEDC; --rosso-testo:#8E1B16;
+  --verde:#2E8B57; --verde-tinta:#DFF0E4; --verde-testo:#1F6A40;
+  --scuro:#0E1319; --scuro-testo:#FFFFFF; --scuro-muto:#9FB6C4; --scuro-linea:rgba(255,255,255,.12);
+  --azione:#0E1319; --azione-testo:#FFFFFF;
+  --barra:#0E1319; --barra-testo:#8FA3AE;
+  --ombra:0 1px 2px rgba(14,19,25,.05), 0 8px 24px -16px rgba(14,19,25,.25);
+  --prato-1:#317F4C; --prato-2:#28693F; --prato-riga:rgba(255,255,255,.06); --prato-linea:rgba(255,255,255,.6);
+  --r:16px; --r2:11px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-tema="chiaro"]){
+    --nebbia:#0B1016; --carta:#141B23; --carta-2:#1B242E;
+    --testo:#E8EEF0; --testo-2:#B4C0C4; --grigio:#8C99A0;
+    --linea:#273240; --linea-2:#1F2833;
+    --azzurro:#4FB3EE; --azzurro-cupo:#8ACDF3; --azzurro-tinta:#122E3E;
+    --oro:#E8AC2A; --oro-tinta:#33290F; --oro-testo:#F2CB6B;
+    --rosso:#F0605A; --rosso-tinta:#3A1614; --rosso-testo:#F49892;
+    --verde:#4CC275; --verde-tinta:#11301E; --verde-testo:#8EDCA9;
+    --scuro:#1B242E; --scuro-testo:#F2F5F6; --scuro-muto:#93A6B3; --scuro-linea:rgba(255,255,255,.09);
+    --azione:#E8EEF0; --azione-testo:#0E1319;
+    --barra:#070B10; --barra-testo:#7F929E;
+    --ombra:none;
+    --prato-1:#245C39; --prato-2:#1B4A2D;
+    color-scheme:dark;
+  }
+}
+:root[data-tema="scuro"]{
+  --nebbia:#0B1016; --carta:#141B23; --carta-2:#1B242E;
+  --testo:#E8EEF0; --testo-2:#B4C0C4; --grigio:#8C99A0;
+  --linea:#273240; --linea-2:#1F2833;
+  --azzurro:#4FB3EE; --azzurro-cupo:#8ACDF3; --azzurro-tinta:#122E3E;
+  --oro:#E8AC2A; --oro-tinta:#33290F; --oro-testo:#F2CB6B;
+  --rosso:#F0605A; --rosso-tinta:#3A1614; --rosso-testo:#F49892;
+  --verde:#4CC275; --verde-tinta:#11301E; --verde-testo:#8EDCA9;
+  --scuro:#1B242E; --scuro-testo:#F2F5F6; --scuro-muto:#93A6B3; --scuro-linea:rgba(255,255,255,.09);
+  --azione:#E8EEF0; --azione-testo:#0E1319;
+  --barra:#070B10; --barra-testo:#7F929E;
+  --ombra:none;
+  --prato-1:#245C39; --prato-2:#1B4A2D;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--nebbia)}
+html,body{margin:0;padding:0}
+body{
+  background:var(--nebbia);color:var(--testo);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  padding:calc(12px + env(safe-area-inset-top)) 12px calc(104px + env(safe-area-inset-bottom));
+  max-width:620px;margin:0 auto;
+  font-variant-numeric:tabular-nums;
+}
+h1,h2,h3,p{margin:0}
+button{font-family:inherit;cursor:pointer;color:inherit}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--testo)}
+:focus-visible{outline:3px solid var(--azzurro);outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.anton{font-family:Anton,Impact,"Arial Narrow Bold",sans-serif}
+[hidden]{display:none!important}
+
+/* ---------------------------------------------------------------- accesso */
+.accesso{position:fixed;inset:0;z-index:50;background:var(--nebbia);display:flex;align-items:center;justify-content:center;overflow:auto;
+  padding:calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
+.accesso .scheda{width:100%;max-width:380px;background:var(--carta);border:1px solid var(--linea);border-radius:var(--r);padding:24px 20px 20px;box-shadow:var(--ombra);margin:auto}
+.accesso svg{width:76px;height:76px;display:block;margin:0 auto 12px;filter:drop-shadow(0 4px 10px rgba(14,19,25,.3))}
+.accesso .marchio{text-align:center;font-size:30px}
+.accesso .sotto{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grigio);margin:6px 0 18px}
+.accesso .link{background:none;border:0;color:var(--azzurro);font-size:13px;font-weight:600;padding:12px 0 0;width:100%;text-align:center}
+.spunta-riga{display:flex;align-items:center;gap:10px;font-size:13.5px;margin:2px 0 14px;color:var(--testo-2);cursor:pointer}
+.spunta-riga input{width:20px;height:20px;accent-color:var(--azzurro);margin:0}
+body.bloccata > :not(.accesso){display:none}
+
+/* ---------------------------------------------------------------- testata */
+.testata{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.testata svg{width:48px;height:48px;flex:0 0 48px;filter:drop-shadow(0 2px 4px rgba(14,19,25,.25))}
+.testata>div{flex:1;min-width:0}
+.marchio{font-family:Anton,Impact,sans-serif;font-size:26px;letter-spacing:.02em;line-height:1;text-transform:uppercase;font-weight:400}
+.claim{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--grigio);margin-top:4px}
+.pilla{border:1px solid var(--linea);background:var(--carta);color:var(--grigio);border-radius:999px;
+  padding:8px 12px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.06em;white-space:nowrap;
+  display:flex;align-items:center;gap:6px}
+.pilla::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--grigio);flex:0 0 7px}
+.pilla.ok{border-color:var(--azzurro);color:var(--azzurro)} .pilla.ok::before{background:var(--azzurro)}
+.pilla.lavora{border-color:var(--oro);color:var(--oro)} .pilla.lavora::before{background:var(--oro);animation:pulsa 1.2s ease-in-out infinite}
+.pilla.male{border-color:var(--rosso);color:var(--rosso)} .pilla.male::before{background:var(--rosso)}
+@keyframes pulsa{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ---------------------------------------------------------------- schede */
+.schede{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--barra);
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.schede>div{display:flex;gap:4px;width:100%;max-width:620px}
+.schede button{flex:1;border:0;background:transparent;color:var(--barra-testo);padding:8px 2px 7px;border-radius:12px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:4px;transition:background .18s,color .18s}
+.schede button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.schede button[aria-selected="true"]{background:var(--azzurro);color:#fff}
+.pannello{animation:appare .22s ease-out}
+@keyframes appare{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------------------------------------------------------------- blocchi */
+.blocco{background:var(--carta);border:1px solid var(--linea);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--ombra)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--grigio);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.eyebrow small{letter-spacing:.06em;text-transform:none;font-size:10.5px}
+.nota{font-size:12.5px;color:var(--grigio);margin-top:10px;line-height:1.5}
+.nota b{color:var(--testo-2);font-weight:600}
+.vuoto{color:var(--grigio);font-size:13.5px;padding:8px 0}
+.avviso{margin-top:12px;padding:11px 13px;border-radius:var(--r2);font-size:13.5px;line-height:1.45}
+.avviso.ok{background:var(--azzurro-tinta);color:var(--azzurro-cupo)}
+.avviso.attenzione{background:var(--oro-tinta);color:var(--oro-testo)}
+.avviso.grave{background:var(--rosso-tinta);color:var(--rosso-testo)}
+.avviso.bene{background:var(--verde-tinta);color:var(--verde-testo)}
+
+.campo{display:block;margin-bottom:10px}
+.campo span{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grigio);margin-bottom:5px}
+input[type=text],input[type=number],input[type=search],input[type=password],select,textarea{
+  width:100%;padding:11px 12px;border:1px solid var(--linea);border-radius:var(--r2);background:var(--carta-2);color:var(--testo);appearance:none;-webkit-appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--grigio) 50%),linear-gradient(135deg,var(--grigio) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+textarea{min-height:104px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;line-height:1.5;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--grigio);opacity:.8}
+.duecol{display:flex;gap:10px} .duecol>*{flex:1;min-width:0}
+.azione{width:100%;border:0;background:var(--azione);color:var(--azione-testo);padding:14px;border-radius:var(--r2);font-weight:700;font-size:15px;transition:transform .08s}
+.azione:active{transform:scale(.985)}
+.azione:disabled{background:var(--linea);color:var(--grigio);transform:none}
+.azione.secondaria{background:transparent;color:var(--testo);border:1px solid var(--linea);font-weight:600;padding:11px}
+.azione.chiave{background:var(--azzurro);color:#fff}
+.azione+.azione{margin-top:10px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--linea);background:var(--carta-2);color:var(--testo-2);border-radius:999px;padding:7px 12px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.02em;transition:background .15s,color .15s}
+.chips button[aria-pressed="true"]{background:var(--azione);color:var(--azione-testo);border-color:transparent}
+.chips button.verde[aria-pressed="true"]{background:var(--verde);color:#fff}
+.chips button.oro[aria-pressed="true"]{background:var(--oro);color:#fff}
+
+.sigla{font-family:Anton,Impact,sans-serif;font-size:17px;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;
+  background:var(--azione);color:var(--azione-testo);flex:0 0 28px}
+.sigla.corrente{background:var(--azzurro);color:#fff}
+.sigla.P{background:var(--oro);color:#fff} .sigla.D{background:var(--azzurro);color:#fff}
+.sigla.C{background:var(--verde);color:#fff} .sigla.A{background:var(--rosso);color:#fff}
+
+.giocatore{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.giocatore:last-child{border-bottom:0}
+.giocatore .nome{flex:1;font-weight:600;font-size:14.5px;min-width:0;overflow:hidden}
+.giocatore .nome small{display:block;font-weight:400;font-size:11px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.giocatore .val{font-family:"IBM Plex Mono",monospace;font-size:11.5px;text-align:right;color:var(--grigio);white-space:nowrap}
+.giocatore .val b{display:block;color:var(--testo);font-size:14px}
+input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.elimina{border:0;background:transparent;color:var(--grigio);font-size:20px;line-height:1;padding:4px 8px;border-radius:8px}
+.elimina:hover{background:var(--linea-2)}
+.spunta{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--verde);color:#fff;font-size:10px;font-weight:700;vertical-align:-2px;margin-left:5px}
+.dubbio-tag{display:inline-block;background:var(--oro-tinta);color:var(--oro-testo);font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;padding:2px 6px;border-radius:6px;vertical-align:1px;margin-left:5px}
+.probabile-tag{display:inline-block;color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:10px;margin-left:5px}
+
+/* ---------------------------------------------------------------- asta */
+.plancia{display:flex;gap:16px}
+.marea{width:60px;flex:0 0 60px;position:relative;border:2px solid var(--testo);border-radius:10px;background:var(--carta-2);overflow:hidden;min-height:160px}
+.acqua{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--azzurro),var(--azzurro-cupo));transition:height .45s cubic-bezier(.2,.8,.2,1)}
+.acqua::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.35)}
+.tacca{position:absolute;left:0;right:0;border-top:1px dashed var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:9px;padding-left:3px;color:var(--testo)}
+.tacca b{background:var(--carta-2);padding:0 3px;border-radius:3px;color:var(--testo)}
+.marea .etichetta{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--testo);mix-blend-mode:difference;filter:invert(1) grayscale(1) contrast(9)}
+.offerta{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.cifra{font-family:Anton,Impact,sans-serif;font-size:76px;line-height:.85;color:var(--azzurro);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.cifra.rischio{color:var(--rosso)}
+.righetta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--grigio);margin-top:8px;line-height:1.7}
+.fase{display:inline-flex;align-items:center;gap:8px;background:var(--azione);color:var(--azione-testo);font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:7px;margin-bottom:12px}
+.fase i{width:6px;height:6px;border-radius:50%;background:var(--oro)}
+.passi{display:flex;gap:4px;margin:0 0 12px}
+.passi span{flex:1;height:4px;border-radius:2px;background:var(--linea)}
+.passi span.fatto{background:var(--azzurro)} .passi span.corrente{background:var(--oro)}
+
+.ruolo{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.ruolo:last-child{border-bottom:0}
+.barra{height:6px;border-radius:3px;background:var(--linea-2);overflow:hidden;margin-top:6px}
+.barra i{display:block;height:100%;background:var(--azzurro);transition:width .35s}
+.barra i.sopra{background:var(--rosso)}
+.numeri{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;white-space:nowrap}
+.numeri em{font-style:normal;color:var(--grigio)}
+.nomeruolo{font-size:13.5px;font-weight:600}
+
+.cerca{margin-bottom:10px}
+.esito-l{display:grid;grid-template-columns:28px 1fr auto auto auto;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.esito-l:last-child{border-bottom:0}
+.esito-l .nome{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-align:left;background:none;border:0;padding:0;color:inherit;font-family:inherit}
+.esito-l .nome small{display:block;font-weight:400;font-size:10.5px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.esito-l .tetto{font-family:Anton,Impact,sans-serif;font-size:26px;color:var(--azzurro);line-height:1;text-align:right;min-width:44px}
+.esito-l .tetto small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--grigio);letter-spacing:.08em;text-align:right}
+.esito-l .tetto.oltre{color:var(--rosso)}
+.esito-l button.prendi{border:0;background:var(--azione);color:var(--azione-testo);border-radius:8px;padding:9px 10px;font-size:12px;font-weight:700}
+.esito-l button.via{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:8px;padding:9px 10px;font-size:12px}
+.spiega{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
+.riga-filtro{display:flex;gap:6px;margin-bottom:10px}
+.riga-filtro button{flex:1;border:1px solid var(--linea);background:var(--carta-2);color:var(--grigio);border-radius:8px;padding:8px 0;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600}
+.riga-filtro button[aria-pressed="true"]{background:var(--azzurro);color:#fff;border-color:transparent}
+
+.movimento{display:flex;flex-direction:column;gap:8px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.movimento:last-child{border-bottom:0}
+.movimento .testo{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.movimento .testo b{font-weight:600}
+.movimento .testo small{color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:auto;white-space:nowrap}
+.movimento .annulla{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.assegna{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.assegna button{border:1px solid var(--linea);background:var(--carta-2);color:var(--testo-2);border-radius:999px;padding:6px 10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600}
+.assegna button[aria-pressed="true"]{background:var(--azzurro);color:#fff;border-color:transparent}
+.assegna input{width:70px;padding:7px 8px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:13px}
+
+.avversario{display:grid;grid-template-columns:1fr 84px;gap:8px;align-items:center;margin-bottom:8px}
+.avversario input[type=number]{text-align:right;font-family:"IBM Plex Mono",monospace}
+.avversario small{grid-column:1 / -1;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--grigio);margin-top:-4px}
+
+.interruttore{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.interruttore span{font-size:13.5px;font-weight:600}
+.interruttore small{display:block;font-weight:400;color:var(--grigio);font-size:12px;margin-top:2px}
+.levetta{width:48px;height:28px;border-radius:14px;background:var(--linea);border:0;position:relative;flex:0 0 48px;transition:background .2s}
+.levetta::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.levetta[aria-checked="true"]{background:var(--verde)}
+.levetta[aria-checked="true"]::after{transform:translateX(20px)}
+
+/* ---------------------------------------------------------------- formazione */
+.verdetto{background:var(--scuro);color:var(--scuro-testo);border-radius:var(--r);padding:18px 18px 16px;margin-bottom:12px;border:1px solid var(--scuro-linea);position:relative;overflow:hidden}
+.verdetto::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(79,179,238,.18),transparent 70%);pointer-events:none}
+.verdetto .eyebrow{color:var(--scuro-muto)}
+.verdetto .modulo{font-family:Anton,Impact,sans-serif;font-size:64px;line-height:.9;letter-spacing:.01em}
+.verdetto .sotto{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--scuro-muto);margin-top:8px;line-height:1.75}
+.verdetto b{color:var(--oro);font-weight:600}
+.verdetto .riga-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.verdetto .punti{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--scuro-muto);line-height:1.5}
+.verdetto .punti b{display:block;font-family:Anton,Impact,sans-serif;font-size:38px;color:var(--scuro-testo);line-height:1;font-weight:400;letter-spacing:.01em}
+.verdetto .punti b em{font-style:normal;color:var(--oro);font-size:22px}
+
+.metro{margin-top:14px}
+.metro .tracce{display:flex;gap:3px;height:10px}
+.metro .tracce span{flex:1;background:rgba(255,255,255,.12);border-radius:3px;position:relative;transition:background .3s}
+.metro .tracce span.raggiunto{background:rgba(255,255,255,.35)}
+.metro .tracce span.attivo{background:var(--oro)}
+.metro .etichette{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--scuro-muto);margin-top:5px;letter-spacing:.04em}
+.metro .etichette span{flex:1;text-align:center}
+.metro .cursore{position:relative;height:0}
+.metro .cursore i{position:absolute;top:-16px;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--scuro-testo);transition:left .35s}
+.metro .lettura{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--scuro-muto);margin-top:8px;line-height:1.6}
+
+.prato{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:3/3.9;margin-bottom:12px;
+  background:repeating-linear-gradient(180deg,var(--prato-1) 0 12.5%,var(--prato-2) 12.5% 25%);box-shadow:var(--ombra),inset 0 0 60px rgba(0,0,0,.18)}
+.prato svg.linee{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--prato-linea);stroke-width:1.6}
+.prato .file{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr 1fr 1fr;padding:8px 6px 10px}
+.fila{display:flex;justify-content:space-evenly;align-items:center;gap:4px}
+.tessera{display:flex;flex-direction:column;align-items:center;width:78px;min-width:0;text-align:center;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55);animation:appare .3s ease-out both}
+.tessera .maglia{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:Anton,Impact,sans-serif;font-size:17px;border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 3px 8px rgba(0,0,0,.35);position:relative;text-shadow:none}
+.tessera.P .maglia{background:var(--oro)} .tessera.D .maglia{background:var(--azzurro)} .tessera.C .maglia{background:#2A6F49;background:linear-gradient(180deg,#F5F7F2,#DDE3DD);color:#0E1319} .tessera.A .maglia{background:var(--rosso)}
+.tessera .tnome{font-size:11px;font-weight:600;margin-top:5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.tessera .tval{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.9}
+.tessera .marca{position:absolute;right:-7px;top:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--oro);color:#fff;border:2px solid var(--prato-1);
+  font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:700;display:grid;place-items:center;text-shadow:none;line-height:1}
+.tessera.dubbio .maglia{border-color:var(--oro)}
+.tessera .ok{position:absolute;left:-6px;top:-6px;width:17px;height:17px;border-radius:50%;background:var(--verde);color:#fff;border:2px solid var(--prato-1);font-size:10px;font-weight:700;display:grid;place-items:center;text-shadow:none}
+.tessera.fantasma{opacity:.55}
+.prato .cartellino{position:absolute;left:10px;top:10px;background:rgba(14,19,25,.55);color:#fff;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;backdrop-filter:blur(4px)}
+.prato .cartellino.destra{left:auto;right:10px}
+
+.stato{display:flex;gap:4px}
+.stato button{border:1px solid var(--linea);background:var(--carta-2);color:var(--grigio);font-size:11px;font-weight:700;
+  padding:8px 0;border-radius:8px;width:36px;font-family:"IBM Plex Mono",monospace;transition:background .15s}
+.stato button[aria-pressed="true"]{color:#fff;border-color:transparent}
+.stato button[data-s="T"][aria-pressed="true"]{background:var(--azzurro)}
+.stato button[data-s="B"][aria-pressed="true"]{background:var(--oro)}
+.stato button[data-s="F"][aria-pressed="true"]{background:var(--rosso)}
+.undici .giocatore .val{min-width:60px}
+.costo{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;padding:4px 8px;border-radius:7px;white-space:nowrap}
+.costo.basso{background:var(--verde-tinta);color:var(--verde-testo)}
+.costo.medio{background:var(--oro-tinta);color:var(--oro-testo)}
+.costo.alto{background:var(--rosso-tinta);color:var(--rosso-testo)}
+.confronto{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+.confronto .riga{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--linea-2)}
+.confronto .riga:last-child{border-bottom:0}
+.confronto .riga .b{height:6px;border-radius:3px;background:var(--linea-2);overflow:hidden}
+.confronto .riga .b i{display:block;height:100%;background:var(--azzurro);opacity:.75}
+.confronto .riga .b i.top{background:var(--oro);opacity:1}
+.confronto .riga span:last-child{color:var(--grigio);white-space:nowrap}
+.confronto .riga span:last-child b{color:var(--testo);font-weight:600}
+.confronto .riga .m{font-weight:600}
+
+table.dati{width:100%;border-collapse:collapse;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+table.dati th{text-align:left;font-weight:600;color:var(--grigio);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-bottom:6px}
+table.dati td{padding:6px 0;border-bottom:1px solid var(--linea-2)}
+table.dati tr:last-child td{border-bottom:0}
+table.dati td.n,table.dati th.n{text-align:right}
+.esito{font-family:Anton,Impact,sans-serif;font-size:42px;color:var(--azzurro);line-height:1;margin-top:6px}
+.esito small{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--grigio);display:block;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.quattro{display:flex;gap:8px} .quattro label{flex:1} .quattro input{text-align:center;padding:11px 4px}
+dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 0 0;color:var(--testo-2)}
+.rosa-avv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rosa-avv .scheda{background:var(--carta-2);border:1px solid var(--linea-2);border-radius:var(--r2);padding:10px 12px;font-size:12.5px}
+.rosa-avv .scheda b{display:block;font-size:13.5px;margin-bottom:2px}
+.rosa-avv .scheda small{font-family:"IBM Plex Mono",monospace;color:var(--grigio);font-size:10.5px;display:block;margin-bottom:6px}
+.rosa-avv .scheda div{color:var(--testo-2);line-height:1.5}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:var(--azione);color:var(--azione-testo);
+  padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.visibile{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:360px){ .cifra{font-size:64px} .tessera{width:66px} .tessera .maglia{width:36px;height:36px} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ ACCESSO ============ -->
+<div class="accesso" id="accesso" hidden>
+  <div class="scheda">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Stemma FC Cazzimma"><defs><linearGradient id="cz2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12A5EE"/><stop offset="1" stop-color="#0A5E96"/></linearGradient><clipPath id="cc2"><circle cx="256" cy="256" r="228"/></clipPath></defs><circle cx="256" cy="256" r="228" fill="url(#cz2)"/><g clip-path="url(#cc2)"><rect x="0" y="400" width="512" height="124" fill="#1B8AC9"/><path d="M 6 400 L 176 300 L 216 326 L 282 254 L 496 400 Z" fill="#093C62" stroke="#F0B429" stroke-width="4" stroke-linejoin="round" stroke-opacity=".85"/><g fill="#0E1319"><path d="M 190 398 C 193 414, 203 430, 220 439 C 250 453, 288 452, 310 438 C 324 429, 331 414, 334 398 L 322 396 C 318 409, 309 420, 296 426 C 274 437, 242 437, 222 426 C 208 419, 202 409, 199 396 Z"/><path d="M 324 400 L 328 366 L 345 366 L 347 377 L 336 379 L 338 389 L 329 391 L 331 399 Z"/></g></g><g transform="translate(256 256) scale(.88)"><g transform="rotate(-34)"><g stroke="#0E1319" stroke-width="6" stroke-linejoin="round"><path d="M -5.5 -104 H 5.5 V 74 H -5.5 Z" fill="#E9C99C"/><path d="M -5 66 C -15 84, -16 108, -11 126 C -7 133, 7 133, 11 126 C 16 108, 15 84, 5 66 Z" fill="#E9C99C"/><circle cx="0" cy="-106" r="9" fill="#E9C99C"/></g><path d="M -3 -100 H 3 V 70 H -3 Z" fill="#0E1319" opacity=".18"/></g><g transform="rotate(34)"><path d="M -25 -98 C -34 -28, -22 32, 6 78 C 14 91, 22 99, 29 102 C 22 92, 18 80, 16 68 C 12 32, 23 -32, 25 -98 Z" fill="#D42D28" stroke="#0E1319" stroke-width="6" stroke-linejoin="round"/><g fill="none" stroke="#A11F1B" stroke-width="5" stroke-linecap="round"><path d="M -23 -60 C -18 -56, 14 -56, 22 -62"/><path d="M -20 -18 C -14 -13, 12 -13, 20 -20"/><path d="M -12 26 C -6 31, 8 30, 15 24"/></g><rect x="-29" y="-112" width="58" height="18" rx="8" fill="#F0B429" stroke="#0E1319" stroke-width="6"/><circle cx="0" cy="-126" r="11" fill="none" stroke="#F0B429" stroke-width="7"/><circle cx="0" cy="-126" r="11" fill="none" stroke="#0E1319" stroke-width="2.5"/></g></g><circle cx="256" cy="256" r="228" fill="none" stroke="#0E1319" stroke-width="20"/><circle cx="256" cy="256" r="228" fill="none" stroke="#F0B429" stroke-width="4"/></svg>
+    <h2 class="marchio">FC Cazzimma</h2>
+    <div class="sotto" id="accessoSotto">Accesso riservato</div>
+    <div id="accessoAvviso" class="avviso grave" hidden style="margin:0 0 14px"></div>
+
+    <form id="formEntra" hidden>
+      <label class="campo"><span>Utente</span>
+        <input type="text" id="accUtente" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="username" placeholder="nome utente GitHub"></label>
+      <label class="campo"><span>Password</span>
+        <input type="password" id="accPassword" autocomplete="current-password"></label>
+      <label class="spunta-riga"><input type="checkbox" id="accRicorda" checked> Resta collegato su questo dispositivo</label>
+      <button type="submit" class="azione chiave">Entra</button>
+      <button type="button" class="link" id="btnVersoConfigura">Primo accesso su questo dispositivo</button>
+      <button type="button" class="link" id="btnDimenticata" style="color:var(--grigio);font-weight:500">Password dimenticata? Ricomincia con il token</button>
+    </form>
+
+    <form id="formConfigura" hidden>
+      <p class="nota" style="margin:0 0 14px" id="configuraTesto"></p>
+      <div id="configuraCampi">
+        <label class="campo"><span>Utente GitHub</span>
+          <input type="text" id="cfUtente" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" placeholder="il tuo nome utente"></label>
+        <label class="campo"><span>Repository dei dati</span>
+          <input type="text" id="cfRepo" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" value="fc-cazzimma-dati"></label>
+        <label class="campo"><span>Token di accesso</span>
+          <input type="password" id="cfToken" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" placeholder="github_pat_…"></label>
+      </div>
+      <label class="campo"><span>Scegli una password</span>
+        <input type="password" id="cfPassword" autocomplete="new-password" placeholder="almeno 6 caratteri"></label>
+      <label class="campo"><span>Ripeti la password</span>
+        <input type="password" id="cfPassword2" autocomplete="new-password"></label>
+      <label class="spunta-riga"><input type="checkbox" id="cfRicorda" checked> Resta collegato su questo dispositivo</label>
+      <button type="submit" class="azione chiave" id="btnConfigura">Configura e entra</button>
+      <button type="button" class="link" id="btnVersoEntra">Ho già una password su questo dispositivo</button>
+    </form>
+  </div>
+</div>
+
+<header class="testata">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Stemma FC Cazzimma"><defs><linearGradient id="cz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12A5EE"/><stop offset="1" stop-color="#0A5E96"/></linearGradient><clipPath id="cc"><circle cx="256" cy="256" r="228"/></clipPath></defs><circle cx="256" cy="256" r="228" fill="url(#cz)"/><g clip-path="url(#cc)"><rect x="0" y="400" width="512" height="124" fill="#1B8AC9"/><path d="M 6 400 L 176 300 L 216 326 L 282 254 L 496 400 Z" fill="#093C62" stroke="#F0B429" stroke-width="4" stroke-linejoin="round" stroke-opacity=".85"/><g fill="#0E1319"><path d="M 190 398 C 193 414, 203 430, 220 439 C 250 453, 288 452, 310 438 C 324 429, 331 414, 334 398 L 322 396 C 318 409, 309 420, 296 426 C 274 437, 242 437, 222 426 C 208 419, 202 409, 199 396 Z"/><path d="M 324 400 L 328 366 L 345 366 L 347 377 L 336 379 L 338 389 L 329 391 L 331 399 Z"/></g></g><g transform="translate(256 256) scale(.88)"><g transform="rotate(-34)"><g stroke="#0E1319" stroke-width="6" stroke-linejoin="round"><path d="M -5.5 -104 H 5.5 V 74 H -5.5 Z" fill="#E9C99C"/><path d="M -5 66 C -15 84, -16 108, -11 126 C -7 133, 7 133, 11 126 C 16 108, 15 84, 5 66 Z" fill="#E9C99C"/><circle cx="0" cy="-106" r="9" fill="#E9C99C"/></g><path d="M -3 -100 H 3 V 70 H -3 Z" fill="#0E1319" opacity=".18"/></g><g transform="rotate(34)"><path d="M -25 -98 C -34 -28, -22 32, 6 78 C 14 91, 22 99, 29 102 C 22 92, 18 80, 16 68 C 12 32, 23 -32, 25 -98 Z" fill="#D42D28" stroke="#0E1319" stroke-width="6" stroke-linejoin="round"/><g fill="none" stroke="#A11F1B" stroke-width="5" stroke-linecap="round"><path d="M -23 -60 C -18 -56, 14 -56, 22 -62"/><path d="M -20 -18 C -14 -13, 12 -13, 20 -20"/><path d="M -12 26 C -6 31, 8 30, 15 24"/></g><rect x="-29" y="-112" width="58" height="18" rx="8" fill="#F0B429" stroke="#0E1319" stroke-width="6"/><circle cx="0" cy="-126" r="11" fill="none" stroke="#F0B429" stroke-width="7"/><circle cx="0" cy="-126" r="11" fill="none" stroke="#0E1319" stroke-width="2.5"/></g></g><circle cx="256" cy="256" r="228" fill="none" stroke="#0E1319" stroke-width="20"/><circle cx="256" cy="256" r="228" fill="none" stroke="#F0B429" stroke-width="4"/></svg>
+  <div>
+    <h1 class="marchio">FC Cazzimma</h1>
+    <div class="claim">Fantacalcio Venezia · 2026/27</div>
+  </div>
+  <button class="pilla" id="pillaSync" aria-label="Sincronizzazione e impostazioni">solo locale</button>
+</header>
+
+<!-- ============ FORMAZIONE ============ -->
+<section class="pannello" id="p-formazione" hidden>
+  <div id="verdetto"></div>
+  <div id="prato"></div>
+
+  <div class="blocco">
+    <div class="eyebrow"><span>I dubbi di questa giornata</span><small id="dubbiRiassunto"></small></div>
+    <div id="dubbi"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">L'undici</div>
+    <div class="undici" id="undici"></div>
+    <button class="azione chiave" id="btnCopiaForm" style="margin-top:12px">Copia la formazione</button>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Panchina, in quest'ordine</div>
+    <div id="panchina"></div>
+    <p class="nota">Ruolo per ruolo entra il primo che ha giocato: per questo ogni reparto è ordinato per fantavoto, non per certezza. Se nessuno del ruolo è disponibile si scala e cambia modulo.</p>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Gli altri moduli</div>
+    <div class="confronto" id="confronto"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow"><span>Chi gioca questa giornata</span></div>
+    <div class="duecol" style="margin-bottom:12px">
+      <button class="azione secondaria" id="btnTuttiT">Tutti titolari</button>
+      <label class="campo" style="margin:0"><span>Giornata</span>
+        <input type="number" id="inGiornata" inputmode="numeric" min="1" max="38"></label>
+    </div>
+    <div class="eyebrow" style="margin-bottom:6px"><span>Formazioni ufficiali già uscite</span></div>
+    <div class="chips" id="ufficiali"></div>
+    <p class="nota" style="margin-top:8px;margin-bottom:4px">Alla deadline sono certe solo le squadre che hanno già dato la formazione. Segna quelle e vedrai la spunta verde su chi non ti può più tradire.</p>
+    <div id="disponibilita"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Leggi le probabili formazioni</div>
+    <textarea id="inProbabili" placeholder="Copia il testo della pagina delle probabili formazioni e incollalo qui. Riconosco i tuoi giocatori fra titolari, ballottaggi con percentuale, indisponibili e squalificati."></textarea>
+    <button class="azione secondaria" id="btnLeggiProbabili" style="margin-top:10px">Leggi e aggiorna gli stati</button>
+    <div id="esitoProbabili" class="nota"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Dati della settimana dal Mac</div>
+    <textarea id="inIncolla" placeholder='Incolla qui il blocco prodotto da esporta_app.py'></textarea>
+    <button class="azione secondaria" id="btnImporta" style="margin-top:10px">Aggiorna i valori attesi</button>
+    <div id="esitoImport" class="nota"></div>
+  </div>
+</section>
+
+<!-- ============ ASTA ============ -->
+<section class="pannello" id="p-asta" hidden>
+  <div class="blocco">
+    <div id="fase" class="fase"><i></i>Fase: portieri</div>
+    <div class="passi" id="passi" aria-hidden="true"></div>
+    <div class="plancia">
+      <div class="marea" aria-hidden="true">
+        <div class="acqua" id="acqua" style="height:0%"></div>
+        <div id="tacche"></div>
+        <div class="etichetta" id="etichettaMarea">0 / 500</div>
+      </div>
+      <div class="offerta">
+        <div class="eyebrow">Puoi offrire fino a</div>
+        <div class="cifra" id="offertaMax">499</div>
+        <div class="righetta" id="dettaglio"></div>
+      </div>
+    </div>
+    <div class="avviso ok" id="avviso">Rosa vuota. Si parte dai portieri.</div>
+    <div class="interruttore" style="margin-top:6px;padding-bottom:0">
+      <span>Tieni lo schermo acceso<small>Per la sera dell'asta. Si spegne da solo quando chiudi l'app.</small></span>
+      <button class="levetta" id="levettaSchermo" role="switch" aria-checked="false" aria-label="Tieni lo schermo acceso"></button>
+    </div>
+  </div>
+
+  <div class="blocco" id="bloccoPiano" hidden>
+    <div class="eyebrow"><span>Piano di spesa</span><small id="pianoRiassunto"></small></div>
+    <div class="chips" id="piani"></div>
+    <p class="nota">Stessi prezzi di mercato, tetti diversi: cambia dove decidi di spendere. Se il piano salta perché qualcuno impazzisce su un reparto, passi al piano B con un tocco.</p>
+  </div>
+
+  <div class="blocco" id="bloccoListone">
+    <div class="eyebrow" id="titoloListone">Listone</div>
+    <div id="listoneCaricato" hidden>
+      <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
+      <div class="riga-filtro" id="filtroRuoli"></div>
+      <div id="risultatiListone"></div>
+      <p class="nota">Tocca un nome per capire da dove viene il tetto. <b>Preso</b> compila il modulo qui sotto, <b>via</b> lo segna a un avversario.</p>
+      <button class="azione secondaria" id="btnSostituisciListone" style="margin-top:6px">Sostituisci il listone</button>
+    </div>
+    <div id="listoneVuoto">
+      <p class="nota" style="margin-top:0">Incolla qui il listone prodotto da <b>listone.py</b>: prezzi di mercato, i quattro piani e il tuo tetto per ogni giocatore, modificatore compreso.</p>
+      <textarea id="inListone" placeholder='{"piani":{...},"listone":[...]}'></textarea>
+      <button class="azione secondaria" id="btnCaricaListone" style="margin-top:10px">Carica il listone</button>
+      <div id="esitoListone" class="nota"></div>
+    </div>
+  </div>
+
+  <div class="blocco" id="bloccoMovimenti" hidden>
+    <div class="eyebrow"><span>Ultimi movimenti</span></div>
+    <div id="movimenti"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Aggiudicato a me</div>
+    <label class="campo"><span>Giocatore</span>
+      <input type="text" id="inNome" placeholder="Es. Maignan" autocomplete="off"></label>
+    <div class="duecol">
+      <label class="campo"><span>Ruolo</span>
+        <select id="inRuolo"><option value="P">Portiere</option><option value="D">Difensore</option>
+        <option value="C">Centrocampista</option><option value="A">Attaccante</option></select></label>
+      <label class="campo"><span>Prezzo</span>
+        <input type="number" id="inPrezzo" inputmode="numeric" min="1" placeholder="0"></label>
+    </div>
+    <button class="azione" id="btnAggiungi">Aggiungi alla rosa</button>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Budget per reparto</div>
+    <div id="reparti"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow"><span>Gli avversari</span><small>crediti e slot</small></div>
+    <div id="avversari"></div>
+    <button class="azione secondaria" id="btnResetAvv">Riporta tutti a 500</button>
+    <p class="nota">I crediti scendono da soli quando segni un acquisto con <b>via</b>. Dopo la fase centrocampisti il conteggio diventa pubblico: se qualcosa non torna, correggi qui.</p>
+  </div>
+</section>
+
+<!-- ============ ROSA ============ -->
+<section class="pannello" id="p-rosa" hidden>
+  <div class="blocco">
+    <div class="eyebrow"><span>La rosa</span><small>fantavoto · voto puro</small></div>
+    <div id="rosa"></div>
+    <p class="nota"><b>FV</b> è il fantavoto atteso, bonus compresi. <b>Voto</b> è il voto puro: alimenta il modificatore difesa, quindi su portiere e difensori conta quanto il primo. La squadra serve per riconoscere le formazioni ufficiali e le probabili.</p>
+  </div>
+  <div class="blocco">
+    <div class="eyebrow">Mercato di riparazione</div>
+    <div id="svincoli"></div>
+    <button class="azione secondaria" id="btnCopia" style="margin-top:10px">Copia la rosa come testo</button>
+  </div>
+  <div class="blocco">
+    <div class="eyebrow"><span>Obiettivi di spesa</span><small id="pianoAttivo"></small></div>
+    <div class="chips" id="pianiRosa" style="margin-bottom:12px"></div>
+    <div class="duecol">
+      <label class="campo"><span>Portieri</span><input type="number" id="tgP" inputmode="numeric"></label>
+      <label class="campo"><span>Difensori</span><input type="number" id="tgD" inputmode="numeric"></label>
+    </div>
+    <div class="duecol">
+      <label class="campo"><span>Centrocamp.</span><input type="number" id="tgC" inputmode="numeric"></label>
+      <label class="campo"><span>Attaccanti</span><input type="number" id="tgA" inputmode="numeric"></label>
+    </div>
+    <div class="righetta" id="sommaTarget"></div>
+    <button class="azione secondaria" id="btnAzzera" style="margin-top:12px">Svuota tutto e ricomincia</button>
+  </div>
+</section>
+
+<!-- ============ STAGIONE ============ -->
+<section class="pannello" id="p-stagione" hidden>
+  <div class="blocco">
+    <div class="eyebrow">Il campionato</div>
+    <div id="classifica"></div>
+    <div class="duecol" style="margin-top:12px">
+      <label class="campo"><span>Giornata</span><input type="number" id="gN" inputmode="numeric" min="1" max="38"></label>
+      <label class="campo"><span>Miei punti</span><input type="number" id="gPF" inputmode="decimal" step="0.5"></label>
+      <label class="campo"><span>Avversario</span><input type="number" id="gPS" inputmode="decimal" step="0.5"></label>
+    </div>
+    <button class="azione secondaria" id="btnGiornata">Registra la giornata</button>
+    <div id="storico" style="margin-top:12px"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow"><span>Le rose degli avversari</span><small>dall'asta</small></div>
+    <div id="roseAvversari"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Modificatore difesa</div>
+    <p class="nota" style="margin-top:0">Attivo con 4 o più difensori schierati. Media fra il voto puro del portiere e quelli dei 3 migliori difensori.</p>
+    <div class="quattro">
+      <label class="campo"><span>Port.</span><input type="number" step="0.5" inputmode="decimal" class="mod" id="m0"></label>
+      <label class="campo"><span>Dif 1</span><input type="number" step="0.5" inputmode="decimal" class="mod" id="m1"></label>
+      <label class="campo"><span>Dif 2</span><input type="number" step="0.5" inputmode="decimal" class="mod" id="m2"></label>
+      <label class="campo"><span>Dif 3</span><input type="number" step="0.5" inputmode="decimal" class="mod" id="m3"></label>
+    </div>
+    <div class="esito" id="esitoMod">—<small>punti extra</small></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Da punti a gol</div>
+    <label class="campo"><span>Punteggio di giornata</span>
+      <input type="number" step="0.5" inputmode="decimal" id="inPunti" placeholder="es. 73"></label>
+    <div class="esito" id="esitoGol">—<small>gol segnati</small></div>
+    <p class="nota">Prima fascia a 66 punti, poi un gol ogni 4.</p>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Da tenere a mente</div>
+    <dl>
+      <dt>Formazione</dt><dd>Entro 15 minuti dal fischio d'inizio della prima partita. Se te ne dimentichi resta quella della giornata precedente.</dd>
+      <dt>Partite valide</dt><dd>Da venerdì a lunedì sera. Nei turni infrasettimanali da martedì a giovedì.</dd>
+      <dt>Panchina</dt><dd>Libera nel numero e nell'ordine. 5 sostituzioni, portiere compreso, ruolo per ruolo.</dd>
+      <dt>Ultimo attaccante</dt><dd>Se sfori il budget o non riesci a completare la rosa perdi il diritto d'asta su quel giocatore, che torna fra gli svincolati.</dd>
+      <dt>Classifica</dt><dd>3 punti a vittoria, 1 a pareggio. A pari punti contano somma punti, differenza reti, gol segnati.</dd>
+      <dt>Rinvii</dt><dd>In coppa scatta il 6 politico se non si recupera prima della giornata dopo. In campionato si aspetta il recupero.</dd>
+      <dt>Penalità</dt><dd>Accordi alla vigilia: 3 punti a testa. Combine in asta: si perdono i giocatori più 5 punti.</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- ============ IMPOSTAZIONI E SINCRONIZZAZIONE ============ -->
+<section class="pannello" id="p-sync" hidden>
+  <div class="blocco">
+    <div class="eyebrow">Sincronizzazione</div>
+    <div class="avviso ok" id="statoSync">Non collegata: i dati restano solo su questo dispositivo.</div>
+    <label class="campo" style="margin-top:12px"><span>Utente GitHub</span>
+      <input type="text" id="cfgUtente" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="il tuo nome utente"></label>
+    <label class="campo"><span>Repository dei dati</span>
+      <input type="text" id="cfgRepo" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="fc-cazzimma-dati"></label>
+    <label class="campo"><span>Token di accesso</span>
+      <input type="password" id="cfgToken" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_..."></label>
+    <button class="azione chiave" id="btnCollega">Salva e sincronizza</button>
+    <button class="azione secondaria" id="btnSyncOra">Sincronizza adesso</button>
+    <button class="azione secondaria" id="btnEsci">Esci: chiedi la password alla prossima apertura</button>
+    <button class="azione secondaria" id="btnScollega">Scollega questo dispositivo</button>
+    <p class="nota">Il token resta su questo dispositivo, cifrato con la tua password, e non viene mai mostrato altrove. Dagli accesso al solo repository dei dati, con permesso <b>Contents: read and write</b>. Se lo perdi o pensi che sia finito in giro, revocalo da GitHub e generane un altro: i dati non si toccano. Per cambiarlo, incollalo qui sopra e premi Salva.</p>
+    <p class="nota">Ogni salvataggio diventa una versione su GitHub. Anche il listone viaggia da lì: lo incolli una volta sul Mac e lo ritrovi sul telefono.</p>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Aspetto</div>
+    <div class="chips" id="temi">
+      <button data-tema="auto">come il telefono</button>
+      <button data-tema="chiaro">chiaro</button>
+      <button data-tema="scuro">scuro</button>
+    </div>
+    <p class="nota">Lo scuro è pensato per la sera dell'asta: meno luce in faccia, numeri più leggibili.</p>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow">Versione</div>
+    <p class="nota" style="margin-top:0" id="versione">FC Cazzimma · app locale</p>
+    <button class="azione secondaria" id="btnRicarica" style="margin-top:10px">Controlla aggiornamenti</button>
+  </div>
+</section>
+
+<nav class="schede" role="tablist" aria-label="Sezioni">
+  <div>
+    <button role="tab" aria-selected="false" data-p="formazione">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/><circle cx="12" cy="12" r="2.6"/></svg>Formazione</button>
+    <button role="tab" aria-selected="false" data-p="asta">
+      <svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM4 20l7-7M12 12l-1.5-1.5M3 21l2-2"/><path d="M15.5 12.5l3.5 3.5"/></svg>Asta</button>
+    <button role="tab" aria-selected="false" data-p="rosa">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c3 .3 5.5 2.6 5.5 5.8"/></svg>Rosa</button>
+    <button role="tab" aria-selected="false" data-p="stagione">
+      <svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/><path d="M12 13v4M8 21h8M10 17h4"/></svg>Stagione</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==== motore: inizio ====
+   Questa parte è pura: nessun accesso al DOM, nessuno stato globale.
+   Vive in due lingue, qui e in motore/ottimizzatore.py: se cambi una
+   regola cambiala in entrambi e lancia motore/verifica_parita.py.  */
+const BUDGET = 500;
+const SLOT = {P:3, D:8, C:8, A:6};
+const ORDINE = ['P','D','C','A'];
+const MODULI = {'3-4-3':[3,4,3], '3-5-2':[3,5,2], '4-3-3':[4,3,3], '4-4-2':[4,4,2],
+                '4-5-1':[4,5,1], '5-4-1':[5,4,1], '5-3-2':[5,3,2]};
+const FASCE_MOD = [[6.00,0],[6.25,1],[6.50,2],[6.75,3],[7.00,4]];
+const MOD_MAX = 5;
+const SOGLIA_GOL = 66, AMPIEZZA = 4;
+const PROB_BALLOTTAGGIO = 0.5;   // quando delle probabili sappiamo solo "in dubbio"
+
+function modificatore(votoP, votiD){
+  if(votiD.length < 4) return {punti:0, media:null};
+  const migliori = [...votiD].sort((a,b)=>b-a).slice(0,3);
+  const media = (votoP + migliori.reduce((a,b)=>a+b,0)) / 4;
+  for(const [soglia, punti] of FASCE_MOD) if(media <= soglia) return {punti, media};
+  return {punti:MOD_MAX, media};
+}
+const golDaPunti = p => p < SOGLIA_GOL ? 0 : Math.floor((p - SOGLIA_GOL)/AMPIEZZA) + 1;
+function alGolDopo(p){
+  const prossima = p < SOGLIA_GOL ? SOGLIA_GOL : SOGLIA_GOL + golDaPunti(p)*AMPIEZZA;
+  return Math.round((prossima - p)*100)/100;
+}
+
+/* Probabilità che scenda in campo. T = certo, F = fuori, B = in dubbio con
+   la percentuale delle probabili se la conosciamo, altrimenti metà. */
+function probabilita(g){
+  if(g.st === 'F') return 0;
+  if(g.st === 'B'){ const p = Number(g.pb); return isFinite(p) && p > 0 && p < 1 ? p : PROB_BALLOTTAGGIO; }
+  return 1;
+}
+
+/* Ordine di panchina dentro un ruolo: per fantavoto. Entra il primo che ha
+   giocato, quindi mettere davanti il migliore non costa nulla anche se è
+   in dubbio: se non gioca, si passa al successivo. */
+function ordina(gs){
+  return [...gs].sort((a,b)=> (b.fv - a.fv) || (b.voto - a.voto) || String(a.n).localeCompare(String(b.n)));
+}
+
+/* Resa attesa della panchina di un ruolo: se il primo non gioca entra il
+   secondo, e così via. Se nessuno gioca la casella resta vuota e vale zero. */
+function catena(panca, campo){
+  let resa = 0;
+  for(let i = panca.length-1; i >= 0; i--){
+    const p = probabilita(panca[i]);
+    resa = p*panca[i][campo] + (1-p)*resa;
+  }
+  return resa;
+}
+
+function combinazioni(arr, k){
+  const out = [];
+  (function ricorsione(inizio, acc){
+    if(acc.length === k){ out.push(acc.slice()); return; }
+    for(let i=inizio; i<arr.length; i++){ acc.push(arr[i]); ricorsione(i+1, acc); acc.pop(); }
+  })(0, []);
+  return out;
+}
+
+/* Un reparto schierato: chi resta fuori fa da ricambio, e ogni titolare in
+   dubbio vale la sua parte più la parte del ricambio. */
+function valutaReparto(disponibili, scelti){
+  const ids = new Set(scelti.map(g=>g.id));
+  const panca = ordina(disponibili.filter(g=>!ids.has(g.id)));
+  const ricambio = {fv: catena(panca, 'fv'), voto: catena(panca, 'voto')};
+  const attesi = scelti.map(g=>{
+    const p = probabilita(g);
+    return {g, p, atteso: p*g.fv + (1-p)*ricambio.fv, votoAtteso: p*g.voto + (1-p)*ricambio.voto};
+  });
+  return {attesi, panca, ricambio, somma: attesi.reduce((s,x)=>s+x.atteso, 0)};
+}
+
+function miglioreReparto(disponibili, n){
+  let migliore = null;
+  for(const combo of combinazioni(disponibili, n)){
+    const v = valutaReparto(disponibili, combo);
+    if(!migliore || v.somma > migliore.somma) migliore = v;
+  }
+  return migliore;
+}
+
+function valutaModulo(disponibili, nomeModulo){
+  const [nd, nc, na] = MODULI[nomeModulo];
+  const per = r => ordina(disponibili.filter(g=>g.r===r));
+  const P = per('P'), D = per('D'), C = per('C'), A = per('A');
+  if(!P.length || D.length < nd || C.length < nc || A.length < na) return null;
+
+  // centrocampo e attacco non toccano il modificatore: si scelgono da soli
+  const c = miglioreReparto(C, nc), a = miglioreReparto(A, na);
+
+  // portiere e difesa interagiscono col modificatore: si provano tutti
+  let migliore = null;
+  for(const por of P){
+    const vp = valutaReparto(P, [por]);
+    for(const combo of combinazioni(D, nd)){
+      const vd = valutaReparto(D, combo);
+      const m = modificatore(vp.attesi[0].votoAtteso, vd.attesi.map(x=>x.votoAtteso));
+      const totale = vp.somma + vd.somma + c.somma + a.somma + m.punti;
+      if(!migliore || totale > migliore.totale)
+        migliore = {modulo:nomeModulo, totale, mod:m.punti, media:m.media, reparti:{P:vp, D:vd, C:c, A:a}};
+    }
+  }
+  return migliore;
+}
+
+/* Quanto costa se un titolare in dubbio non gioca: la differenza fra il
+   punteggio con lui in campo e quello con il suo ricambio al suo posto,
+   modificatore compreso. È il numero da guardare prima di schierarlo. */
+function costoErrore(val, ruolo, indice){
+  const rep = val.reparti[ruolo], x = rep.attesi[indice];
+  const scenario = (fvSuo, votoSuo) => {
+    const votiD = val.reparti.D.attesi.map((d,i)=> ruolo==='D' && i===indice ? votoSuo : d.votoAtteso);
+    const vP = ruolo === 'P' ? votoSuo : val.reparti.P.attesi[0].votoAtteso;
+    return val.totale - x.atteso + fvSuo - val.mod + modificatore(vP, votiD).punti;
+  };
+  const conLui = scenario(x.g.fv, x.g.voto);
+  const senza  = scenario(rep.ricambio.fv, rep.ricambio.voto);
+  return {costo: conLui - senza, sostituto: rep.panca[0] ? rep.panca[0].n : null};
+}
+
+function consiglia(rosa){
+  const disponibili = rosa.filter(g=>g.st !== 'F');
+  const valutazioni = Object.keys(MODULI).map(m=>valutaModulo(disponibili, m)).filter(Boolean);
+  if(!valutazioni.length) return null;
+  valutazioni.sort((a,b)=>b.totale - a.totale);
+  const s = valutazioni[0];
+
+  s.undici = ORDINE.flatMap(r => s.reparti[r].attesi.map((x,i)=>{
+    const c = costoErrore(s, r, i);
+    return {g:x.g, r, p:x.p, atteso:x.atteso, votoAtteso:x.votoAtteso, costo:c.costo, sostituto:c.sostituto};
+  }));
+  s.panchina = ORDINE.flatMap(r => s.reparti[r].panca);
+  s.ricambi = Object.fromEntries(ORDINE.map(r=>[r, s.reparti[r].ricambio]));
+  s.fuori = rosa.filter(g=>g.st === 'F');
+  s.alternative = valutazioni.slice(1).map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media}));
+  s.gol = golDaPunti(s.totale);
+  s.alGolDopo = alGolDopo(s.totale);
+  s.dubbi = s.undici.filter(x=>x.p < 1).sort((a,b)=>b.costo - a.costo);
+  return s;
+}
+/* ==== motore: fine ==== */
+
+/* ======================= stato e memoria ======================= */
+const NOME = {P:'Portieri', D:'Difensori', C:'Centrocampisti', A:'Attaccanti'};
+const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
+const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
+const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
+const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
+const VERSIONE_APP = '2026.09.05';
+
+const statoIniziale = () => ({
+  rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
+  avversari: Array.from({length:9},(_,i)=>({n:'Avversario '+(i+1), c:BUDGET})),
+  giornate: [], giornata: 1, venduti: [], ufficiali: [], v: 1
+});
+let stato = statoIniziale();
+let cfg = {utente:'', repo:'fc-cazzimma-dati', percorso:'stato.json', token:''};
+let shaRemoto = null, shaListone = null, timerSalva, timerInvio;
+const memoria = {};
+
+const locale = {
+  leggi(k){ try{ return localStorage.getItem(k); }catch(e){ return memoria[k] ?? null; } },
+  scrivi(k, v){ try{ localStorage.setItem(k, v); }catch(e){ memoria[k] = v; } },
+  cancella(k){ try{ localStorage.removeItem(k); }catch(e){ delete memoria[k]; } }
+};
+
+function salva(){
+  stato.v = (stato.v || 0) + 1;
+  clearTimeout(timerSalva);
+  timerSalva = setTimeout(()=>locale.scrivi(CHIAVE, JSON.stringify(stato)), 150);
+  clearTimeout(timerInvio);
+  if(collegata()) timerInvio = setTimeout(()=>sincronizza('invia'), 4000);
+  segnala(collegata() ? 'da inviare' : 'solo locale', collegata() ? 'lavora' : '');
+}
+
+function carica(){
+  const g = locale.leggi(CHIAVE);
+  if(g){ try{ stato = Object.assign(stato, JSON.parse(g)); }catch(e){} }
+  normalizza();
+}
+
+function normalizza(){
+  if(!Array.isArray(stato.rosa)) stato.rosa = [];
+  stato.rosa.forEach(x=>{
+    if(!x.id) x.id = nuovoId();
+    if(x.fv === undefined) x.fv = BASE[x.r][0];
+    if(x.voto === undefined) x.voto = BASE[x.r][1];
+    if(!x.st) x.st = 'T';
+    if(x.sq === undefined) x.sq = '';
+    if(!x.t) x.t = 0;
+  });
+  if(!Array.isArray(stato.giornate)) stato.giornate = [];
+  if(!Array.isArray(stato.avversari) || stato.avversari.length !== 9)
+    stato.avversari = Array.from({length:9},(_,i)=>({n:'Avversario '+(i+1), c:BUDGET}));
+  // i venduti erano solo nomi: ora portano anche a chi e per quanto
+  stato.venduti = (Array.isArray(stato.venduti) ? stato.venduti : [])
+    .map(v => typeof v === 'string' ? {n:v} : v).filter(v => v && v.n);
+  if(!Array.isArray(stato.ufficiali)) stato.ufficiali = [];
+  if(!stato.target) stato.target = {...OBIETTIVI_BASE};
+  if(!stato.piano) stato.piano = 'equilibrio';
+  if(typeof stato.v !== 'number') stato.v = 1;
+  if(typeof stato.giornata !== 'number') stato.giornata = 1;
+}
+const nuovoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+/* ======================= sincronizzazione ======================= */
+const collegata = () => !!(cfg.utente && cfg.repo && cfg.token);
+const inB64 = t => btoa(String.fromCharCode(...new TextEncoder().encode(t)));
+const daB64 = t => new TextDecoder().decode(Uint8Array.from(atob(t.replace(/\s/g,'')), c=>c.charCodeAt(0)));
+
+function segnala(testo, classe){
+  const p = document.getElementById('pillaSync');
+  p.textContent = testo;
+  p.className = 'pilla ' + (classe || '');
+}
+
+async function chiamaGitHub(metodo, corpo, percorso){
+  const url = `https://api.github.com/repos/${cfg.utente}/${cfg.repo}/contents/${percorso || cfg.percorso}`;
+  const r = await fetch(url, {
+    method: metodo,
+    headers: {'Authorization':'Bearer '+cfg.token, 'Accept':'application/vnd.github+json',
+              'X-GitHub-Api-Version':'2022-11-28', 'Content-Type':'application/json'},
+    body: corpo ? JSON.stringify(corpo) : undefined,
+    cache: 'no-store'
+  });
+  if(r.status === 404) return null;
+  if(!r.ok){
+    const dettaglio = r.status === 401 ? 'token non valido o scaduto'
+      : r.status === 403 ? 'al token mancano i permessi sul repository'
+      : r.status === 409 ? 'il repository è vuoto: crealo con un README'
+      : r.status === 422 ? 'versione remota cambiata nel frattempo, riprovo alla prossima'
+      : 'errore ' + r.status;
+    throw new Error(dettaglio);
+  }
+  return r.json();
+}
+
+async function sincronizza(modo){
+  if(!collegata()){ segnala('solo locale',''); return; }
+  segnala('sincronizzo…','lavora');
+  try{
+    const remoto = await chiamaGitHub('GET');
+    if(!remoto){
+      await invia(null, 'primo salvataggio');
+      await sincronizzaListone();
+      return esitoSync('creato il file sul repository');
+    }
+    shaRemoto = remoto.sha;
+    const dati = JSON.parse(daB64(remoto.content));
+    const vr = dati.v || 0, vl = stato.v || 0;
+
+    if(vr > vl){
+      stato = Object.assign(statoIniziale(), dati);
+      normalizza();
+      locale.scrivi(CHIAVE, JSON.stringify(stato));
+      aggiornaCampi(); disegnaTutto();
+      await sincronizzaListone();
+      return esitoSync('presa la versione più recente dal cloud');
+    }
+    if(vl > vr){
+      await invia(shaRemoto, 'aggiornamento');
+      await sincronizzaListone();
+      return esitoSync('inviato al cloud');
+    }
+    await sincronizzaListone();
+    esitoSync('già allineato');
+  }catch(e){
+    segnala('errore','male');
+    scriviStatoSync('Non sono riuscito a sincronizzare: ' + e.message + '. I dati restano salvi qui.', 'grave');
+  }
+}
+
+async function invia(sha, messaggio){
+  const corpo = {message:`${messaggio} — v${stato.v}`, content: inB64(JSON.stringify(stato, null, 1))};
+  if(sha) corpo.sha = sha;
+  const r = await chiamaGitHub('PUT', corpo);
+  if(r && r.content) shaRemoto = r.content.sha;
+}
+
+/* Il listone è un file a parte nel repository: si incolla una volta sul Mac
+   e gli altri dispositivi lo prendono da lì. Vince il più recente. */
+async function sincronizzaListone(){
+  try{
+    const remoto = await chiamaGitHub('GET', null, 'listone.json');
+    const locMs = listone.caricato || 0;
+    if(!remoto){
+      if(listone.voci.length) await inviaListone(null);
+      return;
+    }
+    shaListone = remoto.sha;
+    const dati = JSON.parse(daB64(remoto.content));
+    const remMs = dati.caricato || 0;
+    if(remMs > locMs){
+      listone = normalizzaListone(dati);
+      locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
+      disegnaPiani(); disegnaListone();
+    } else if(locMs > remMs){
+      await inviaListone(shaListone);
+    }
+  }catch(e){ /* il listone non è vitale per la sincronizzazione dello stato */ }
+}
+async function inviaListone(sha){
+  const corpo = {message:`listone — ${new Date(listone.caricato||Date.now()).toISOString().slice(0,10)}`,
+                 content: inB64(JSON.stringify(listone))};
+  if(sha) corpo.sha = sha;
+  const r = await chiamaGitHub('PUT', corpo, 'listone.json');
+  if(r && r.content) shaListone = r.content.sha;
+}
+
+function esitoSync(testo){
+  const ora = new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+  segnala('sincronizzato', 'ok');
+  scriviStatoSync(`${testo.charAt(0).toUpperCase()+testo.slice(1)}, alle ${ora}. Versione ${stato.v}.`, 'ok');
+}
+function scriviStatoSync(testo, classe){
+  const el = document.getElementById('statoSync');
+  if(el){ el.textContent = testo; el.className = 'avviso ' + classe; }
+}
+
+/* ======================= utilità ======================= */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const normNome = t => String(t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z]/g,'');
+const f2 = n => Number(n).toFixed(2);
+const presi = r => stato.rosa.filter(g=>g.r===r).length;
+const spesoR = r => stato.rosa.filter(g=>g.r===r).reduce((s,g)=>s+g.p,0);
+const spesoTot = () => stato.rosa.reduce((s,g)=>s+g.p,0);
+const slotTot = () => ORDINE.reduce((s,r)=>s+SLOT[r],0);
+const slotLiberi = () => slotTot() - stato.rosa.length;
+const residuo = () => BUDGET - spesoTot();
+const maxOfferta = () => slotLiberi()<=0 ? 0 : Math.max(0, residuo() - (slotLiberi()-1));
+const faseCorrente = () => ORDINE.find(r => presi(r) < SLOT[r]) || null;
+const ufficiale = g => !!(g.sq && stato.ufficiali.includes(g.sq));
+const $ = id => document.getElementById(id);
+
+let timerToast;
+function toast(testo){
+  const t = $('toast'); t.textContent = testo; t.classList.add('visibile');
+  clearTimeout(timerToast); timerToast = setTimeout(()=>t.classList.remove('visibile'), 2200);
+}
+
+/* animazione del numero grande: conta da dove era a dove deve arrivare */
+const numeriAnimati = new Map();
+function animaNumero(el, valore){
+  const da = numeriAnimati.has(el) ? numeriAnimati.get(el) : valore;
+  numeriAnimati.set(el, valore);
+  if(da === valore || matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent = valore; return; }
+  const inizio = performance.now(), durata = 380;
+  (function passo(t){
+    const k = Math.min(1, (t - inizio)/durata), e = 1 - Math.pow(1-k, 3);
+    el.textContent = Math.round(da + (valore - da)*e);
+    if(k < 1) requestAnimationFrame(passo);
+  })(inizio);
+}
+
+/* ======================= formazione ======================= */
+const classeCosto = c => c < 0.6 ? 'basso' : c < 1.5 ? 'medio' : 'alto';
+const percento = p => Math.round(p*100) + '%';
+
+function disegnaFormazione(){
+  const s = consiglia(stato.rosa);
+  const vd = $('verdetto'), prato = $('prato');
+
+  if(!s){
+    vd.className = 'blocco';
+    vd.innerHTML = `<div class="eyebrow">Formazione</div>
+      <p class="vuoto">Serve una rosa con almeno un portiere, tre difensori, tre centrocampisti
+      e un attaccante disponibili. I giocatori si aggiungono dalla scheda Asta.</p>`;
+    prato.innerHTML = '';
+    ['undici','panchina','confronto','dubbi'].forEach(i=>$(i).innerHTML='');
+    $('dubbiRiassunto').textContent = '';
+    disegnaDisponibilita();
+    return;
+  }
+
+  const secondo = s.alternative[0];
+  const margine = secondo ? (s.totale - secondo.totale) : 0;
+  const certi = s.undici.filter(x=>ufficiale(x.g)).length;
+  const nd = MODULI[s.modulo][0];
+
+  vd.className = 'verdetto';
+  vd.innerHTML = `
+    <div class="eyebrow"><span>Giornata ${stato.giornata} · schiera</span><span title="giocatori confermati dalle formazioni ufficiali">${certi}/11 ufficiali</span></div>
+    <div class="riga-top">
+      <div class="modulo">${s.modulo}</div>
+      <div class="punti"><b>${f2(s.totale)}</b>punti attesi<br><b><em>${s.gol}</em></b>gol</div>
+    </div>
+    ${disegnaMetro(s, nd)}
+    <div class="sotto">
+      ${secondo ? `davanti al <b>${secondo.modulo}</b> di ${f2(margine)}${margine < 0.5 ? ' · margine sottile, decidi tu' : ''}<br>` : ''}
+      al gol successivo mancano <b>${s.alGolDopo}</b> punti
+    </div>`;
+
+  prato.innerHTML = disegnaPrato(s);
+
+  $('dubbi').innerHTML = s.dubbi.length ? s.dubbi.map(x=>`
+    <div class="giocatore">
+      <div class="sigla ${x.r}">${x.r}</div>
+      <div class="nome">${esc(x.g.n)}<span class="dubbio-tag">${percento(x.p)}</span>${ufficiale(x.g) ? '<span class="spunta" title="formazione ufficiale">✓</span>' : ''}
+        <small>${x.sostituto ? 'al suo posto entra ' + esc(x.sostituto) : 'nessun ricambio: casella vuota'}</small></div>
+      <div class="costo ${classeCosto(x.costo)}">se perde −${f2(Math.max(0, x.costo))}</div>
+    </div>`).join('')
+    : '<div class="vuoto">Nessun ballottaggio in campo. Undici sicuro, salvo formazioni ufficiali.</div>';
+  const peggiore = s.dubbi[0];
+  $('dubbiRiassunto').textContent = peggiore ? `il più caro: ${peggiore.g.n}` : '';
+
+  let ultimo = null;
+  $('undici').innerHTML = s.undici.map(x=>{
+    const g = x.g;
+    const testa = x.r !== ultimo ? `<div class="eyebrow" style="margin-top:12px">${SINGOLARE[x.r]}${x.r==='D' && s.mod ? ` · media difesa ${s.media.toFixed(3)}` : ''}</div>` : '';
+    ultimo = x.r;
+    const tag = g.st === 'B' ? `<span class="dubbio-tag">${percento(x.p)}</span>` : '';
+    const ok = ufficiale(g) ? '<span class="spunta" title="formazione ufficiale">✓</span>' : (g.sq ? '<span class="probabile-tag">probabile</span>' : '');
+    return `${testa}<div class="giocatore">
+      <div class="sigla ${x.r}">${x.r}</div>
+      <div class="nome">${esc(g.n)}${tag}${ok}<small>${esc(g.sq || '')}${g.sq ? ' · ' : ''}atteso ${f2(x.atteso)}</small></div>
+      <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
+    </div>`;
+  }).join('');
+
+  $('panchina').innerHTML = s.panchina.length
+    ? s.panchina.map((g,i)=>`<div class="giocatore">
+        <div class="sigla ${g.r}">${g.r}</div>
+        <div class="nome">${i+1}. ${esc(g.n)}${g.st==='B' ? `<span class="dubbio-tag">${percento(probabilita(g))}</span>` : ''}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}</div>
+        <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
+      </div>`).join('')
+      + (s.fuori.length ? `<p class="nota">Fuori questa giornata: ${s.fuori.map(g=>esc(g.n)).join(', ')}.</p>` : '')
+    : '<div class="vuoto">Nessuno in panchina.</div>';
+
+  const peggio = Math.max(0.01, ...s.alternative.map(a=>s.totale - a.totale));
+  $('confronto').innerHTML = [`<div class="riga"><span class="m">${s.modulo}</span><div class="b"><i class="top" style="width:100%"></i></div><span><b>${f2(s.totale)}</b>${s.mod ? ' · mod +'+s.mod : ''}</span></div>`]
+    .concat(s.alternative.map(a=>{
+      const d = s.totale - a.totale;
+      return `<div class="riga"><span class="m">${a.modulo}</span><div class="b"><i style="width:${Math.max(4, 100 - d/peggio*100)}%"></i></div>
+        <span><b>${f2(a.totale)}</b> (−${f2(d)})${a.mod ? ' · mod +'+a.mod : ''}</span></div>`;
+    })).join('');
+
+  disegnaDisponibilita();
+}
+
+/* il misuratore del modificatore: sei fasce da 5.75 a 7.25, il cursore sulla media */
+function disegnaMetro(s, nd){
+  const soglie = [5.75, 6.00, 6.25, 6.50, 6.75, 7.00, 7.25];
+  if(!s.media){
+    return `<div class="metro"><div class="tracce">${'<span></span>'.repeat(6)}</div>
+      <div class="lettura">modificatore non attivo: con ${nd} difensori non scatta. Servono almeno 4.</div></div>`;
+  }
+  const m = s.media, pos = Math.max(0, Math.min(100, (m - 5.75)/1.5*100));
+  const tracce = [0,1,2,3,4,5].map(i=>`<span class="${i < s.mod ? 'raggiunto' : i === s.mod ? 'attivo' : ''}"></span>`).join('');
+  const prossima = s.mod < MOD_MAX ? soglie[s.mod+1] : null;
+  const sotto = s.mod > 0 ? soglie[s.mod] : null;
+  let lettura = `media difesa <b>${m.toFixed(3)}</b> → modificatore <b>+${s.mod}</b>`;
+  if(prossima) lettura += ` · alla fascia +${s.mod+1} mancano ${(prossima - m + 0.0001).toFixed(2)}`;
+  if(sotto) lettura += ` · scendi a +${s.mod-1} sotto ${sotto.toFixed(2)} (margine ${(m - sotto).toFixed(2)})`;
+  return `<div class="metro">
+    <div class="tracce">${tracce}</div>
+    <div class="cursore"><i style="left:${pos}%"></i></div>
+    <div class="etichette"><span>+0</span><span>+1</span><span>+2</span><span>+3</span><span>+4</span><span>+5</span></div>
+    <div class="lettura">${lettura}</div></div>`;
+}
+
+function disegnaPrato(s){
+  const fila = r => `<div class="fila">${s.undici.filter(x=>x.r===r).map(x=>{
+    const g = x.g, dubbio = x.p < 1;
+    return `<div class="tessera ${r} ${dubbio ? 'dubbio' : ''}" title="${esc(g.n)} · fv ${f2(g.fv)} · voto ${f2(g.voto)}">
+      <div class="maglia">${r}${dubbio ? `<span class="marca">${Math.round(x.p*100)}</span>` : ''}${ufficiale(g) ? '<span class="ok">✓</span>' : ''}</div>
+      <div class="tnome">${esc(g.n)}</div>
+      <div class="tval">${f2(g.fv)}</div>
+    </div>`;
+  }).join('')}</div>`;
+  return `<div class="prato" role="img" aria-label="Schieramento ${s.modulo}">
+    <svg class="linee" viewBox="0 0 300 390" preserveAspectRatio="none">
+      <rect x="8" y="8" width="284" height="374" rx="2"/>
+      <line x1="8" y1="195" x2="292" y2="195"/><circle cx="150" cy="195" r="34"/><circle cx="150" cy="195" r="1.5" fill="rgba(255,255,255,.6)"/>
+      <rect x="70" y="8" width="160" height="58"/><rect x="110" y="8" width="80" height="22"/>
+      <rect x="70" y="324" width="160" height="58"/><rect x="110" y="360" width="80" height="22"/>
+      <path d="M118 66 A 34 34 0 0 0 182 66"/><path d="M118 324 A 34 34 0 0 1 182 324"/>
+    </svg>
+    <div class="cartellino">${s.modulo}</div>
+    <div class="cartellino destra">${s.mod ? 'mod +'+s.mod : 'senza mod'}</div>
+    <div class="file">${fila('A')}${fila('C')}${fila('D')}${fila('P')}</div>
+  </div>`;
+}
+
+function squadreInRosa(){
+  return [...new Set(stato.rosa.map(g=>g.sq).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+
+function disegnaDisponibilita(){
+  const squadre = squadreInRosa();
+  $('ufficiali').innerHTML = squadre.length
+    ? squadre.map(sq=>`<button class="verde" data-uff="${esc(sq)}" aria-pressed="${stato.ufficiali.includes(sq)}">${esc(sq)}</button>`).join('')
+      + `<button data-uff="" aria-pressed="false" style="color:var(--grigio)">azzera</button>`
+    : '<div class="vuoto" style="padding:0">Assegna la squadra ai tuoi giocatori nella scheda Rosa e qui compariranno.</div>';
+
+  let ultimo = null;
+  $('disponibilita').innerHTML = ORDINE.flatMap(r=>
+    stato.rosa.filter(g=>g.r===r).sort((a,b)=>b.fv-a.fv).map(g=>{
+      const testa = r !== ultimo ? `<div class="eyebrow" style="margin-top:12px">${NOME[r]}</div>` : '';
+      ultimo = r;
+      const bottoni = ['T','B','F'].map(st=>
+        `<button data-id="${g.id}" data-s="${st}" aria-pressed="${g.st===st}"
+          aria-label="${{T:'titolare',B:'ballottaggio',F:'fuori'}[st]}">${st}</button>`).join('');
+      const pb = g.st === 'B' ? ` · ${percento(probabilita(g))}` : '';
+      return `${testa}<div class="giocatore">
+        <div class="nome">${esc(g.n)}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}<small>${esc(g.sq || 'squadra?')}${pb} · fv ${f2(g.fv)}</small></div>
+        <div class="stato">${bottoni}</div>
+      </div>`;
+    })).join('') || '<div class="vuoto">Rosa ancora vuota.</div>';
+}
+
+$('disponibilita').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-s]');
+  if(!b) return;
+  const g = stato.rosa.find(x=>x.id === b.dataset.id);
+  if(!g) return;
+  if(b.dataset.s === 'B' && g.st === 'B'){
+    // secondo tocco su B: chiedo la percentuale delle probabili
+    const v = prompt(`Percentuale con cui ${g.n} parte titolare (dalle probabili)`, Math.round(probabilita(g)*100));
+    const n = parseInt(v, 10);
+    if(!isNaN(n) && n > 0 && n < 100) g.pb = n/100;
+  } else {
+    g.st = b.dataset.s;
+  }
+  disegnaFormazione(); salva();
+});
+
+$('ufficiali').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-uff]');
+  if(!b) return;
+  const sq = b.dataset.uff;
+  if(!sq) stato.ufficiali = [];
+  else stato.ufficiali = stato.ufficiali.includes(sq) ? stato.ufficiali.filter(x=>x!==sq) : [...stato.ufficiali, sq];
+  disegnaFormazione(); salva();
+});
+
+$('btnTuttiT').addEventListener('click', ()=>{
+  stato.rosa.forEach(g=>{ g.st = 'T'; delete g.pb; });
+  disegnaFormazione(); salva();
+});
+
+$('inGiornata').addEventListener('input', e=>{
+  const n = +e.target.value || 1;
+  if(n !== stato.giornata){ stato.ufficiali = []; }   // nuova giornata, nuove formazioni
+  stato.giornata = n;
+  disegnaFormazione(); salva();
+});
+
+$('btnCopiaForm').addEventListener('click', async ()=>{
+  const s = consiglia(stato.rosa);
+  if(!s) return;
+  const testo = `FC CAZZIMMA — giornata ${stato.giornata}\n${s.modulo} · ${f2(s.totale)} punti attesi · ${s.gol} gol${s.mod ? ' · mod +'+s.mod : ''}\n\n`
+    + s.undici.map(x=>`${x.r}  ${x.g.n}${x.p < 1 ? '  (?)' : ''}`).join('\n')
+    + `\n\nPANCHINA\n` + s.panchina.map((g,i)=>`${i+1}. ${g.n} (${g.r})`).join('\n');
+  try{ await navigator.clipboard.writeText(testo); toast('Formazione copiata'); }
+  catch(e){ toast('Copia non riuscita: selezionala a mano'); }
+});
+
+/* ======================= lettore delle probabili ======================= */
+/* Il testo incollato dalla pagina delle probabili è fatto di blocchi per
+   squadra: la riga col modulo e gli undici, poi ballottaggi, indisponibili,
+   squalificati. Si riconoscono i cognomi della rosa e si assegna lo stato.
+   Quando non si è sicuri lo si dice, non si tira a indovinare. */
+const PAROLE_FUORI = ['indisponibil','infortunat','squalificat','assent','nonconvocat','fuori','out','panchina','inpanchina'];
+const PAROLE_DUBBIO = ['ballottagg','indubbio','dubbi','dubbio'];
+const PAROLE_IGNORA = ['rigorist','diffidat','arbitro','allenatore','stadio','ore'];
+
+function chiaveNome(nome){
+  // "Martinez L." -> cognome martinez, iniziali l ; "Carlos Augusto" -> cognome carlosaugusto
+  const parole = String(nome).trim().split(/\s+/);
+  const iniziali = parole.filter(p=>p.endsWith('.')).map(p=>normNome(p)).filter(Boolean);
+  const cognome = parole.filter(p=>!p.endsWith('.')).map(normNome).filter(Boolean);
+  return {cognome, iniziali};
+}
+
+function leggiProbabili(testo, rosa){
+  const righe = testo.split(/\r?\n/);
+  const trovati = new Map();     // id -> {st, pb}
+  const ambigui = new Set();
+  let contesto = null, testoHaStruttura = false;
+  const chiavi = rosa.map(g=>({g, ...chiaveNome(g.n)}));
+
+  const riconosci = (pezzo) => {
+    const perc = pezzo.match(/(\d{1,3})\s*%/);
+    const pulito = pezzo.replace(/\(.*?\)/g,' ').replace(/\d{1,3}\s*%/g,' ').replace(/[^\p{L}\s.'’-]/gu,' ');
+    const parole = pulito.split(/[\s'’-]+/).map(normNome).filter(Boolean);
+    if(!parole.length) return null;
+    const candidati = chiavi.filter(k=>{
+      if(!k.cognome.length) return false;
+      // il cognome (anche composto) deve comparire per intero
+      const testo = parole.join(' ');
+      const cogn = k.cognome.join(' ');
+      if(!(' '+testo+' ').includes(' '+cogn+' ')) return false;
+      // se in rosa c'è un'iniziale e il testo ha altre parole, devono combaciare
+      const extra = parole.filter(p=>!k.cognome.includes(p));
+      if(k.iniziali.length && extra.length) return extra.some(e=>k.iniziali.some(i=>e[0] === i[0]));
+      return true;
+    });
+    return {candidati, p: perc ? Math.min(1, Math.max(0, +perc[1]/100)) : null};
+  };
+
+  for(const rigaGrezza of righe){
+    const riga = rigaGrezza.trim();
+    if(!riga){ contesto = null; continue; }
+    const rn = normNome(riga);
+    const intestazione = /\(\s*\d\s*-\s*\d\s*-\s*\d(\s*-\s*\d)?\s*\)/.test(riga);
+    let corpo = riga, nuovoContesto = null;
+    const doppio = riga.indexOf(':');
+    const etichetta = doppio > 0 ? normNome(riga.slice(0, doppio)) : '';
+
+    if(intestazione){ nuovoContesto = 'T'; testoHaStruttura = true; corpo = doppio > 0 ? riga.slice(doppio+1) : riga.replace(/^.*?\)/,''); }
+    else if(etichetta && PAROLE_FUORI.some(k=>etichetta.includes(k))){ nuovoContesto = 'F'; corpo = riga.slice(doppio+1); testoHaStruttura = true; }
+    else if(etichetta && PAROLE_DUBBIO.some(k=>etichetta.includes(k))){ nuovoContesto = 'B'; corpo = riga.slice(doppio+1); testoHaStruttura = true; }
+    else if(etichetta && PAROLE_IGNORA.some(k=>etichetta.includes(k))){ contesto = 'X'; continue; }
+    else if(!etichetta && PAROLE_FUORI.some(k=>rn.startsWith(k))){ nuovoContesto = 'F'; corpo = riga.replace(/^\S+/,''); testoHaStruttura = true; }
+    else if(!etichetta && PAROLE_DUBBIO.some(k=>rn.startsWith(k))){ nuovoContesto = 'B'; corpo = riga.replace(/^\S+/,''); testoHaStruttura = true; }
+
+    if(nuovoContesto) contesto = nuovoContesto;
+    const ctx = contesto || (testoHaStruttura ? null : 'T');
+    if(!ctx || ctx === 'X') continue;
+
+    // i nomi sono separati da ; , e nei ballottaggi da trattini e "o"
+    const pezzi = corpo.split(/[;,\/]|\s[-–]\s|\s+o\s+|\s+oppure\s+/i).map(x=>x.trim()).filter(Boolean);
+    for(const pezzo of pezzi){
+      const r = riconosci(pezzo);
+      if(!r || !r.candidati.length) continue;
+      if(r.candidati.length > 1){ r.candidati.forEach(k=>ambigui.add(k.g.n)); continue; }
+      const g = r.candidati[0].g;
+      let st = ctx, pb = null;
+      if(r.p !== null){ if(r.p >= 1) st = 'T'; else if(r.p <= 0) st = 'F'; else { st = 'B'; pb = r.p; } }
+      const prima = trovati.get(g.id);
+      // un ballottaggio dichiarato vince sulla presenza fra gli undici; fuori vince su tutto
+      if(!prima || st === 'F' || (st === 'B' && prima.st === 'T')) trovati.set(g.id, {st, pb});
+    }
+  }
+  return {trovati, ambigui:[...ambigui], struttura: testoHaStruttura};
+}
+
+$('btnLeggiProbabili').addEventListener('click', ()=>{
+  const out = $('esitoProbabili');
+  const testo = $('inProbabili').value.trim();
+  if(!testo){ out.textContent = 'Incolla prima il testo delle probabili.'; return; }
+  if(!stato.rosa.length){ out.textContent = 'La rosa è vuota: non ho nomi da cercare.'; return; }
+  const {trovati, ambigui, struttura} = leggiProbabili(testo, stato.rosa);
+  const conteggi = {T:0, B:0, F:0}; const cambiati = [];
+  trovati.forEach((v, id)=>{
+    const g = stato.rosa.find(x=>x.id===id); if(!g) return;
+    const prima = g.st + (g.st==='B' ? ' '+percento(probabilita(g)) : '');
+    g.st = v.st; if(v.pb !== null) g.pb = v.pb; else if(v.st !== 'B') delete g.pb;
+    conteggi[v.st]++;
+    const dopo = g.st + (g.st==='B' ? ' '+percento(probabilita(g)) : '');
+    if(prima !== dopo) cambiati.push(`${g.n} ${prima} → ${dopo}`);
+  });
+  const nonTrovati = stato.rosa.filter(g=>!trovati.has(g.id) && !ambigui.includes(g.n)).map(g=>g.n);
+  let html = `<b>Riconosciuti ${trovati.size} su ${stato.rosa.length}</b>: ${conteggi.T} titolari, ${conteggi.B} in ballottaggio, ${conteggi.F} fuori.`;
+  if(cambiati.length) html += `<br>Cambiati: ${cambiati.map(esc).join(', ')}.`;
+  if(ambigui.length) html += `<br><b>Non sono sicuro</b> (stesso cognome, lasciati come prima): ${ambigui.map(esc).join(', ')}.`;
+  if(nonTrovati.length) html += `<br>Non trovati nel testo, lasciati come prima: ${nonTrovati.map(esc).join(', ')}.`;
+  if(!struttura) html += `<br>Il testo non aveva intestazioni con il modulo: ho considerato titolare chiunque compaia.`;
+  out.innerHTML = html;
+  $('inProbabili').value = '';
+  disegnaFormazione(); salva();
+});
+
+/* ======================= importazione settimanale ======================= */
+$('btnImporta').addEventListener('click', ()=>{
+  const out = $('esitoImport');
+  const grezzo = $('inIncolla').value.trim();
+  if(!grezzo){ out.textContent = 'Incolla prima il blocco di dati.'; return; }
+  let dati;
+  try{ dati = JSON.parse(grezzo); }
+  catch(e){ out.textContent = 'Il testo incollato non è un blocco valido. Ricopialo per intero, parentesi comprese.'; return; }
+
+  const voci = Array.isArray(dati) ? dati : (dati.giocatori || []);
+  if(!voci.length){ out.textContent = 'Nel blocco non ci sono giocatori.'; return; }
+  if(dati.giornata){ stato.giornata = +dati.giornata; stato.ufficiali = []; $('inGiornata').value = stato.giornata; }
+
+  let aggiornati = 0; const mancanti = [];
+  voci.forEach(v=>{
+    const g = stato.rosa.find(x=>normNome(x.n) === normNome(v.nome || v.n || ''));
+    if(!g){ mancanti.push(v.nome || v.n); return; }
+    if(v.fv !== undefined) g.fv = +v.fv;
+    if(v.voto !== undefined) g.voto = +v.voto;
+    if(v.sq || v.squadra) g.sq = v.sq || v.squadra;
+    if(v.st) g.st = v.st;
+    else if(v.p !== undefined) g.st = v.p >= 1 ? 'T' : (v.p > 0 ? 'B' : 'F');
+    if(v.p !== undefined && v.p > 0 && v.p < 1) g.pb = +v.p; else if(v.pb !== undefined) g.pb = +v.pb;
+    aggiornati++;
+  });
+
+  out.innerHTML = `Aggiornati ${aggiornati} giocatori.`
+    + (mancanti.length ? ` Non trovati in rosa: ${mancanti.map(esc).join(', ')}.` : '');
+  $('inIncolla').value = '';
+  disegnaFormazione(); disegnaRosa(); salva();
+});
+
+/* ======================= listone e piani ======================= */
+let listone = {piani:{}, voci:[], caricato:0};
+let filtroRuolo = null, spiegato = null;
+
+/* Accetta sia il file nuovo, con i quattro piani dentro, sia quello vecchio
+   con un solo tetto per giocatore. */
+function normalizzaListone(dati){
+  const voci = Array.isArray(dati) ? dati : (dati.listone || dati.voci || []);
+  const piani = (dati && dati.piani && typeof dati.piani === 'object') ? dati.piani : {};
+  const out = {piani:{}, voci:[], caricato: (dati && dati.caricato) || Date.now()};
+  for(const [nome, ob] of Object.entries(piani)){
+    if(ob && ORDINE.every(r=>isFinite(+ob[r]))) out.piani[nome] = Object.fromEntries(ORDINE.map(r=>[r, Math.round(+ob[r])]));
+  }
+  out.voci = voci.filter(v=>v && v.n && SLOT[v.r]).map(v=>{
+    const tt = (v.tt && typeof v.tt === 'object') ? v.tt : {personale: Math.round(+v.tt || 1)};
+    return {n:String(v.n), sq:String(v.sq || ''), r:v.r, qt:+v.qt || 0, pr:+v.pr || 0, tt};
+  });
+  if(!Object.keys(out.piani).length){
+    const nomi = new Set(out.voci.flatMap(v=>Object.keys(v.tt)));
+    nomi.forEach(n=>out.piani[n] = {...stato.target});
+  }
+  return out;
+}
+const pianoCorrente = () => listone.piani[stato.piano] ? stato.piano : (Object.keys(listone.piani)[0] || null);
+const tettoPiano = g => { const p = pianoCorrente(); return Math.round(g.tt[p] ?? g.tt[Object.keys(g.tt)[0]] ?? 1); };
+
+/* Il tetto del listone vale a inizio asta. Man mano che compri si adatta:
+   se hai risparmiato su un reparto puoi spingere di più su chi resta,
+   se hai speso troppo scende da solo. */
+function fattoreReparto(r){
+  const restanti = SLOT[r] - presi(r);
+  if(restanti <= 0) return 0;
+  const t = stato.target[r] || 1;
+  const k = ((t - spesoR(r)) / t) * (SLOT[r] / restanti);
+  return Math.max(0.4, Math.min(2.5, k));
+}
+const tettoOggi = g => Math.max(1, Math.min(maxOfferta(), Math.round(tettoPiano(g) * fattoreReparto(g.r))));
+
+function caricaListone(){
+  const grezzo = locale.leggi(CHIAVE_LISTONE);
+  if(grezzo){ try{ listone = normalizzaListone(JSON.parse(grezzo)); }catch(e){ listone = {piani:{}, voci:[], caricato:0}; } }
+}
+
+function applicaPiano(nome){
+  if(!listone.piani[nome]) return;
+  stato.piano = nome;
+  stato.target = {...listone.piani[nome]};
+  aggiornaCampi(); disegnaTutto(); salva();
+  toast(`Piano ${nome}: ${ORDINE.map(r=>r+' '+stato.target[r]).join(' · ')}`);
+}
+
+function disegnaPiani(){
+  const nomi = Object.keys(listone.piani);
+  const ha = nomi.length > 1 || (nomi.length === 1 && nomi[0] !== 'personale');
+  $('bloccoPiano').hidden = !ha;
+  const chips = nomi.map(n=>`<button data-piano="${esc(n)}" aria-pressed="${n===pianoCorrente() && stato.piano !== 'personale'}">${esc(n)}</button>`).join('');
+  $('piani').innerHTML = chips;
+  $('pianiRosa').innerHTML = ha ? chips : '';
+  const p = pianoCorrente();
+  const ob = p ? listone.piani[p] : null;
+  $('pianoRiassunto').textContent = ob ? ORDINE.map(r=>`${r} ${ob[r]}`).join(' · ') : '';
+  $('pianoAttivo').textContent = ha && p && stato.piano !== 'personale' ? `piano ${p}` : 'a mano';
+}
+['piani','pianiRosa'].forEach(id => $(id).addEventListener('click', e=>{
+  const b = e.target.closest('button[data-piano]'); if(b) applicaPiano(b.dataset.piano);
+}));
+
+const nomiVenduti = () => new Set(stato.venduti.map(v=>normNome(v.n)));
+
+function spiegaTetto(g){
+  const base = tettoPiano(g), k = fattoreReparto(g.r), oggi = tettoOggi(g);
+  const p = pianoCorrente() || 'personale';
+  const sp = spesoR(g.r), t = stato.target[g.r], rest = SLOT[g.r]-presi(g.r);
+  let s = `Il mercato lo paga circa <b>${g.pr}</b> (listino ${g.qt}). Col piano <b>${esc(p)}</b> il tuo tetto di partenza è <b>${base}</b>. `;
+  if(rest <= 0) s += `Reparto già completo.`;
+  else if(Math.abs(k-1) < 0.03) s += `Sei in linea col piano sul reparto, quindi resta ${oggi}.`;
+  else if(k > 1) s += `Sui ${NOME[g.r].toLowerCase()} hai speso ${sp} dei ${t} previsti con ${rest} slot da riempire: hai margine, e il tetto sale a <b>${oggi}</b>.`;
+  else s += `Sui ${NOME[g.r].toLowerCase()} hai già speso ${sp} dei ${t} previsti e restano ${rest} slot: il tetto scende a <b>${oggi}</b>.`;
+  if(oggi >= maxOfferta() && maxOfferta() > 0) s += ` È anche il massimo che puoi offrire tenendo 1 credito per ogni slot che resta.`;
+  return s;
+}
+
+function disegnaListone(){
+  const caricato = listone.voci.length > 0;
+  $('listoneCaricato').hidden = !caricato;
+  $('listoneVuoto').hidden = caricato;
+  if(!caricato){ $('titoloListone').textContent = 'Listone'; return; }
+
+  const venduti = nomiVenduti();
+  const miei = new Set(stato.rosa.map(g=>normNome(g.n)));
+  const liberi = listone.voci.filter(g=>!venduti.has(normNome(g.n)) && !miei.has(normNome(g.n)));
+  $('titoloListone').innerHTML = `<span>Listone</span><small>${liberi.length} liberi su ${listone.voci.length}</small>`;
+
+  if(filtroRuolo === null) filtroRuolo = faseCorrente() || '';
+  $('filtroRuoli').innerHTML = ORDINE.map(r=>{
+    const n = liberi.filter(g=>g.r===r).length;
+    return `<button data-f="${r}" aria-pressed="${filtroRuolo===r}">${r} ${n}</button>`;
+  }).join('') + `<button data-f="" aria-pressed="${filtroRuolo===''}">tutti</button>`;
+
+  const cerca = normNome($('cercaListone').value);
+  let risultati = liberi;
+  if(cerca) risultati = risultati.filter(g=>normNome(g.n).includes(cerca) || normNome(g.sq).startsWith(cerca));
+  else if(filtroRuolo) risultati = risultati.filter(g=>g.r===filtroRuolo);
+  risultati = [...risultati].sort((a,b)=>tettoPiano(b)-tettoPiano(a) || b.pr-a.pr).slice(0, 30);
+
+  $('risultatiListone').innerHTML = risultati.length
+    ? risultati.map(g=>{
+        const t = tettoOggi(g);
+        const oltre = t >= maxOfferta() && maxOfferta() > 0;
+        const k = normNome(g.n)+'|'+g.r;
+        return `<div class="esito-l">
+          <div class="sigla ${g.r}">${g.r}</div>
+          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}<small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)}</small></button>
+          <div class="tetto ${oltre?'oltre':''}">${t}<small>tetto</small></div>
+          <button class="prendi" data-prendi="${esc(k)}">preso</button>
+          <button class="via" data-via="${esc(k)}" aria-label="Venduto a un avversario">via</button>
+          ${spiegato === k ? `<div class="spiega">${spiegaTetto(g)}</div>` : ''}
+        </div>`;
+      }).join('')
+    : `<div class="vuoto">${cerca ? 'Nessuno con questo nome fra i liberi.' : 'Reparto esaurito.'}</div>`;
+}
+
+const trovaVoce = k => listone.voci.find(x=>normNome(x.n)+'|'+x.r === k);
+
+$('btnCaricaListone').addEventListener('click', ()=>{
+  const out = $('esitoListone');
+  let dati;
+  try{ dati = JSON.parse($('inListone').value.trim()); }
+  catch(e){ out.textContent = 'Il testo incollato non è un blocco valido. Ricopialo per intero.'; return; }
+  const nuovo = normalizzaListone(dati);
+  if(!nuovo.voci.length){ out.textContent = 'Nel blocco non ci sono giocatori.'; return; }
+  nuovo.caricato = Date.now();
+  listone = nuovo;
+  locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
+  $('inListone').value = ''; out.textContent = '';
+  filtroRuolo = null;
+  if(listone.piani[stato.piano]) stato.target = {...listone.piani[stato.piano]};
+  else if(Object.keys(listone.piani).length){ stato.piano = Object.keys(listone.piani)[0]; stato.target = {...listone.piani[stato.piano]}; }
+  aggiornaCampi(); disegnaTutto(); salva();
+  toast(`Listone caricato: ${listone.voci.length} giocatori, ${Object.keys(listone.piani).length} piani`);
+  if(collegata()) sincronizzaListone();
+});
+
+$('btnSostituisciListone').addEventListener('click', ()=>{
+  if(!confirm('Tolgo il listone da questo dispositivo? La rosa e i movimenti restano.')) return;
+  listone = {piani:{}, voci:[], caricato: Date.now()};
+  locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
+  disegnaPiani(); disegnaListone();
+  if(collegata()) sincronizzaListone();
+});
+
+$('cercaListone').addEventListener('input', ()=>{ spiegato = null; disegnaListone(); });
+$('filtroRuoli').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-f]'); if(!b) return;
+  filtroRuolo = b.dataset.f || ''; spiegato = null; disegnaListone();
+});
+
+$('risultatiListone').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.spiega !== undefined){ spiegato = spiegato === b.dataset.spiega ? null : b.dataset.spiega; disegnaListone(); return; }
+  if(b.dataset.prendi !== undefined){
+    const g = trovaVoce(b.dataset.prendi); if(!g) return;
+    inNome.value = g.n; inRuolo.value = g.r; inPrezzo.value = ''; inPrezzo.focus();
+    const av = $('avviso'); av.className = 'avviso ok';
+    av.textContent = `${g.n}: tetto consigliato ${tettoOggi(g)} FM, massimo possibile ${maxOfferta()}.`;
+    inNome.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  if(b.dataset.via !== undefined){
+    const g = trovaVoce(b.dataset.via); if(!g) return;
+    stato.venduti.push({n:g.n, r:g.r, sq:g.sq, a:null, p:null, t:Date.now()});
+    spiegato = null;
+    disegnaAsta(); disegnaListone(); disegnaMovimenti(); salva();
+    toast(`${g.n} via · a chi? tocca qui sotto`);
+  }
+});
+
+/* ======================= movimenti e avversari ======================= */
+function movimenti(){
+  const miei = stato.rosa.filter(g=>g.t).map(g=>({tipo:'mio', t:g.t, g}));
+  const altri = stato.venduti.filter(v=>v.t).map(v=>({tipo:'via', t:v.t, v}));
+  return [...miei, ...altri].sort((a,b)=>b.t-a.t).slice(0, 6);
+}
+
+function disegnaMovimenti(){
+  const ms = movimenti();
+  $('bloccoMovimenti').hidden = !ms.length;
+  $('movimenti').innerHTML = ms.map((m,i)=>{
+    const ora = new Date(m.t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    if(m.tipo === 'mio') return `<div class="movimento"><div class="testo">
+      <div class="sigla ${m.g.r}">${m.g.r}</div><b>${esc(m.g.n)}</b> → me · ${m.g.p} FM
+      <small>${ora}</small>
+      <button class="annulla" data-annulla-mio="${esc(m.g.id)}">annulla</button></div></div>`;
+    const v = m.v, assegnato = v.a !== null && v.a !== undefined && stato.avversari[v.a];
+    const chips = stato.avversari.map((a,j)=>`<button data-avv="${j}" data-t="${v.t}" aria-pressed="${v.a===j}">${esc(a.n.replace(/^Avversario /,'Avv '))}</button>`).join('');
+    return `<div class="movimento"><div class="testo">
+      <div class="sigla ${v.r||''}">${v.r||'?'}</div><b>${esc(v.n)}</b> → ${assegnato ? esc(stato.avversari[v.a].n.replace(/^Avversario /,'Avv ')) : 'via'}${v.p ? ' · ' + v.p + ' FM' : ''}
+      <small>${ora}</small>
+      <button class="annulla" data-annulla-via="${v.t}">annulla</button></div>
+      ${i === 0 || !assegnato ? `<div class="assegna">${chips}<input type="number" inputmode="numeric" placeholder="FM" value="${v.p ?? ''}" data-prezzo-via="${v.t}" aria-label="Prezzo pagato"></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+$('movimenti').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.annullaMio){ stato.rosa = stato.rosa.filter(g=>g.id !== b.dataset.annullaMio); toast('Acquisto annullato'); disegnaTutto(); salva(); return; }
+  if(b.dataset.annullaVia){ stato.venduti = stato.venduti.filter(v=>String(v.t) !== b.dataset.annullaVia); toast('Tornato fra i liberi'); disegnaTutto(); salva(); return; }
+  if(b.dataset.avv !== undefined){
+    const v = stato.venduti.find(x=>String(x.t) === b.dataset.t); if(!v) return;
+    v.a = v.a === +b.dataset.avv ? null : +b.dataset.avv;
+    disegnaMovimenti(); disegnaAvversari(); disegnaRoseAvversari(); salva();
+  }
+});
+$('movimenti').addEventListener('input', e=>{
+  const t = e.target.dataset.prezzoVia; if(!t) return;
+  const v = stato.venduti.find(x=>String(x.t) === t); if(!v) return;
+  const n = parseInt(e.target.value, 10);
+  v.p = isNaN(n) || n < 1 ? null : n;
+  disegnaAvversari(); disegnaRoseAvversari(); salva();
+});
+
+/* crediti spesi da ciascun avversario, per quello che abbiamo segnato */
+const spesoAvv = i => stato.venduti.filter(v=>v.a === i && v.p).reduce((s,v)=>s+v.p, 0);
+const presiAvv = (i, r) => stato.venduti.filter(v=>v.a === i && v.r === r).length;
+
+function disegnaAvversari(){
+  $('avversari').innerHTML = stato.avversari.map((a,i)=>{
+    const sp = spesoAvv(i), slot = ORDINE.map(r=>`${r}${presiAvv(i,r)}`).join(' ');
+    const stimato = BUDGET - sp;
+    return `<div class="avversario">
+      <input type="text" value="${esc(a.n)}" data-avv-n="${i}" aria-label="Nome avversario ${i+1}">
+      <input type="number" inputmode="numeric" value="${a.c}" data-avv-c="${i}" aria-label="Crediti avversario ${i+1}">
+      <small>${slot} · ${sp ? `segnati ${sp} FM spesi, ne avrebbe ${stimato}` : 'nessun acquisto segnato'}${a.c !== stimato && sp ? ` · tu hai scritto ${a.c}` : ''}</small>
+    </div>`;
+  }).join('');
+}
+$('avversari').addEventListener('input', e=>{
+  const n = e.target.dataset.avvN, c = e.target.dataset.avvC;
+  if(n !== undefined) stato.avversari[+n].n = e.target.value;
+  if(c !== undefined) stato.avversari[+c].c = +e.target.value || 0;
+  salva();
+});
+$('btnResetAvv').addEventListener('click', ()=>{
+  stato.avversari.forEach(a=>a.c = BUDGET); disegnaAvversari(); salva();
+});
+
+function disegnaRoseAvversari(){
+  const con = stato.avversari.map((a,i)=>({a, i, rosa: stato.venduti.filter(v=>v.a === i)})).filter(x=>x.rosa.length);
+  $('roseAvversari').innerHTML = con.length ? `<div class="rosa-avv">${con.map(x=>`
+    <div class="scheda"><b>${esc(x.a.n)}</b><small>${x.rosa.length} giocatori · ${spesoAvv(x.i)} FM segnati</small>
+      ${ORDINE.map(r=>{ const gs = x.rosa.filter(v=>v.r===r); return gs.length ? `<div><b style="display:inline;font-size:12px">${r}</b> ${gs.map(v=>esc(v.n)+(v.p?' '+v.p:'')).join(', ')}</div>` : ''; }).join('')}
+    </div>`).join('')}</div>`
+    : '<div class="vuoto">Ancora niente. In asta, dopo <b>via</b>, tocca l\'avversario che ha comprato e scrivi il prezzo: le rose si costruiscono da sole.</div>';
+}
+
+/* ======================= asta ======================= */
+function disegnaAsta(){
+  const fase = faseCorrente(), max = maxOfferta(), res = residuo(), lib = slotLiberi();
+
+  $('fase').innerHTML = `<i></i>${fase ? 'Fase: '+NOME[fase].toLowerCase() : 'Rosa completa'}`;
+  $('passi').innerHTML = ORDINE.map(r=>`<span class="${presi(r) >= SLOT[r] ? 'fatto' : r === fase ? 'corrente' : ''}"></span>`).join('');
+  const cifra = $('offertaMax');
+  animaNumero(cifra, max);
+  cifra.classList.toggle('rischio', max < 15 && lib > 0);
+  $('dettaglio').innerHTML = lib > 0
+    ? `residui ${res} FM · ${lib} slot da riempire<br>media disponibile ${(res/lib).toFixed(1)} FM a slot`
+    : `rosa da 25 · spesi ${spesoTot()} FM · avanzati ${res}`;
+
+  $('acqua').style.height = Math.min(100, spesoTot()/BUDGET*100)+'%';
+  $('etichettaMarea').textContent = spesoTot()+' / '+BUDGET;
+  let cum = 0, tacche = '';
+  ORDINE.forEach(r=>{ cum += stato.target[r];
+    if(r !== 'A') tacche += `<div class="tacca" style="bottom:${Math.min(100, cum/BUDGET*100)}%"><b>${r}</b></div>`; });
+  $('tacche').innerHTML = tacche;
+
+  const av = $('avviso');
+  let cl = 'ok', txt;
+  if(!fase) txt = `Rosa completa. Chiusa a ${spesoTot()} FM con ${res} avanzati.`;
+  else if(lib === 1){ cl='attenzione';
+    txt = `Ultimo slot. Puoi arrivare a ${max} FM: oltre sfori il budget e perdi il diritto d'asta sul giocatore.`; }
+  else {
+    const sf = spesoR(fase), tgt = stato.target[fase], slotFase = SLOT[fase]-presi(fase);
+    if(sf > tgt){ cl='attenzione';
+      const dopo = ORDINE.slice(ORDINE.indexOf(fase)+1).map(r=>NOME[r].toLowerCase()).join(' e ');
+      txt = `Sei sopra di ${sf-tgt} FM sul reparto. Quei crediti li togli a ${dopo || 'nulla'}, e sui ruoli chiusi non si torna indietro.`;
+    } else {
+      txt = `Su ${NOME[fase].toLowerCase()} restano ${slotFase} slot e ${tgt-sf} FM previsti: ${((tgt-sf)/slotFase).toFixed(1)} FM a testa.`;
+    }
+  }
+  if(res < lib){ cl='grave'; txt = `Attenzione: ${res} crediti per ${lib} slot. Non completi la rosa.`; }
+  av.className = 'avviso '+cl; av.textContent = txt;
+
+  $('reparti').innerHTML = ORDINE.map(r=>{
+    const sp = spesoR(r), t = stato.target[r];
+    return `<div class="ruolo">
+      <div class="sigla ${r===fase?'corrente':r}">${r}</div>
+      <div><div class="nomeruolo">${NOME[r]}</div>
+        <div class="barra"><i class="${sp>t?'sopra':''}" style="width:${Math.min(100, t? sp/t*100:0)}%"></i></div></div>
+      <div class="numeri">${presi(r)}/${SLOT[r]}<br><em>${sp} / ${t} FM</em></div></div>`;
+  }).join('');
+
+  $('btnAggiungi').disabled = !fase;
+}
+
+const inNome = $('inNome'), inRuolo = $('inRuolo'), inPrezzo = $('inPrezzo');
+
+$('btnAggiungi').addEventListener('click', ()=>{
+  const nome = inNome.value.trim(), r = inRuolo.value, p = parseInt(inPrezzo.value, 10);
+  const errore = m => { const av = $('avviso'); av.className='avviso grave'; av.textContent=m; };
+  if(!nome){ inNome.focus(); return errore('Scrivi il nome del giocatore.'); }
+  if(!(p >= 1)){ inPrezzo.focus(); return errore('Il prezzo deve essere almeno 1 FM.'); }
+  if(presi(r) >= SLOT[r]) return errore(`Gli slot da ${NOME[r].toLowerCase()} sono già pieni.`);
+  if(p > maxOfferta()) return errore(`${p} FM è oltre il massimo. Puoi arrivare a ${maxOfferta()} tenendo 1 credito per ogni slot che resta.`);
+
+  const voce = listone.voci.find(x=>normNome(x.n) === normNome(nome) && x.r === r) || listone.voci.find(x=>normNome(x.n) === normNome(nome));
+  stato.rosa.push({id:nuovoId(), n:nome, r, p, fv:BASE[r][0], voto:BASE[r][1], st:'T', sq: voce ? voce.sq : '', t:Date.now()});
+  inNome.value = ''; inPrezzo.value = '';
+  const succ = faseCorrente(); if(succ){ inRuolo.value = succ; filtroRuolo = succ; }
+  disegnaTutto(); salva();
+  toast(`${nome} in rosa per ${p} FM`);
+});
+inPrezzo.addEventListener('keydown', e=>{ if(e.key==='Enter') $('btnAggiungi').click(); });
+
+/* schermo acceso durante l'asta */
+let blocco = null;
+$('levettaSchermo').addEventListener('click', async e=>{
+  const b = e.currentTarget, acceso = b.getAttribute('aria-checked') === 'true';
+  if(acceso){ try{ await blocco?.release(); }catch(x){} blocco = null; b.setAttribute('aria-checked','false'); return; }
+  if(!('wakeLock' in navigator)){ toast('Questo browser non lo permette: alza il tempo di blocco nelle impostazioni'); return; }
+  try{ blocco = await navigator.wakeLock.request('screen'); b.setAttribute('aria-checked','true');
+       blocco.addEventListener('release', ()=>{ b.setAttribute('aria-checked','false'); blocco = null; }); }
+  catch(x){ toast('Non sono riuscito a tenere acceso lo schermo'); }
+});
+document.addEventListener('visibilitychange', async ()=>{
+  if(document.visibilityState === 'visible' && $('levettaSchermo').getAttribute('aria-checked') === 'true' && !blocco && 'wakeLock' in navigator){
+    try{ blocco = await navigator.wakeLock.request('screen'); }catch(x){}
+  }
+});
+
+/* ======================= rosa ======================= */
+function opzioniSquadre(scelta){
+  const tutte = new Set([...listone.voci.map(v=>v.sq), ...stato.rosa.map(g=>g.sq)].filter(Boolean));
+  const lista = [...tutte].sort((a,b)=>a.localeCompare(b));
+  return `<option value="">squadra…</option>` + lista.map(s=>`<option value="${esc(s)}" ${s===scelta?'selected':''}>${esc(s)}</option>`).join('');
+}
+
+function disegnaRosa(){
+  let html = '';
+  ORDINE.forEach(r=>{
+    const gs = stato.rosa.filter(g=>g.r===r);
+    html += `<div class="eyebrow" style="margin-top:12px"><span>${NOME[r]} · ${gs.length}/${SLOT[r]}</span><small>${spesoR(r)} FM</small></div>`;
+    if(!gs.length){ html += '<div class="vuoto">Ancora nessuno.</div>'; return; }
+    html += gs.map(g=>`<div class="giocatore" style="flex-wrap:wrap">
+        <div class="sigla ${r}">${r}</div>
+        <div class="nome">${esc(g.n)}<small>${g.p} FM</small></div>
+        <input class="mini" type="number" step="0.05" inputmode="decimal" value="${f2(g.fv)}" data-fv="${g.id}" aria-label="Fantavoto atteso di ${esc(g.n)}">
+        <input class="mini" type="number" step="0.05" inputmode="decimal" value="${f2(g.voto)}" data-voto="${g.id}" aria-label="Voto atteso di ${esc(g.n)}">
+        <button class="elimina" data-del="${g.id}" aria-label="Togli ${esc(g.n)}">×</button>
+        <select data-sq="${g.id}" aria-label="Squadra di ${esc(g.n)}" style="flex:1 1 100%;padding:7px 10px;font-size:13px;margin-left:38px;width:auto;margin-top:-2px">${opzioniSquadre(g.sq)}</select>
+      </div>`).join('');
+  });
+  $('rosa').innerHTML = html;
+
+  $('svincoli').innerHTML = stato.rosa.length
+    ? `<table class="dati"><tr><th>Giocatore</th><th class="n">Pagato</th><th class="n">Svincolo</th></tr>`
+      + stato.rosa.map(g=>`<tr><td>${esc(g.n)}</td><td class="n">${g.p}</td><td class="n">${Math.floor(g.p/2)}</td></tr>`).join('')
+      + `</table><p class="nota">Metà prezzo per chi resta in Serie A, prezzo pieno per chi va all'estero o si ritira. Le mezze cifre si concordano con lo staff.</p>`
+    : '<div class="vuoto">Rosa vuota.</div>';
+
+  const somma = ORDINE.reduce((s,r)=>s+stato.target[r],0);
+  $('sommaTarget').textContent = somma === BUDGET
+    ? `Totale ${somma} FM, in linea col budget.`
+    : `Totale ${somma} FM: ${somma>BUDGET ? 'sono '+(somma-BUDGET)+' di troppo.' : 'ne restano '+(BUDGET-somma)+' non assegnati.'}`;
+}
+
+$('rosa').addEventListener('input', e=>{
+  const fv = e.target.dataset.fv, voto = e.target.dataset.voto;
+  const id = fv || voto; if(!id) return;
+  const g = stato.rosa.find(x=>x.id === id); if(!g) return;
+  const v = parseFloat(e.target.value);
+  if(isNaN(v)) return;
+  if(fv) g.fv = v; else g.voto = v;
+  salva();
+});
+$('rosa').addEventListener('change', e=>{
+  const sq = e.target.dataset.sq;
+  if(sq){ const g = stato.rosa.find(x=>x.id === sq); if(g){ g.sq = e.target.value; salva(); } }
+  disegnaFormazione();
+});
+$('rosa').addEventListener('click', e=>{
+  const id = e.target.dataset.del; if(!id) return;
+  const g = stato.rosa.find(x=>x.id === id);
+  if(g && !confirm(`Tolgo ${g.n} dalla rosa?`)) return;
+  stato.rosa = stato.rosa.filter(g=>g.id !== id);
+  disegnaTutto(); salva();
+});
+
+ORDINE.forEach(r=>{
+  const el = $('tg'+r);
+  el.addEventListener('input', ()=>{ stato.target[r] = +el.value || 0; stato.piano = 'personale'; disegnaPiani(); disegnaAsta(); disegnaRosa(); disegnaListone(); salva(); });
+});
+
+$('btnAzzera').addEventListener('click', ()=>{
+  if(!confirm('Cancello rosa, giornate, movimenti, obiettivi e crediti avversari? Il listone resta.')) return;
+  stato = statoIniziale();
+  if(listone.piani[stato.piano]) stato.target = {...listone.piani[stato.piano]};
+  aggiornaCampi(); disegnaTutto(); salva();
+});
+
+$('btnCopia').addEventListener('click', async ()=>{
+  const t = ORDINE.map(r=>NOME[r].toUpperCase()+'\n'+
+    (stato.rosa.filter(g=>g.r===r).map(g=>`${g.n}${g.sq?' ('+g.sq+')':''} — ${g.p}`).join('\n') || '—')).join('\n\n')
+    + `\n\nTotale ${spesoTot()} FM · residui ${residuo()}`;
+  try{ await navigator.clipboard.writeText(t); toast('Rosa copiata'); }
+  catch(e){ toast('Copia non riuscita: selezionala a mano'); }
+});
+
+/* ======================= stagione ======================= */
+function disegnaStagione(){
+  const gs = [...stato.giornate].sort((a,b)=>a.g-b.g);
+  const tot = {v:0, n:0, p:0, gf:0, gs:0, pf:0};
+  gs.forEach(x=>{
+    const mf = golDaPunti(x.pf), ms = golDaPunti(x.ps);
+    x.gf = mf; x.gs = ms;
+    tot.gf += mf; tot.gs += ms; tot.pf += x.pf;
+    if(mf > ms) tot.v++; else if(mf === ms) tot.n++; else tot.p++;
+  });
+  const punti = tot.v*3 + tot.n;
+
+  $('classifica').innerHTML = gs.length
+    ? `<div class="esito">${punti}<small>punti in ${gs.length} giornate</small></div>
+       <div class="righetta">${tot.v}V ${tot.n}N ${tot.p}P · gol ${tot.gf}-${tot.gs} · media punteggio ${(tot.pf/gs.length).toFixed(2)}</div>`
+    : '<div class="vuoto">Nessuna giornata registrata.</div>';
+
+  $('storico').innerHTML = gs.length
+    ? `<table class="dati"><tr><th>G</th><th class="n">Punti</th><th class="n">Avv.</th><th class="n">Gol</th><th></th></tr>`
+      + gs.map(x=>{
+          const e = x.gf > x.gs ? 'V' : (x.gf === x.gs ? 'N' : 'P');
+          return `<tr><td>${x.g}</td><td class="n">${x.pf}</td><td class="n">${x.ps}</td>
+            <td class="n">${x.gf}-${x.gs}</td><td class="n"><b>${e}</b>
+            <button class="elimina" data-gdel="${x.g}" aria-label="Togli giornata ${x.g}">×</button></td></tr>`;
+        }).join('') + `</table>`
+    : '';
+  disegnaRoseAvversari();
+}
+
+$('btnGiornata').addEventListener('click', ()=>{
+  const g = parseInt($('gN').value, 10), pf = parseFloat($('gPF').value), ps = parseFloat($('gPS').value);
+  if(isNaN(g) || isNaN(pf) || isNaN(ps)){ toast('Servono giornata, punti tuoi e punti avversario'); return; }
+  stato.giornate = stato.giornate.filter(x=>x.g !== g);
+  stato.giornate.push({g, pf, ps});
+  ['gN','gPF','gPS'].forEach(i=>$(i).value='');
+  disegnaStagione(); salva();
+});
+$('storico').addEventListener('click', e=>{
+  const g = e.target.dataset.gdel; if(!g) return;
+  stato.giornate = stato.giornate.filter(x=>x.g !== +g);
+  disegnaStagione(); salva();
+});
+
+function calcolaMod(){
+  const v = ['m0','m1','m2','m3'].map(i=>parseFloat($(i).value));
+  const out = $('esitoMod');
+  if(v.some(isNaN)){ out.innerHTML = '—<small>punti extra</small>'; return; }
+  const r = modificatore(v[0], [v[1], v[2], v[3], 0]);
+  out.innerHTML = `+${r.punti}<small>punti extra · media ${r.media.toFixed(2)}</small>`;
+}
+document.querySelectorAll('.mod').forEach(i=>i.addEventListener('input', calcolaMod));
+
+$('inPunti').addEventListener('input', e=>{
+  const p = parseFloat(e.target.value);
+  $('esitoGol').innerHTML = isNaN(p) ? '—<small>gol segnati</small>'
+    : `${golDaPunti(p)}<small>gol segnati · al prossimo mancano ${alGolDopo(p)}</small>`;
+});
+
+/* ======================= accesso e cifratura ======================= */
+/* Il token vive sul dispositivo cifrato con una chiave derivata dalla
+   password (PBKDF2 + AES-GCM). Chi apre il link vede solo la schermata
+   di accesso: senza password non si legge il token, senza token non si
+   leggono i dati. Il codice resta pubblico, e questo lo sappiamo. */
+const CHIAVE_CFG_CIFRATA = 'fccazzimma:cfgcifrata', CHIAVE_RICORDA = 'fccazzimma:chiave';
+let chiaveSessione = null;
+const aB64 = b => btoa(String.fromCharCode(...new Uint8Array(b)));
+const daB64Bytes = t => Uint8Array.from(atob(t), c=>c.charCodeAt(0));
+const cifraturaDisponibile = () => !!(window.crypto && crypto.subtle);
+
+async function derivaChiave(password, sale){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt:sale, iterations:200000, hash:'SHA-256'}, base,
+                                 {name:'AES-GCM', length:256}, true, ['encrypt','decrypt']);
+}
+async function cifra(chiave, testo){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const dati = await crypto.subtle.encrypt({name:'AES-GCM', iv}, chiave, new TextEncoder().encode(testo));
+  return {iv: aB64(iv), dati: aB64(dati)};
+}
+async function decifra(chiave, blob){
+  const dati = await crypto.subtle.decrypt({name:'AES-GCM', iv: daB64Bytes(blob.iv)}, chiave, daB64Bytes(blob.dati));
+  return new TextDecoder().decode(dati);
+}
+async function ricordaChiave(chiave, ricorda){
+  if(ricorda) locale.scrivi(CHIAVE_RICORDA, aB64(await crypto.subtle.exportKey('raw', chiave)));
+  else locale.cancella(CHIAVE_RICORDA);
+}
+/* prima configurazione, o cambio password: nuova chiave, token cifrato, via il token in chiaro */
+async function salvaCfgCifrata(nuovaCfg, password, ricorda){
+  const sale = crypto.getRandomValues(new Uint8Array(16));
+  const chiave = await derivaChiave(password, sale);
+  const blob = await cifra(chiave, JSON.stringify(nuovaCfg));
+  locale.scrivi(CHIAVE_CFG_CIFRATA, JSON.stringify({sale: aB64(sale), ...blob}));
+  locale.cancella(CHIAVE_CFG);
+  await ricordaChiave(chiave, ricorda);
+  chiaveSessione = chiave; cfg = Object.assign(cfg, nuovaCfg);
+}
+/* la configurazione cambia (token nuovo) ma la password resta la stessa */
+async function riscriviCfg(){
+  if(!chiaveSessione) return;
+  const salvato = JSON.parse(locale.leggi(CHIAVE_CFG_CIFRATA) || '{}');
+  const blob = await cifra(chiaveSessione, JSON.stringify(cfg));
+  locale.scrivi(CHIAVE_CFG_CIFRATA, JSON.stringify({sale: salvato.sale, ...blob}));
+}
+async function apriConPassword(utente, password, ricorda){
+  const grezzo = locale.leggi(CHIAVE_CFG_CIFRATA);
+  if(!grezzo) throw new Error('Questo dispositivo non è ancora configurato: usa "Primo accesso".');
+  const salvato = JSON.parse(grezzo);
+  const chiave = await derivaChiave(password, daB64Bytes(salvato.sale));
+  let testo;
+  try{ testo = await decifra(chiave, salvato); }catch(e){ throw new Error('Utente o password sbagliati.'); }
+  const c = JSON.parse(testo);
+  if(normNome(c.utente) !== normNome(utente)) throw new Error('Utente o password sbagliati.');
+  chiaveSessione = chiave; cfg = Object.assign(cfg, c);
+  await ricordaChiave(chiave, ricorda);
+}
+async function apriRicordata(){
+  const grezza = locale.leggi(CHIAVE_RICORDA), salvato = locale.leggi(CHIAVE_CFG_CIFRATA);
+  if(!grezza || !salvato || !cifraturaDisponibile()) return false;
+  try{
+    const chiave = await crypto.subtle.importKey('raw', daB64Bytes(grezza), 'AES-GCM', true, ['encrypt','decrypt']);
+    cfg = Object.assign(cfg, JSON.parse(await decifra(chiave, JSON.parse(salvato))));
+    chiaveSessione = chiave;
+    return true;
+  }catch(e){ return false; }
+}
+/* il token deve aprire davvero il repository dei dati, altrimenti non si entra */
+async function verificaToken(c){
+  const r = await fetch(`https://api.github.com/repos/${c.utente}/${c.repo}`, {
+    headers:{'Authorization':'Bearer '+c.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28'}, cache:'no-store'});
+  if(r.status === 401) throw new Error('Token non valido o scaduto.');
+  if(r.status === 404 || r.status === 403) throw new Error('Il token non apre il repository dei dati: controlla utente, repository e permessi.');
+  if(!r.ok) throw new Error('GitHub ha risposto con errore ' + r.status + '.');
+}
+
+function avvisoAccesso(testo, classe){
+  const el = $('accessoAvviso');
+  el.hidden = !testo; el.textContent = testo || ''; el.className = 'avviso ' + (classe || 'grave');
+}
+function mostraEntra(){
+  $('formConfigura').hidden = true; $('formEntra').hidden = false;
+  $('accessoSotto').textContent = 'Accesso riservato';
+  avvisoAccesso('');
+  const salvato = locale.leggi(CHIAVE_CFG_CIFRATA);
+  $('btnVersoConfigura').hidden = !!salvato;
+  $('btnDimenticata').hidden = !salvato;
+  setTimeout(()=>$($('accUtente').value ? 'accPassword' : 'accUtente').focus(), 50);
+}
+let cfgDaProteggere = null;
+function mostraConfigura(legacy){
+  cfgDaProteggere = legacy || null;
+  $('formEntra').hidden = true; $('formConfigura').hidden = false;
+  avvisoAccesso('');
+  $('configuraCampi').hidden = !!legacy;
+  $('accessoSotto').textContent = legacy ? 'Proteggi questo dispositivo' : 'Primo accesso';
+  $('configuraTesto').textContent = legacy
+    ? `Questo dispositivo è già collegato come ${legacy.utente}. Scegli una password: da qui in avanti servirà quella, il token non lo rivedi.`
+    : 'Serve il token del repository dei dati, una volta sola. Poi scegli una password: sui prossimi accessi basterà quella.';
+  $('btnVersoEntra').hidden = !locale.leggi(CHIAVE_CFG_CIFRATA);
+  if(!cifraturaDisponibile()) avvisoAccesso('Questo browser non permette la cifratura: apri l\'app da https.', 'grave');
+  setTimeout(()=>$(legacy ? 'cfPassword' : 'cfUtente').focus(), 50);
+}
+$('btnVersoConfigura').addEventListener('click', ()=>mostraConfigura(null));
+$('btnVersoEntra').addEventListener('click', mostraEntra);
+$('btnDimenticata').addEventListener('click', ()=>{
+  if(!confirm('Cancello la password e il token da questo dispositivo. La rosa e i dati restano, qui e su GitHub. Poi rifai il primo accesso con il token.')) return;
+  locale.cancella(CHIAVE_CFG_CIFRATA); locale.cancella(CHIAVE_RICORDA);
+  mostraConfigura(null);
+});
+
+$('formEntra').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const b = e.target.querySelector('button[type=submit]'); b.disabled = true; b.textContent = 'Apro…';
+  try{
+    await apriConPassword($('accUtente').value.trim(), $('accPassword').value, $('accRicorda').checked);
+    $('accPassword').value = '';
+    entra();
+  }catch(err){ avvisoAccesso(err.message); }
+  finally{ b.disabled = false; b.textContent = 'Entra'; }
+});
+
+$('formConfigura').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const pw = $('cfPassword').value, pw2 = $('cfPassword2').value;
+  if(pw.length < 6) return avvisoAccesso('La password deve avere almeno 6 caratteri.');
+  if(pw !== pw2) return avvisoAccesso('Le due password non coincidono.');
+  if(!cifraturaDisponibile()) return avvisoAccesso('Questo browser non permette la cifratura: apri l\'app da https.');
+  const nuova = cfgDaProteggere
+    ? {utente: cfgDaProteggere.utente, repo: cfgDaProteggere.repo || 'fc-cazzimma-dati', percorso:'stato.json', token: cfgDaProteggere.token}
+    : {utente: $('cfUtente').value.trim(), repo: $('cfRepo').value.trim() || 'fc-cazzimma-dati', percorso:'stato.json', token: $('cfToken').value.trim()};
+  if(!nuova.utente || !nuova.token) return avvisoAccesso('Servono utente GitHub e token.');
+  const b = $('btnConfigura'); b.disabled = true; b.textContent = 'Controllo il token…';
+  try{
+    if(!cfgDaProteggere) await verificaToken(nuova);
+    await salvaCfgCifrata(nuova, pw, $('cfRicorda').checked);
+    $('cfToken').value = ''; $('cfPassword').value = ''; $('cfPassword2').value = '';
+    entra();
+  }catch(err){ avvisoAccesso(err.message === 'Failed to fetch' ? 'Non riesco a raggiungere GitHub: sei senza rete?' : err.message); }
+  finally{ b.disabled = false; b.textContent = 'Configura e entra'; }
+});
+
+/* ======================= schede, tema, avvio ======================= */
+function mostra(nome){
+  document.querySelectorAll('.schede button').forEach(x=>x.setAttribute('aria-selected', x.dataset.p === nome));
+  document.querySelectorAll('.pannello').forEach(p=>p.hidden = (p.id !== 'p-'+nome));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.schede button').forEach(b=>b.addEventListener('click', ()=>mostra(b.dataset.p)));
+$('pillaSync').addEventListener('click', ()=>mostra('sync'));
+
+function applicaTema(t){
+  if(t === 'chiaro' || t === 'scuro') document.documentElement.dataset.tema = t; else delete document.documentElement.dataset.tema;
+  locale.scrivi(CHIAVE_TEMA, t);
+  document.querySelectorAll('#temi button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.tema === t));
+}
+$('temi').addEventListener('click', e=>{ const b = e.target.closest('button[data-tema]'); if(b) applicaTema(b.dataset.tema); });
+
+function disegnaTutto(){ disegnaPiani(); disegnaAsta(); disegnaListone(); disegnaMovimenti(); disegnaAvversari(); disegnaRosa(); disegnaFormazione(); disegnaStagione(); }
+
+function aggiornaCampi(){
+  ORDINE.forEach(r=>$('tg'+r).value = stato.target[r]);
+  $('inGiornata').value = stato.giornata;
+}
+
+$('btnCollega').addEventListener('click', async ()=>{
+  cfg.utente = $('cfgUtente').value.trim();
+  cfg.repo = $('cfgRepo').value.trim() || 'fc-cazzimma-dati';
+  const t = $('cfgToken').value.trim();
+  if(t && !t.startsWith('•')) cfg.token = t;
+  if(!collegata()){ scriviStatoSync('Servono utente, repository e token.', 'attenzione'); return; }
+  await riscriviCfg();
+  $('cfgToken').value = '••••••••••••';
+  await sincronizza('avvio');
+});
+$('btnSyncOra').addEventListener('click', ()=>sincronizza('avvio'));
+$('btnEsci').addEventListener('click', ()=>{
+  locale.cancella(CHIAVE_RICORDA);
+  location.reload();
+});
+$('btnScollega').addEventListener('click', ()=>{
+  if(!confirm('Tolgo token e password da questo dispositivo? La rosa resta qui e su GitHub. Per rientrare servirà il token.')) return;
+  locale.cancella(CHIAVE_CFG_CIFRATA); locale.cancella(CHIAVE_RICORDA); locale.cancella(CHIAVE_CFG);
+  location.reload();
+});
+$('btnRicarica').addEventListener('click', async ()=>{
+  try{ const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); }catch(e){}
+  location.reload();
+});
+
+function entra(){
+  $('accesso').hidden = true;
+  document.body.classList.remove('bloccata');
+  carica();
+  caricaListone();
+  aggiornaCampi();
+  const f = faseCorrente(); if(f) inRuolo.value = f;
+  disegnaTutto();
+  // prima dell'asta si vive nella scheda Asta, dopo nella Formazione
+  mostra(stato.rosa.length < slotTot() ? 'asta' : 'formazione');
+  $('versione').textContent = `FC Cazzimma · versione ${VERSIONE_APP}`;
+  $('cfgUtente').value = cfg.utente;
+  $('cfgRepo').value = cfg.repo;
+  if(collegata()){ $('cfgToken').value = '••••••••••••'; sincronizza('avvio'); }
+  else segnala('solo locale','');
+  window.addEventListener('online', ()=>{ if(collegata()) sincronizza('invia'); });
+}
+
+(async function avvio(){
+  applicaTema(locale.leggi(CHIAVE_TEMA) || 'auto');
+  document.body.classList.add('bloccata');
+
+  if('serviceWorker' in navigator && location.protocol === 'https:'){
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.addEventListener('updatefound', ()=>{
+        const nuovo = reg.installing;
+        nuovo?.addEventListener('statechange', ()=>{ if(nuovo.state === 'installed' && navigator.serviceWorker.controller) toast('Nuova versione pronta: riapri l\'app per usarla'); });
+      });
+    }).catch(()=>{});
+  }
+
+  // dispositivo già aperto e ricordato: dentro senza chiedere niente
+  if(await apriRicordata()) return entra();
+
+  $('accesso').hidden = false;
+  // dispositivo collegato prima della password: la si sceglie ora, il token resta
+  const legacy = locale.leggi(CHIAVE_CFG);
+  if(legacy){ try{ const c = JSON.parse(legacy); if(c && c.token && c.utente) return mostraConfigura(c); }catch(e){} }
+  if(locale.leggi(CHIAVE_CFG_CIFRATA)){ $('accUtente').value = ''; mostraEntra(); }
+  else mostraConfigura(null);
+})();
+</script>
+</body>
+</html>

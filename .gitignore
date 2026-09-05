@@ -1,0 +1,30 @@
+# Il repository fc-cazzimma e' pubblico: qui dentro ci va solo il codice.
+# Dati personali, listoni scaricati, uscite del motore restano sul Mac.
+
+# roba del Mac
+.DS_Store
+
+# input grezzi: restano solo gli esempi
+dati/*
+!dati/quotazioni-esempio.csv
+!dati/rosa-esempio.json
+!dati/rosa-prova.json
+!dati/probabili-esempio.txt
+!dati/piani-esempio.json
+
+# uscite del motore
+report/*
+!report/.gitkeep
+
+# documenti della lega e fogli di calcolo: non servono all'app
+*.pdf
+*.xlsx
+*.xlsm
+*.xls
+
+# Python
+__pycache__/
+*.pyc
+
+# impostazioni locali di Claude Code
+.claude/

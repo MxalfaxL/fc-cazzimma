@@ -1,0 +1,20 @@
+{
+  "squadra": "FC Cazzimma",
+  "stagione": "2026/27",
+  "aggiornata_al": "giornata 0 — da compilare dopo l'asta",
+  "_come_si_compila": {
+    "nome": "cognome del giocatore",
+    "ruolo": "P, D, C oppure A",
+    "fv": "fantavoto atteso di questa giornata, bonus e malus compresi",
+    "voto": "voto puro atteso, senza bonus: e' quello che alimenta il modificatore difesa",
+    "p": "probabilita' che scenda in campo, da 0 a 1, letta dalle probabili formazioni",
+    "squadra": "squadra di Serie A",
+    "nota": "testo libero: ballottaggio, diffidato, rientro, rigorista"
+  },
+  "giocatori": [
+    {"nome": "Esempio Portiere", "ruolo": "P", "fv": 6.1, "voto": 6.1, "p": 1.0, "squadra": "", "nota": ""},
+    {"nome": "Esempio Difensore", "ruolo": "D", "fv": 6.3, "voto": 6.2, "p": 0.9, "squadra": "", "nota": ""},
+    {"nome": "Esempio Centrocampista", "ruolo": "C", "fv": 6.8, "voto": 6.1, "p": 1.0, "squadra": "", "nota": ""},
+    {"nome": "Esempio Attaccante", "ruolo": "A", "fv": 7.4, "voto": 6.3, "p": 1.0, "squadra": "", "nota": ""}
+  ]
+}
