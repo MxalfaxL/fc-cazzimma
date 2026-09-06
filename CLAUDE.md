@@ -134,6 +134,7 @@ dati/rosa-prova.json       rosa finta per la verifica di parità
 dati/probabili-esempio.txt testo di probabili per provare il lettore
 report/                    uscite del motore (gitignored)
 docs/                      documentazione di progetto
+docs/MANUALE.md            il manuale per Marco, schermata per schermata
 ```
 
 Nello `<script>` di `index.html` il motore sta fra i segnaposto
