@@ -70,7 +70,7 @@ sei sopra il piano, rosso se rischi di non completare la rosa. C'è anche
 l'interruttore per tenere lo schermo acceso.
 
 **Quando compri tu**: cerca il giocatore, tocca **preso**, scrivi il prezzo,
-**Aggiungi alla rosa**. La tendina **Comprato da** resta su *me*. Se il prezzo
+**Aggiungi alla rosa**. La tendina **Comprato da** resta su *FC Cazzimma*. Se il prezzo
 supera il massimo l'app si rifiuta e spiega perché.
 
 **Quando compra un altro**: tocca **via** sulla sua riga: sparisce dai liberi

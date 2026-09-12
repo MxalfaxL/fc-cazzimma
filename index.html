@@ -505,7 +505,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     </div>
     <label class="campo"><span>Comprato da</span><select id="aChi"></select></label>
     <button class="azione" id="btnAggiungi">Aggiungi alla rosa</button>
-    <p class="nota">Di solito lasci <b>me</b>. Se vuoi tenere il conto anche degli altri, scegli chi ha comprato: i nomi sono quelli del riquadro <b>Gli avversari</b> qui sotto. Da <b>via</b> nel listone il nome arriva già compilato.</p>
+    <p class="nota">Di solito lasci <b>FC Cazzimma</b>. Se vuoi tenere il conto anche degli altri, scegli chi ha comprato: i nomi sono quelli del riquadro <b>Gli avversari</b> qui sotto. Da <b>via</b> nel listone il nome arriva già compilato.</p>
   </div>
 
   <div class="blocco">
@@ -805,7 +805,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.12';
+const VERSIONE_APP = '2026.09.12b';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1547,7 +1547,7 @@ function disegnaMovimenti(){
   $('movimenti').innerHTML = ms.map((m,i)=>{
     const ora = new Date(m.t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     if(m.tipo === 'mio') return `<div class="movimento"><div class="testo">
-      <div class="sigla ${m.g.r}">${m.g.r}</div><b>${esc(m.g.n)}</b> → me · ${m.g.p} FM
+      <div class="sigla ${m.g.r}">${m.g.r}</div><b>${esc(m.g.n)}</b> → FC Cazzimma · ${m.g.p} FM
       <small>${ora}</small>
       <button class="annulla" data-annulla-mio="${esc(m.g.id)}">annulla</button></div></div>`;
     const v = m.v, assegnato = v.a !== null && v.a !== undefined && stato.avversari[v.a];
@@ -1670,10 +1670,10 @@ let destinatario = 'me';
 function disegnaAChi(){
   const fase = faseCorrente();
   $('aChi').innerHTML = (destinatario === null ? `<option value="" selected>a chi è andato?</option>` : '')
-    + `<option value="me" ${destinatario==='me'?'selected':''}>me</option>`
+    + `<option value="me" ${destinatario==='me'?'selected':''}>FC Cazzimma</option>`
     + stato.avversari.map((a,i)=>`<option value="${i}" ${destinatario===i?'selected':''}>${esc(a.n)}</option>`).join('');
   const b = $('btnAggiungi');
-  if(destinatario === 'me'){ b.textContent = 'Aggiungi alla rosa'; b.disabled = !fase; $('aChiRiassunto').textContent = 'a me'; }
+  if(destinatario === 'me'){ b.textContent = 'Aggiungi alla rosa'; b.disabled = !fase; $('aChiRiassunto').textContent = 'FC Cazzimma'; }
   else if(destinatario === null){ b.textContent = 'Scegli a chi è andato'; b.disabled = true; $('aChiRiassunto').textContent = 'a chi?'; }
   else { b.textContent = 'Assegna a ' + stato.avversari[destinatario].n; b.disabled = false; $('aChiRiassunto').textContent = 'a un avversario'; }
 }
