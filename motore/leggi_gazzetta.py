@@ -19,7 +19,9 @@ Tutto resta in dati/, che git ignora: e' un giornale comprato, uso personale.
 
 import json
 import re
+import shutil
 import subprocess
+import tempfile
 import sys
 import unicodedata
 from collections import Counter
@@ -76,9 +78,47 @@ def carica_listone():
     return per_chiave, squadre
 
 
+# Sotto questi caratteri la pagina e' una scansione (solo immagine): serve l'OCR.
+TESTO_MINIMO = 200
+OCR_SORGENTE = RADICE / "motore" / "ocr_pagina.swift"
+OCR_BINARIO = CARTELLA_TESTO / ".ocr"
+
+
+def ocr_pronto():
+    """Compila l'OCR (Vision di macOS) la prima volta. Se non si puo', si va
+    avanti senza: le pagine scansionate restano vuote e l'indice lo dice."""
+    if OCR_BINARIO.exists() and OCR_BINARIO.stat().st_mtime >= OCR_SORGENTE.stat().st_mtime:
+        return True
+    if not shutil.which("xcrun"):
+        return False
+    OCR_BINARIO.parent.mkdir(parents=True, exist_ok=True)
+    esito = subprocess.run(["xcrun", "swiftc", "-O", str(OCR_SORGENTE), "-o", str(OCR_BINARIO)],
+                           capture_output=True, text=True)
+    if esito.returncode != 0:
+        print("OCR non compilato:", esito.stderr.strip().splitlines()[-1] if esito.stderr else "?")
+        return False
+    return True
+
+
+def ocr_pagina(pdf, p):
+    """Rasterizza la pagina a 150 dpi e la legge con Vision. Le colonne del
+    giornale vengono rimesse in ordine dal programma Swift."""
+    if not ocr_pronto():
+        return ""
+    with tempfile.TemporaryDirectory() as td:
+        subprocess.run(["pdftoppm", "-r", "150", "-f", str(p), "-l", str(p), "-png", str(pdf), f"{td}/pag"],
+                       capture_output=True)
+        immagini = sorted(Path(td).glob("pag*.png"))
+        if not immagini:
+            return ""
+        esito = subprocess.run([str(OCR_BINARIO), str(immagini[0])], capture_output=True, text=True)
+        return "\n".join(r for r in esito.stdout.splitlines() if not r.startswith("====="))
+
+
 def pagine_del_pdf(pdf):
     """Numero di pagine e generatore (numero, testo) via pdftotext -raw.
-    -raw e non -layout: il layout tronca i nomi nelle colonne strette."""
+    -raw e non -layout: il layout tronca i nomi nelle colonne strette.
+    Se la pagina e' una scansione senza testo, passa per l'OCR."""
     info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
     m = re.search(r"Pages:\s+(\d+)", info)
     if not m:
@@ -89,6 +129,10 @@ def pagine_del_pdf(pdf):
             ["pdftotext", "-raw", "-f", str(p), "-l", str(p), str(pdf), "-"],
             capture_output=True, text=True,
         ).stdout
+        if len(testo.strip()) < TESTO_MINIMO:
+            letto = ocr_pagina(pdf, p)
+            if letto:
+                testo = letto + "\n[pagina letta con OCR: possibili errori nei nomi]\n"
         yield p, testo
 
 
@@ -123,12 +167,16 @@ def data_del_giornale(pdf):
     m = re.search(r"(\d{4})-(\d{2})-(\d{2})", pdf.name)
     if m:
         return m.group(0)
+    # "La Gazzetta dello Sport - 25 Agosto 2026.pdf", "..._05_ Settembre 2026.pdf"
+    m = re.search(r"(\d{1,2})[ _\-]*(" + "|".join(MESI) + r")[ _\-]*(\d{4})", pdf.name.lower())
+    if m:
+        return f"{m.group(3)}-{MESI.index(m.group(2)) + 1:02d}-{int(m.group(1)):02d}"
     prima = subprocess.run(["pdftotext", "-raw", "-f", "1", "-l", "1", str(pdf), "-"],
                            capture_output=True, text=True).stdout.lower()
     m = re.search(r"(\d{1,2})\s+(" + "|".join(MESI) + r")\s+(\d{4})", prima)
     if m:
         return f"{m.group(3)}-{MESI.index(m.group(2)) + 1:02d}-{int(m.group(1)):02d}"
-    return norm(pdf.stem) or "senza-data"
+    return re.sub(r"[^a-z0-9]+", "-", pdf.stem.lower()).strip("-") or "senza-data"
 
 
 def leggi_pdf(pdf, per_chiave, squadre, tutte=False):

@@ -16,6 +16,14 @@ Uso:
     python3 motore/dossier.py mostra A                        # un ruolo
     python3 motore/dossier.py mostra "Malen"                  # un giocatore
     python3 motore/dossier.py cerca lauta                     # come si chiama nel listone?
+    python3 motore/dossier.py importa dati/gazzetta/2026-09-15/note.json   # le note di un giornale, tutte insieme
+
+Il file note.json e' quello che scrive chi legge un giornale:
+    {"data": "2026-09-15", "note": [{"nome", "tipo", "testo"}],
+     "voti": [{"nome", "giornata", "voto", "fantavoto", "eventi"}],
+     "rigoristi": [{"nome", "valore"}], "sintesi": "..."}
+L'importazione controlla ogni nome contro il listone e si ferma elencando
+quelli che non trova, senza scrivere niente: si correggono e si rilancia.
 
 Tipi di nota: infortunio, rientro, squalifica, titolare, panchina, forma,
 rigorista, mercato, altro. Il nome e' quello del listone, esatto: se non
@@ -55,7 +63,20 @@ def carica():
     return {"aggiornato": None, "giocatori": {}}
 
 
+def ricalcola_stati(dossier):
+    """Lo stato e' l'ultima parola in ordine di DATA, non di importazione:
+    i giornali possono arrivare in disordine (il 26 agosto letto dopo il 12
+    settembre) e una nota vecchia non deve coprire una nuova."""
+    for v in dossier["giocatori"].values():
+        stato = "ok"
+        for n in sorted(v["note"], key=lambda n: n["data"]):
+            if n["tipo"] in STATO_DA_TIPO:
+                stato = STATO_DA_TIPO[n["tipo"]]
+        v["stato"] = stato
+
+
 def salva(dossier):
+    ricalcola_stati(dossier)
     dossier["aggiornato"] = date.today().isoformat()
     DOSSIER.parent.mkdir(exist_ok=True)
     json.dump(dossier, open(DOSSIER, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -97,13 +118,18 @@ def aggiungi(dossier, listone, nome, data, tipo, testo, fonte="gazzetta"):
     print(f"{nome} ({listone[nome]['sq']}, {listone[nome]['r']}) · {data} · {tipo}: {testo}")
 
 
-def voto(dossier, listone, nome, giornata, v, fv=None):
+def voto(dossier, listone, nome, giornata, v, fv=None, eventi=None):
+    """Un voto per giornata: se arriva di nuovo (stessa giornata) sostituisce.
+    eventi e' testo libero breve: 'gol', 'assist', 'rigore sbagliato', 'espulso'."""
     nome = trova(nome, listone)
     voci = voce(dossier, nome)["voti"]
     voci[:] = [x for x in voci if x["g"] != int(giornata)]
-    voci.append({"g": int(giornata), "v": float(v), "fv": float(fv) if fv is not None else None})
+    x = {"g": int(giornata), "v": float(v), "fv": float(fv) if fv not in (None, "") else None}
+    if eventi:
+        x["ev"] = eventi
+    voci.append(x)
     voci.sort(key=lambda x: x["g"])
-    print(f"{nome}: giornata {giornata} voto {v}" + (f", fantavoto {fv}" if fv is not None else ""))
+    print(f"{nome}: giornata {giornata} voto {v}" + (f", fantavoto {fv}" if x["fv"] is not None else "") + (f" ({eventi})" if eventi else ""))
 
 
 def rigorista(dossier, listone, nome, valore):
@@ -143,7 +169,7 @@ def mostra(dossier, listone, filtro=None):
         for n in v["note"]:
             print(f"   {n['data']}  [{n['tipo']}] {n['testo']}  ({n['fonte']})")
         if v["voti"]:
-            print("   voti: " + "  ".join(f"g{x['g']} {x['v']}" + (f"/{x['fv']}" if x['fv'] is not None else "") for x in v["voti"]))
+            print("   voti: " + "  ".join(f"g{x['g']} {x['v']}" + (f"/{x['fv']}" if x['fv'] is not None else "") + (f" [{x['ev']}]" if x.get("ev") else "") for x in v["voti"]))
         return
     for r in ([filtro] if filtro else RUOLI):
         nomi = [n for n in dossier["giocatori"] if listone.get(n, {}).get("r") == r]
@@ -155,6 +181,37 @@ def mostra(dossier, listone, filtro=None):
             ultima = v["note"][-1] if v["note"] else None
             print(riga(nome, v, listone[nome]) + (f"\n      ultima: {ultima['data']} [{ultima['tipo']}] {ultima['testo']}" if ultima else ""))
     print(f"\n{len(dossier['giocatori'])} giocatori con qualcosa nel dossier, aggiornato il {dossier['aggiornato']}")
+
+
+def importa(dossier, listone, percorso):
+    """Tutte le note di un giornale. Prima controlla tutti i nomi: se anche uno
+    solo non e' nel listone non scrive niente, cosi' il dossier non si sporca."""
+    dati = json.load(open(percorso, encoding="utf-8"))
+    data = dati["data"]
+    fonte = dati.get("fonte", "gazzetta")
+    problemi = []
+    voci = [(n["nome"], "nota") for n in dati.get("note", [])]
+    voci += [(v["nome"], "voto") for v in dati.get("voti", [])]
+    voci += [(r["nome"], "rigorista") for r in dati.get("rigoristi", [])]
+    for nome, dove in voci:
+        if nome not in listone:
+            chiave = norm(nome)
+            simili = [n for n in listone if chiave and (chiave in norm(n) or norm(n) in chiave)]
+            problemi.append(f"  {dove}: '{nome}' non e' nel listone" + (f" (forse: {', '.join(simili)})" if simili else ""))
+    for n in dati.get("note", []):
+        if n["tipo"] not in TIPI:
+            problemi.append(f"  nota di {n['nome']}: tipo '{n['tipo']}' sconosciuto")
+    if problemi:
+        print(f"{percorso}: {len(problemi)} problemi, non importo niente:")
+        print("\n".join(sorted(set(problemi))))
+        sys.exit(1)
+    for n in dati.get("note", []):
+        aggiungi(dossier, listone, n["nome"], data, n["tipo"], n["testo"], fonte)
+    for v in dati.get("voti", []):
+        voto(dossier, listone, v["nome"], v["giornata"], v["voto"], v.get("fantavoto"), v.get("eventi"))
+    for r in dati.get("rigoristi", []):
+        rigorista(dossier, listone, r["nome"], r["valore"])
+    print(f"Importate {len(dati.get('note', []))} note, {len(dati.get('voti', []))} voti, {len(dati.get('rigoristi', []))} rigoristi da {percorso}")
 
 
 def cerca(listone, pezzo):
@@ -179,6 +236,8 @@ def main(argv):
     elif comando == "mostra":
         mostra(dossier, listone, resto[0] if resto else None)
         return
+    elif comando == "importa" and resto:
+        importa(dossier, listone, resto[0])
     elif comando == "cerca" and resto:
         cerca(listone, resto[0])
         return
