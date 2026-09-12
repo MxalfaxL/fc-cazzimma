@@ -43,6 +43,13 @@ if __name__ == "__main__":
     blocco = json.loads(LISTONE.read_text(encoding="utf-8"))
     if not blocco.get("listone"):
         raise SystemExit("Il listone e' vuoto.")
+    # la lega (nome, data dell'asta, cognomi degli avversari) sta in un file
+    # privato e viaggia dentro il listone: l'app rinomina gli avversari che
+    # hanno ancora il nome di default. Cosi' i cognomi non finiscono nel codice.
+    lega = RADICE / "dati" / "lega.json"
+    if lega.exists():
+        blocco["lega"] = json.loads(lega.read_text(encoding="utf-8"))
+        blocco["lega"].pop("_cosa_e", None)
     # il marcatore di tempo e' quello che l'app confronta: piu' recente vince
     blocco["caricato"] = int(time.time() * 1000)
     contenuto = base64.b64encode(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).decode("ascii")
@@ -66,6 +73,8 @@ if __name__ == "__main__":
         n = len(blocco["listone"])
         print(f"\n  listone inviato: {n} giocatori, {len(blocco.get('piani', {}))} piani, "
               f"{sum(1 for v in blocco['listone'] if v.get('gz'))} con segnale Gazzetta.")
+        if blocco.get("lega"):
+            print(f"  con la lega: {blocco['lega'].get('lega')} · asta {blocco['lega'].get('asta_testo')} · {len(blocco['lega'].get('avversari', []))} avversari")
         print("  L'app lo prende alla prossima apertura, su tutti i dispositivi collegati.\n")
     finally:
         if precedente and precedente != UTENTE:

@@ -8,8 +8,8 @@ le cose ti serviranno. L'app è su <https://mxalfaxl.github.io/fc-cazzimma/>.
 | quando | cosa |
 |---|---|
 | adesso | entra, metti l'icona sul telefono, carica il listone dal Mac |
-| fino al 6 ottobre | prova a secco con un'asta finta; procurati i rigoristi |
-| 6 ottobre, sera | l'asta: ogni acquisto va segnato subito |
+| fino al 7 ottobre | prova a secco con un'asta finta; procurati i rigoristi |
+| 7 ottobre, sera | l'asta: ogni acquisto va segnato subito |
 | dopo l'asta | sistema la rosa: squadra e voti attesi, una volta sola |
 | ogni sabato | la formazione: probabili, ufficiali, dubbi, copia e schiera |
 | dopo ogni giornata | registra il risultato in Stagione |
@@ -87,7 +87,7 @@ il conto degli altri è facoltativo, il tuo no. Su ogni movimento c'è
 hanno per ruolo e quanto hanno speso da quello che hai segnato. Dopo i
 centrocampisti i crediti sono pubblici: se non torna, correggi a mano.
 
-**Prova a secco** prima del 6 ottobre: compra, segna via, cambia piano,
+**Prova a secco** prima del 7 ottobre: compra, segna via, cambia piano,
 annulla. Alla fine *Rosa → Svuota tutto e ricomincia*: il listone resta.
 
 ## 5. Dopo l'asta: la rosa

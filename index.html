@@ -807,7 +807,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.12c';
+const VERSIONE_APP = '2026.09.12d';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -954,7 +954,8 @@ async function sincronizzaListone(){
     if(remMs > locMs){
       listone = normalizzaListone(dati);
       locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
-      disegnaPiani(); disegnaListone();
+      if(applicaLega()){ salva(); }
+      disegnaTutto();
     } else if(locMs > remMs){
       await inviaListone(shaListone);
     }
@@ -1364,6 +1365,7 @@ function normalizzaListone(dati){
   const voci = Array.isArray(dati) ? dati : (dati.listone || dati.voci || []);
   const piani = (dati && dati.piani && typeof dati.piani === 'object') ? dati.piani : {};
   const out = {piani:{}, voci:[], caricato: (dati && dati.caricato) || Date.now()};
+  if(dati && dati.lega && typeof dati.lega === 'object') out.lega = dati.lega;
   for(const [nome, ob] of Object.entries(piani)){
     if(ob && ORDINE.every(r=>isFinite(+ob[r]))) out.piani[nome] = Object.fromEntries(ORDINE.map(r=>[r, Math.round(+ob[r])]));
   }
@@ -1393,6 +1395,19 @@ function fattoreReparto(r){
   return Math.max(0.4, Math.min(2.5, k));
 }
 const tettoOggi = g => Math.max(1, Math.min(maxOfferta(), Math.round(tettoPiano(g) * fattoreReparto(g.r))));
+
+/* la lega arriva col listone: nome in testata, e i cognomi al posto di
+   "Avversario N" per chi non è stato ancora rinominato a mano */
+function applicaLega(){
+  const l = listone.lega; if(!l) return false;
+  let cambiato = false;
+  (l.avversari || []).slice(0, 9).forEach((nome, i)=>{
+    if(stato.avversari[i] && /^Avversario \d$/.test(stato.avversari[i].n) && nome){ stato.avversari[i].n = nome; cambiato = true; }
+  });
+  const claim = document.querySelector('.claim');
+  if(claim && l.lega) claim.textContent = `${l.lega}${l.asta_testo ? ' · asta ' + l.asta_testo : ''}`;
+  return cambiato;
+}
 
 function caricaListone(){
   const grezzo = locale.leggi(CHIAVE_LISTONE);
@@ -1493,6 +1508,7 @@ $('btnCaricaListone').addEventListener('click', ()=>{
   locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
   $('inListone').value = ''; out.textContent = '';
   filtroRuolo = null;
+  applicaLega();
   if(listone.piani[stato.piano]) stato.target = {...listone.piani[stato.piano]};
   else if(Object.keys(listone.piani).length){ stato.piano = Object.keys(listone.piani)[0]; stato.target = {...listone.piani[stato.piano]}; }
   aggiornaCampi(); disegnaTutto(); salva();
@@ -2070,6 +2086,7 @@ function entra(){
   caricaListone();
   aggiornaCampi();
   const f = faseCorrente(); if(f) inRuolo.value = f;
+  if(applicaLega()) salva();
   disegnaTutto();
   // prima dell'asta si vive nella scheda Asta, dopo nella Formazione
   mostra(stato.rosa.length < slotTot() ? 'asta' : 'formazione');

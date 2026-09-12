@@ -19,7 +19,9 @@ tirarlo dentro fa solo danno:
 - Il tono è quello di due amici che costruiscono una cosa per divertimento.
   Diretto, senza cerimonie.
 
-**Data dell'asta: 6 ottobre 2026.** Tutto quello che serve per l'asta ha
+**Data dell'asta: 7 ottobre 2026, sera.** Lega Minuetto, 10 squadre; Marco è
+Lomasto, la squadra è FC Cazzimma; i cognomi degli avversari stanno in
+`dati/lega.json` (privato) e arrivano all'app dentro il listone. Tutto quello che serve per l'asta ha
 priorità su tutto il resto.
 
 ## La cartella di lavoro
