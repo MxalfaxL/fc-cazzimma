@@ -139,7 +139,11 @@ i rigori, i trasferimenti. Arriva sul telefono insieme al listone, quindi si
 aggiorna da sola a ogni **Controlla aggiornamenti**; in alto a destra c'è la
 data dell'ultimo aggiornamento.
 
-Cerca per nome o squadra, filtra per ruolo e scegli l'ordine: **forma**
+Cerca per nome o squadra, filtra per ruolo e scegli l'ordine: **consiglio**
+(i fantapunti attesi a giornata calcolati sul Mac: partono da quanto costa
+nel listone e si spostano verso quello che il dossier sa davvero, voti,
+presenze, infortuni, rigori; **▲ affare** vale più di quanto costa, **▼ caro**
+il contrario, e aprendo il nome c'è il perché in parole), **forma**
 (media dei voti con le ultime giornate che pesano di più: l'ultima vale tre,
 la precedente due, le altre una), **media** (semplice), **novità** (chi ha
 notizie più fresche in cima), **nome**. Chi non ha ancora voti sta in fondo,

@@ -143,6 +143,7 @@ motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il list
 motore/invia_listone.py    manda report/listone.json all'app, via repository dei dati
 motore/leggi_gazzetta.py   dal PDF del giornale, le pagine di Serie A e chi viene citato
 motore/dossier.py          note datate per giocatore (infortuni, rigoristi, voti), base della classifica d'asta
+motore/classifica_asta.py  fantapunti attesi a giornata per ruolo: listone + dossier, con il perché in parole
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
