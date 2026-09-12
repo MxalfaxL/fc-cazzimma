@@ -141,6 +141,9 @@ motore/listone.py          prezzi d'asta e piani dal listone ufficiale
 motore/esporta_app.py      blocco settimanale da incollare nell'app
 motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il listone della Gazzetta
 motore/invia_listone.py    manda report/listone.json all'app, via repository dei dati
+motore/leggi_gazzetta.py   dal PDF del giornale, le pagine di Serie A e chi viene citato
+motore/dossier.py          note datate per giocatore (infortuni, rigoristi, voti), base della classifica d'asta
+Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
 dati/piani-esempio.json    ripartizione neutra del mercato, per far girare il codice
