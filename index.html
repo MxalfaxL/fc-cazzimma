@@ -493,7 +493,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   </div>
 
   <div class="blocco">
-    <div class="eyebrow">Aggiudicato a me</div>
+    <div class="eyebrow"><span>Aggiudicato</span><small id="aChiRiassunto"></small></div>
     <label class="campo"><span>Giocatore</span>
       <input type="text" id="inNome" placeholder="Es. Maignan" autocomplete="off"></label>
     <div class="duecol">
@@ -503,7 +503,9 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <label class="campo"><span>Prezzo</span>
         <input type="number" id="inPrezzo" inputmode="numeric" min="1" placeholder="0"></label>
     </div>
+    <label class="campo"><span>Comprato da</span><select id="aChi"></select></label>
     <button class="azione" id="btnAggiungi">Aggiungi alla rosa</button>
+    <p class="nota">Di solito lasci <b>me</b>. Se vuoi tenere il conto anche degli altri, scegli chi ha comprato: i nomi sono quelli del riquadro <b>Gli avversari</b> qui sotto. Da <b>via</b> nel listone il nome arriva già compilato.</p>
   </div>
 
   <div class="blocco">
@@ -803,7 +805,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.05';
+const VERSIONE_APP = '2026.09.12';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1512,7 +1514,7 @@ $('risultatiListone').addEventListener('click', e=>{
   if(b.dataset.spiega !== undefined){ spiegato = spiegato === b.dataset.spiega ? null : b.dataset.spiega; disegnaListone(); return; }
   if(b.dataset.prendi !== undefined){
     const g = trovaVoce(b.dataset.prendi); if(!g) return;
-    inNome.value = g.n; inRuolo.value = g.r; inPrezzo.value = ''; inPrezzo.focus();
+    inNome.value = g.n; inRuolo.value = g.r; inPrezzo.value = ''; destinatario = 'me'; disegnaAChi(); inPrezzo.focus();
     const av = $('avviso'); av.className = 'avviso ok';
     av.textContent = `${g.n}: tetto consigliato ${tettoOggi(g)} FM, massimo possibile ${maxOfferta()}.`;
     inNome.scrollIntoView({behavior:'smooth', block:'center'});
@@ -1520,10 +1522,15 @@ $('risultatiListone').addEventListener('click', e=>{
   }
   if(b.dataset.via !== undefined){
     const g = trovaVoce(b.dataset.via); if(!g) return;
+    // sparisce subito dai liberi; a chi e per quanto lo dici nel modulo, se vuoi
     stato.venduti.push({n:g.n, r:g.r, sq:g.sq, a:null, p:null, t:Date.now()});
     spiegato = null;
-    disegnaAsta(); disegnaListone(); disegnaMovimenti(); salva();
-    toast(`${g.n} via · a chi? tocca qui sotto`);
+    inNome.value = g.n; inRuolo.value = g.r; inPrezzo.value = ''; destinatario = null;
+    disegnaAsta(); disegnaListone(); disegnaMovimenti(); disegnaAChi(); salva();
+    const av = $('avviso'); av.className = 'avviso attenzione';
+    av.textContent = `${g.n} è andato via. Se vuoi tenere il conto, scegli chi lo ha preso e scrivi il prezzo. Altrimenti vai avanti.`;
+    inNome.scrollIntoView({behavior:'smooth', block:'center'});
+    $('aChi').focus();
   }
 });
 
@@ -1589,7 +1596,7 @@ function disegnaAvversari(){
 }
 $('avversari').addEventListener('input', e=>{
   const n = e.target.dataset.avvN, c = e.target.dataset.avvC;
-  if(n !== undefined) stato.avversari[+n].n = e.target.value;
+  if(n !== undefined){ stato.avversari[+n].n = e.target.value; disegnaAChi(); }
   if(c !== undefined) stato.avversari[+c].c = +e.target.value || 0;
   salva();
 });
@@ -1652,16 +1659,50 @@ function disegnaAsta(){
       <div class="numeri">${presi(r)}/${SLOT[r]}<br><em>${sp} / ${t} FM</em></div></div>`;
   }).join('');
 
-  $('btnAggiungi').disabled = !fase;
+  disegnaAChi();
 }
 
 const inNome = $('inNome'), inRuolo = $('inRuolo'), inPrezzo = $('inPrezzo');
+
+/* a chi va il giocatore: 'me', l'indice di un avversario, o null quando
+   deve ancora scegliere dopo un "via" */
+let destinatario = 'me';
+function disegnaAChi(){
+  const fase = faseCorrente();
+  $('aChi').innerHTML = (destinatario === null ? `<option value="" selected>a chi è andato?</option>` : '')
+    + `<option value="me" ${destinatario==='me'?'selected':''}>me</option>`
+    + stato.avversari.map((a,i)=>`<option value="${i}" ${destinatario===i?'selected':''}>${esc(a.n)}</option>`).join('');
+  const b = $('btnAggiungi');
+  if(destinatario === 'me'){ b.textContent = 'Aggiungi alla rosa'; b.disabled = !fase; $('aChiRiassunto').textContent = 'a me'; }
+  else if(destinatario === null){ b.textContent = 'Scegli a chi è andato'; b.disabled = true; $('aChiRiassunto').textContent = 'a chi?'; }
+  else { b.textContent = 'Assegna a ' + stato.avversari[destinatario].n; b.disabled = false; $('aChiRiassunto').textContent = 'a un avversario'; }
+}
+$('aChi').addEventListener('change', e=>{
+  const v = e.target.value;
+  destinatario = v === '' ? null : (v === 'me' ? 'me' : +v);
+  disegnaAChi(); if(destinatario !== null) inPrezzo.focus();
+});
 
 $('btnAggiungi').addEventListener('click', ()=>{
   const nome = inNome.value.trim(), r = inRuolo.value, p = parseInt(inPrezzo.value, 10);
   const errore = m => { const av = $('avviso'); av.className='avviso grave'; av.textContent=m; };
   if(!nome){ inNome.focus(); return errore('Scrivi il nome del giocatore.'); }
   if(!(p >= 1)){ inPrezzo.focus(); return errore('Il prezzo deve essere almeno 1 FM.'); }
+  if(destinatario === null) return errore('Tocca chi lo ha comprato: me oppure un avversario.');
+
+  if(destinatario !== 'me'){
+    // comprato da un avversario: aggiorno il "via" già segnato o ne creo uno
+    const voceL = listone.voci.find(x=>normNome(x.n) === normNome(nome) && x.r === r) || listone.voci.find(x=>normNome(x.n) === normNome(nome));
+    let v = stato.venduti.find(x=>normNome(x.n) === normNome(nome) && (x.a === null || x.a === undefined));
+    if(!v){ v = {n: voceL ? voceL.n : nome, r, sq: voceL ? voceL.sq : '', a:null, p:null, t:Date.now()}; stato.venduti.push(v); }
+    v.a = destinatario; v.p = p; v.r = v.r || r;
+    const chi = stato.avversari[destinatario].n;
+    inNome.value = ''; inPrezzo.value = ''; destinatario = 'me';
+    disegnaTutto(); salva();
+    toast(`${v.n} a ${chi} per ${p} FM`);
+    return;
+  }
+
   if(presi(r) >= SLOT[r]) return errore(`Gli slot da ${NOME[r].toLowerCase()} sono già pieni.`);
   if(p > maxOfferta()) return errore(`${p} FM è oltre il massimo. Puoi arrivare a ${maxOfferta()} tenendo 1 credito per ogni slot che resta.`);
 

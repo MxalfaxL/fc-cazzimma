@@ -223,7 +223,8 @@ Fatto e funzionante:
 
 - PWA completa: asta con tetto dinamico, listone con ricerca e spiegazione
   del tetto, cambio piano con un tocco, annulla ultimo movimento, rose e
-  crediti degli avversari che si costruiscono segnando i loro acquisti,
+  crediti degli avversari che si costruiscono segnando i loro acquisti
+  (tendina "Comprato da" nel modulo, di default su me),
   consigliere di formazione, stagione, sincronizzazione con il repository
   privato (stato e listone), tema chiaro e scuro, schermo acceso in asta.
 - `listone.py` tarato sul file ufficiale 2026/27, un solo `report/listone.json`

@@ -4,7 +4,7 @@
 
    Quando cambia qualcosa nell'app, alza VERSIONE: il vecchio guscio viene
    buttato e il nuovo scaricato alla prima apertura con rete. */
-const VERSIONE = '2026.09.05';
+const VERSIONE = '2026.09.12';
 const CACHE = 'cazzimma-' + VERSIONE;
 const FONT = 'cazzimma-font';
 const GUSCIO = ['./', './index.html', './manifest.webmanifest',

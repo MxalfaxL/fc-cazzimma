@@ -70,13 +70,15 @@ sei sopra il piano, rosso se rischi di non completare la rosa. C'è anche
 l'interruttore per tenere lo schermo acceso.
 
 **Quando compri tu**: cerca il giocatore, tocca **preso**, scrivi il prezzo,
-**Aggiungi alla rosa**. Se il prezzo supera il massimo l'app si rifiuta e
-spiega perché.
+**Aggiungi alla rosa**. La tendina **Comprato da** resta su *me*. Se il prezzo
+supera il massimo l'app si rifiuta e spiega perché.
 
-**Quando compra un altro**: tocca **via** sulla sua riga. In **Ultimi
-movimenti** tocca l'avversario che l'ha preso e scrivi il prezzo: facoltativo,
-ma così crediti e rose degli altri si costruiscono da soli. Su ogni movimento
-c'è **annulla**.
+**Quando compra un altro**: tocca **via** sulla sua riga: sparisce dai liberi
+e il suo nome arriva nel modulo. Se vuoi tenere il conto, nella tendina
+**Comprato da** scegli l'avversario, scrivi il prezzo e tocca **Assegna**:
+crediti e rose degli altri si costruiscono da soli. Se non vuoi, vai avanti:
+il conto degli altri è facoltativo, il tuo no. Su ogni movimento c'è
+**annulla**.
 
 **Gli avversari**: puoi dare loro il nome vero; l'app mostra quanti giocatori
 hanno per ruolo e quanto hanno speso da quello che hai segnato. Dopo i

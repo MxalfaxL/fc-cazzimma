@@ -80,8 +80,9 @@ Prima dell'asta, una volta sola:
 
 In asta: cerchi il nome, vedi il tuo tetto, tocchi il nome se vuoi sapere da
 dove viene, premi **preso** e il modulo è compilato. Chi va a un avversario lo
-segni con **via**, poi tocchi l'avversario e scrivi il prezzo: crediti e rose
-degli altri si aggiornano da soli. Se hai sbagliato, **annulla** sull'ultimo
+segni con **via**; se vuoi tenere il conto anche degli altri, nella tendina
+**Comprato da** scegli l'avversario e scrivi il prezzo: crediti e rose degli
+altri si aggiornano da soli. Se hai sbagliato, **annulla** sull'ultimo
 movimento.
 
 Il **piano di spesa** si cambia con un tocco fra equilibrio, difesa,
