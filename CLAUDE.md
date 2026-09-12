@@ -24,6 +24,16 @@ Lomasto, la squadra è FC Cazzimma; i cognomi degli avversari stanno in
 `dati/lega.json` (privato) e arrivano all'app dentro il listone. Tutto quello che serve per l'asta ha
 priorità su tutto il resto.
 
+## Prima di tutto: la wiki privata
+
+In `wiki/` (git la ignora, resta sul Mac) c'è una wiki scritta per te: stato
+del progetto, prossimi passi, fatti della lega, procedure, errori già fatti,
+decisioni e diario. `wiki/STATO.md` e `wiki/LEGA.md` arrivano da soli in
+contesto all'avvio (hook in `.claude/settings.json`). Prima di toccare app,
+listone o GitHub leggi `wiki/PROCEDURE.md`; se qualcosa non torna,
+`wiki/LEZIONI.md`. **A fine sessione aggiorna `wiki/STATO.md` e aggiungi la
+voce in `wiki/DIARIO.md`.** Le regole di manutenzione sono in `wiki/INDICE.md`.
+
 ## La cartella di lavoro
 
 Tutto il progetto vive in una cartella sul Mac di Marco, quella in cui stai

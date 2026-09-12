@@ -28,3 +28,6 @@ __pycache__/
 
 # impostazioni locali di Claude Code
 .claude/
+
+# wiki privata per Claude: mai su GitHub
+wiki/
