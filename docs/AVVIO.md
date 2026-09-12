@@ -74,9 +74,20 @@ Prima dell'asta, una volta sola:
    ogni piano, e `report/LISTONE.md` con le tabelle. I piani li scrivi in
    `dati/piani.json`: niente di tutto questo finisce su GitHub.
 
-3. Copialo tutto e incollalo nell'app sotto **Asta → Listone**. Se l'app è
-   collegata al repository, il listone viaggia da solo sugli altri
-   dispositivi.
+3. Mandalo all'app:
+
+   ```bash
+   python3 motore/invia_listone.py
+   ```
+
+   Lo scrive nel repository dei dati e l'app lo prende alla prossima
+   apertura, su tutti i dispositivi. Incollarlo a mano in **Asta → Listone**
+   resta possibile, ma non serve più.
+
+Se hai anche la pagina del listone della Gazzetta, fra il passo 2 e il 3
+lancia `python3 motore/confronta_gazzetta.py dati/gazzetta-DATA-grezzo.csv`:
+accanto ai nomi compare ▲ *sale* o ▼ *cala*, con la spiegazione quando li
+tocchi. È un secondo parere sulle gerarchie, non un prezzo.
 
 In asta: cerchi il nome, vedi il tuo tetto, tocchi il nome se vuoi sapere da
 dove viene, premi **preso** e il modulo è compilato. Chi va a un avversario lo

@@ -43,14 +43,17 @@ Finché la rosa non è completa l'app si apre su Asta, poi su Formazione.
 
 ## 3. Caricare il listone
 
-Il listone sono i 250 giocatori che verranno comprati, con il prezzo di
-mercato e il **tuo tetto**, il massimo che ti conviene offrire. Lo calcola il
+Il listone sono tutti i giocatori di Serie A, con il prezzo di mercato e il
+**tuo tetto**, il massimo che ti conviene offrire. Chi sta fuori dai 250 che
+verranno comprati vale 1, e l'app lo dice. Lo calcola il
 Mac dal file ufficiale; lo incolli nell'app una volta e viaggia da solo sugli
 altri dispositivi.
 
-1. Sul Mac, in Claude Code: "rigenera il listone e mettimelo negli appunti".
-2. Nell'app, **Asta → Listone**, clicca nella casella grande, Cmd+V.
-3. **Carica il listone**. Compare "250 giocatori, 4 piani".
+1. Sul Mac, in Claude Code: "rigenera il listone e mandalo all'app".
+2. Apri l'app: il listone arriva da solo, su tutti i dispositivi collegati.
+   Se l'app era già aperta, chiudila e riaprila.
+3. Accanto ad alcuni nomi c'è ▲ *sale* o ▼ *cala*: è il secondo parere della
+   Gazzetta sulle gerarchie. Tocca il nome e ti dice perché.
 
 Sopra il listone c'è il **Piano di spesa**: quattro piani, il tetto di ogni
 giocatore cambia col piano, si passa dall'uno all'altro con un tocco. La

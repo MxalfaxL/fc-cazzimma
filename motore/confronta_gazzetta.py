@@ -143,6 +143,26 @@ if __name__ == "__main__":
     uscita = RADICE / "report" / "confronto-gazzetta.md"
     uscita.write_text("\n".join(doc) + "\n", encoding="utf-8")
 
+    # il segnale entra nel listone dell'app: una freccia accanto al nome e una
+    # riga di spiegazione quando lo si tocca. I vecchi segnali vengono tolti.
+    percorso_listone = RADICE / "report" / "listone.json"
+    blocco = json.loads(percorso_listone.read_text(encoding="utf-8"))
+    nomi_ruolo = {"P": "portieri", "D": "difensori", "C": "centrocampisti", "A": "attaccanti"}
+    segnali = {}
+    for verso, lista in (("su", su), ("giu", giu)):
+        for x in lista:
+            testo = (f"la Gazzetta dell'{data[8:10]}/{data[5:7]} lo mette {x['pos_gazzetta']}° fra i {nomi_ruolo[x['ruolo']]}, "
+                     f"noi {x['pos_nostra']}°: " + ("è salito nelle gerarchie dopo le prime giornate." if verso == "su"
+                                                   else "è sceso, controlla le ultime formazioni prima di pagarlo il tetto."))
+            segnali[(x["nome"], x["ruolo"])] = (verso, testo)
+    for v in blocco["listone"]:
+        v.pop("gz", None); v.pop("gzn", None)
+        seg = segnali.get((v["n"], v["r"]))
+        if seg:
+            v["gz"], v["gzn"] = seg
+    percorso_listone.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"  segnali scritti nel listone dell'app: {sum(1 for v in blocco['listone'] if 'gz' in v)}")
+
     print(f"\n  abbinati {len(righe)} su {len(gazzetta)} · non nel file: {len(nuovi)} · squadra diversa: {len(cambi)}")
     print(f"  in ascesa: {len(su)} · in calo: {len(giu)}")
     for titolo, lista in (("IN ASCESA", su[:15]), ("IN CALO", giu[:15])):

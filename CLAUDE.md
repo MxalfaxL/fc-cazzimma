@@ -127,6 +127,7 @@ motore/verifica_parita.py  controlla che Python e JavaScript diano gli stessi nu
 motore/listone.py          prezzi d'asta e piani dal listone ufficiale
 motore/esporta_app.py      blocco settimanale da incollare nell'app
 motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il listone della Gazzetta
+motore/invia_listone.py    manda report/listone.json all'app, via repository dei dati
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
 dati/piani-esempio.json    ripartizione neutra del mercato, per far girare il codice
@@ -150,9 +151,11 @@ pubblico ma innocuo: non ci sono segreti nel codice.
 
 ## Cose da non fare
 
-- **Non toccare mai il repository `fc-cazzimma-dati`.** Ci scrive solo l'app
-  attraverso l'API di GitHub. Se ci mettessimo le mani da qui, le versioni si
-  pesterebbero i piedi.
+- **Non toccare mai `stato.json` nel repository `fc-cazzimma-dati`.** Ci
+  scrive solo l'app attraverso l'API di GitHub: se ci mettessimo le mani da
+  qui, le versioni si pesterebbero i piedi. L'unica eccezione, dal 12
+  settembre 2026, è `listone.json`: lo scrive `motore/invia_listone.py` dal
+  Mac e l'app lo prende se è più recente del suo. Niente altro.
 - **Nessun token, nessuna credenziale in un file.** Il token dell'app vive solo
   sul dispositivo, cifrato con la password che Marco sceglie nella schermata
   di accesso (PBKDF2 + AES-GCM, tutto nel browser). Se ti serve autenticarti
@@ -228,8 +231,11 @@ Fatto e funzionante:
   (tendina "Comprato da" nel modulo, di default su me),
   consigliere di formazione, stagione, sincronizzazione con il repository
   privato (stato e listone), tema chiaro e scuro, schermo acceso in asta.
-- `listone.py` tarato sul file ufficiale 2026/27, un solo `report/listone.json`
-  con i piani dentro, più `report/LISTONE.md` con le tabelle. Entrambi privati.
+- `listone.py` tarato sul file ufficiale del 12 settembre 2026, un solo
+  `report/listone.json` con tutti i giocatori (chi è fuori dai 250 vale 1),
+  i piani dentro e i segnali della Gazzetta (`gz`/`gzn`), più
+  `report/LISTONE.md` con le tabelle. Entrambi privati. La sequenza è
+  `listone.py` → `confronta_gazzetta.py` → `invia_listone.py`.
 - **Costo dell'errore sui ballottaggi** (punto 1, fatto): il ricambio è il vero
   primo di panchina del ruolo, con la catena "se non gioca lui entra il
   successivo", e per ogni dubbio schierato l'app dice quanto costa se perde,

@@ -233,9 +233,12 @@ def esporta_app(per_piano, percorso):
     """Un solo file per l'app: prezzi di mercato uguali per tutti, un tetto
     per ogni piano. Cosi' in asta si passa dal piano A al piano B senza
     ricaricare niente."""
+    # tutti i giocatori, non solo i 250 che verranno comprati: in asta puo'
+    # essere chiamato chiunque, e deve essere trovabile. Chi sta fuori dai
+    # 250 vale 1, ed e' giusto che l'app lo dica.
     base = next(iter(per_piano.values()))
     voci = []
-    for _, r in base[base["comprato"]].iterrows():
+    for _, r in base.iterrows():
         tetti = {}
         for nome, df in per_piano.items():
             riga = df[(df["nome"] == r["nome"]) & (df["ruolo"] == r["ruolo"])]
@@ -251,7 +254,7 @@ def esporta_app(per_piano, percorso):
     }
     percorso.parent.mkdir(exist_ok=True)
     percorso.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    return len(voci)
+    return int(base["comprato"].sum())
 
 
 def esporta_tabelle(per_piano, percorso, quanti=18):
@@ -322,5 +325,5 @@ if __name__ == "__main__":
     uscita = RADICE / "report" / "listone.json"
     n = esporta_app(per_piano, uscita)
     esporta_tabelle(per_piano, RADICE / "report" / "LISTONE.md")
-    print(f"  → report/listone.json, {n} giocatori e {len(per_piano)} piani, pronto per l'app")
+    print(f"  → report/listone.json, {n} giocatori con un prezzo e {len(grezzo) - n} a 1 credito, {len(per_piano)} piani, pronto per l'app")
     print(f"  → report/LISTONE.md, le tabelle con i tetti da leggere prima dell'asta\n")
