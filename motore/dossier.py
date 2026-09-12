@@ -124,8 +124,9 @@ def aggiungi(dossier, listone, nome, data, tipo, testo, fonte="gazzetta", rif=No
     v["note"].sort(key=lambda n: n["data"])
     if tipo in STATO_DA_TIPO:
         v["stato"] = STATO_DA_TIPO[tipo]
-    if tipo == "rigorista" and v["rigorista"] is None:
-        v["rigorista"] = "si"
+    # una nota di tipo "rigorista" NON basta a farne il rigorista: puo' dire
+    # "e' l'alternativa" o "ha perso il posto". Il valore lo mette solo il
+    # comando rigorista (o l'array "rigoristi" di un note.json).
     print(f"{nome} ({listone[nome]['sq']}, {listone[nome]['r']}) · {data} · {tipo}: {testo}")
 
 
