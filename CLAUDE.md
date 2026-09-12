@@ -126,6 +126,7 @@ motore/ottimizzatore.py    modulo, undici, costo dei ballottaggi, versione Pytho
 motore/verifica_parita.py  controlla che Python e JavaScript diano gli stessi numeri
 motore/listone.py          prezzi d'asta e piani dal listone ufficiale
 motore/esporta_app.py      blocco settimanale da incollare nell'app
+motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il listone della Gazzetta
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
 dati/piani-esempio.json    ripartizione neutra del mercato, per far girare il codice
@@ -273,3 +274,8 @@ Da fare, in quest'ordine:
 - La lista dei rigoristi delle venti squadre. È l'informazione che sposta più
   punti e non sta in nessun listone.
 - La conferma dello staff su data dell'asta e arrotondamento dello svincolo.
+- **Il file delle quotazioni va riscaricato da Fantacalcio.it la settimana
+  dell'asta**: quello di agosto aveva 30 giocatori in meno e 6 squadre
+  sbagliate. Ogni giovedì la Gazzetta pubblica il suo listone: la pagina
+  del PDF, passata per `pdftotext -raw`, diventa il CSV per
+  `confronta_gazzetta.py`.
