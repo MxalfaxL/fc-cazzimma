@@ -151,9 +151,10 @@ con un trattino.
 
 Tocca un nome: sale un foglio con il consiglio, i voti con gli eventi (gol,
 assist, ammonizioni) e le notizie dalla più recente, una riga ciascuna con
-data e tipo. Tocca una notizia per leggerla per intero, con la fonte
-(Gazzetta con la pagina, SOS Fanta con il collegamento all'articolo, le
-altre pagine web con il nome del sito). Si chiude toccando fuori o la ×.
+data e tipo. Le notizie che dicono la stessa cosa da fonti o giorni diversi sono una riga
+sola, con **×N** accanto: tocca la notizia per leggerla per intero e vedere
+tutte le fonti (Gazzetta con la pagina, SOS Fanta con il collegamento
+all'articolo, le altre pagine web con il nome del sito). Si chiude toccando fuori o la ×.
 Dal listone d'asta lo stesso foglio si apre con **Tutte le notizie ›** sotto
 la spiegazione del tetto.
 Accanto al nome, **ko** rosso vuol dire infortunato o squalificato secondo

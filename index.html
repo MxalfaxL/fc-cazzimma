@@ -256,7 +256,8 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .note-l .tipo{font-weight:700;margin-right:5px}
 .note-l li.infortunio .tipo,.note-l li.squalifica .tipo{color:var(--rosso-testo)} .note-l li.rientro .tipo,.note-l li.titolare .tipo{color:var(--verde-testo)} .note-l li.rigorista .tipo{color:var(--oro)}
 .note-l .dett{margin:0 0 10px 52px;font-size:12.5px;color:var(--grigio);line-height:1.5}
-.note-l .dett a{display:inline-block;margin-top:6px;border:1px solid var(--linea);border-radius:8px;padding:6px 10px;color:var(--azzurro);text-decoration:none;font-weight:600}
+.note-l .dett a{display:inline-block;margin-left:4px;border:1px solid var(--linea);border-radius:6px;padding:2px 7px;color:var(--azzurro);text-decoration:none;font-weight:600}
+.note-l .segnale.neutro{margin-left:6px}
 .an-dett{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
 .an-dett .voti{font-family:"IBM Plex Mono",monospace;font-size:11.5px;margin-bottom:6px;word-break:break-word}
 .an-dett ul{margin:0;padding:0;list-style:none}
@@ -659,7 +660,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <div class="riga-filtro" id="analisiRuoli"></div>
       <div class="riga-filtro" id="analisiOrdine"></div>
       <div id="risultatiAnalisi"></div>
-      <p class="nota"><b>Consiglio</b> sono i fantapunti attesi a giornata calcolati sul Mac: parte da quanto costa nel listone e si sposta verso quello che il dossier sa davvero (voti, presenze, infortuni, rigori). <b>▲ affare</b> vale più di quanto costa, <b>▼ caro</b> il contrario. <b>Forma</b> è la media dei voti Gazzetta con le ultime giornate che pesano di più (l'ultima vale tre, la precedente due, prima una). <b>Media</b> è la media semplice. <b>Novità</b> mette in cima chi ha notizie più fresche. I voti sono quelli della Gazzetta, non quelli ufficiali della lega: un termometro, non la classifica. Tocca un nome per leggere le note, dalla più recente, ognuna con la data e il giornale da cui viene.</p>
+      <p class="nota"><b>Consiglio</b> sono i fantapunti attesi a giornata calcolati sul Mac: parte da quanto costa nel listone e si sposta verso quello che il dossier sa davvero (voti, presenze, infortuni, rigori). <b>▲ affare</b> vale più di quanto costa, <b>▼ caro</b> il contrario. Le notizie uguali da fonti o giorni diversi sono unite in una sola, con il numero di fonti accanto: aprendola le vedi tutte. <b>Forma</b> è la media dei voti Gazzetta con le ultime giornate che pesano di più (l'ultima vale tre, la precedente due, prima una). <b>Media</b> è la media semplice. <b>Novità</b> mette in cima chi ha notizie più fresche. I voti sono quelli della Gazzetta, non quelli ufficiali della lega: un termometro, non la classifica. Tocca un nome per leggere le note, dalla più recente, ognuna con la data e il giornale da cui viene.</p>
     </div>
   </div>
 </section>
@@ -871,7 +872,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.12g';
+const VERSIONE_APP = '2026.09.12h';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1520,7 +1521,7 @@ function spiegaTetto(g){
   if(d){
     const f = forma(d), m = mediaVoti(d);
     s += `<br><b>Dossier:</b> ${d.st === 'infortunato' ? 'INFORTUNATO. ' : d.st === 'squalificato' ? 'SQUALIFICATO. ' : ''}${d.rig === 'si' ? 'Rigorista. ' : d.rig === 'dubbio' ? 'Rigorista in dubbio. ' : ''}${m !== null ? `${d.v.length} voti, media ${m.toFixed(2)}, forma ${f.toFixed(2)}. ` : 'Nessun voto finora. '}`;
-    if(d.n && d.n[0]) s += `Ultima notizia (${esc(d.n[0].f || 'giornale')} del ${dataBreve(d.n[0].d)}): ${esc(d.n[0].x)}`;
+    if(d.n && d.n[0]) s += `Ultima notizia (${esc(nomeFonte(fontiNota(d.n[0])[0].f))} del ${dataBreve(d.n[0].d)}): ${esc(d.n[0].x)}`;
     const c = consiglioDi(d);
     if(c) s += `<br><b>Consiglio:</b> ${(+c.at).toFixed(2)} fantapunti attesi a giornata${c.ve === 'su' ? ', <b>vale più di quanto costa</b>' : c.ve === 'giu' ? ', <b>costa più di quanto vale ora</b>' : ''}. ${esc(c.mo||'')}`;
     s += ` <button class="apri-foglio" data-foglio="${esc(normNome(g.n)+'|'+g.r)}">Tutte le notizie ›</button>`;
@@ -1602,6 +1603,18 @@ function segnaliDossier(g){
 /* nel listone d'asta anche il verdetto del consiglio, in una parola */
 const segnaliAsta = g => segnaliDossier(g) + segnaleConsiglio(consiglioDi(dossierDi(g)));
 const dataBreve = iso => iso ? iso.slice(5).split('-').reverse().join('/') : '';
+/* le fonti di una notizia: il dossier nuovo le raggruppa in x.s, quello vecchio aveva x.f e x.r */
+const fontiNota = x => (x.s && x.s.length) ? x.s : [{d: x.d, f: x.f || '', r: x.r}];
+const NOME_FONTE = {gazzetta:'Gazzetta', sosfanta:'SOS Fanta', fantacalciopedia:'Fantacalciopedia', dazn:'DAZN', sky:'Sky', 'fantacalcio-online':'Fantacalcio-online', pianetafanta:'Pianetafanta'};
+const nomeFonte = f => NOME_FONTE[f] || f || 'giornale';
+function descriviFonte(s){
+  const r = s.r || {};
+  let t = `${nomeFonte(s.f)} · ${dataBreve(s.d)}`;
+  if(r.pagina) t += `, pagina ${r.pagina}`;
+  if(r.titolo) t += ` · <i>${esc(r.titolo)}</i>`;
+  if(r.link) t += ` <a href="${esc(r.link)}" target="_blank" rel="noopener">apri ↗</a>`;
+  return t;
+}
 const TIPO_NOTA = {infortunio:'Infortunio', rientro:'Rientro', squalifica:'Squalifica', titolare:'Titolare', panchina:'Panchina', forma:'Forma', rigorista:'Rigorista', mercato:'Mercato', altro:'Nota'};
 
 let filtroAnalisi = '', ordineAnalisi = 'consiglio', apertoAnalisi = null;
@@ -1680,10 +1693,10 @@ function disegnaFoglio(g){
     : `<div class="voti">Nessun voto in pagella finora.</div>`;
   const note = d.n && d.n.length ? `<div class="eyebrow"><span>Notizie</span><small>dalla più recente · tocca per leggere tutto</small></div><ul class="note-l">${d.n.map((x,i)=>{
       const aperta = notaAperta === i;
-      const r = x.r || {};
-      const dove = r.pagina ? `${esc(x.f||'giornale')} del ${dataBreve(x.d)}, pagina ${r.pagina}` : `${esc(x.f||'')} · ${dataBreve(x.d)}`;
-      const dett = aperta ? `<div class="dett">${r.titolo ? `<i>${esc(r.titolo)}</i><br>` : ''}Fonte: ${dove}${r.link ? `<br><a href="${esc(r.link)}" target="_blank" rel="noopener">Apri l'articolo ↗</a>` : ''}</div>` : '';
-      return `<li class="${esc(x.t)}" aria-expanded="${aperta}"><button class="n" data-nota="${i}"><time>${dataBreve(x.d)}</time><span><span class="tipo">${TIPO_NOTA[x.t]||'Nota'}</span>${esc(x.x)}</span></button>${dett}</li>`;
+      const fonti = fontiNota(x);
+      const dett = aperta ? `<div class="dett">${fonti.length > 1 ? `${fonti.length} fonti, dalla più recente:` : 'Fonte:'}<br>${fonti.map(descriviFonte).join('<br>')}</div>` : '';
+      const conta = fonti.length > 1 ? `<span class="segnale neutro">×${fonti.length}</span>` : '';
+      return `<li class="${esc(x.t)}" aria-expanded="${aperta}"><button class="n" data-nota="${i}"><time>${dataBreve(x.d)}</time><span><span class="tipo">${TIPO_NOTA[x.t]||'Nota'}</span>${esc(x.x)}${conta}</span></button>${dett}</li>`;
     }).join('')}</ul>` : `<p class="nota">Nessuna notizia raccolta su di lui.</p>`;
   $('foglio').innerHTML = `<div class="maniglia"></div>
     <div class="testa"><div class="sigla ${g.r}">${g.r}</div><div><h3>${esc(g.n)}${segnaliDossier(g)}${segnaleConsiglio(c)}</h3><small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)} · tetto ${tettoPiano(g)}${d.v && d.v.length ? ` · ${d.v.length} voti` : ''}</small></div><button class="chiudi" aria-label="Chiudi">×</button></div>

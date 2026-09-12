@@ -178,8 +178,9 @@ def mostra(dossier, listone, filtro=None):
             print(f"{nome}: niente nel dossier, solo listone → {listone[nome]}")
             return
         print(riga(nome, v, listone[nome]))
-        for n in v["note"]:
-            print(f"   {n['data']}  [{n['tipo']}] {n['testo']}  ({n['fonte']})")
+        for g in raggruppa(v["note"]):
+            fonti = ", ".join(f"{f.get('fonte','?')} {f['data'][5:]}" for f in g["fonti"])
+            print(f"   {g['data']}  [{g['tipo']}] {g['testo']}  ({fonti})")
         if v["voti"]:
             print("   voti: " + "  ".join(f"g{x['g']} {x['v']}" + (f"/{x['fv']}" if x['fv'] is not None else "") + (f" [{x['ev']}]" if x.get("ev") else "") for x in v["voti"]))
         return
@@ -256,6 +257,73 @@ def importa(dossier, listone, percorso):
 
 NOTE_PER_APP = 10  # le piu' recenti: sul telefono conta cosa e' successo negli ultimi giorni
 
+# Due note dicono la stessa cosa se sono dello stesso tipo, vicine nel tempo
+# e si sovrappongono abbastanza nelle parole. Vengono unite: si tiene il
+# testo piu' preciso (il piu' lungo) e si elencano tutte le fonti.
+GIORNI_UNIONE = 4
+SOMIGLIANZA_MINIMA = 0.3
+# Un giocatore ha un infortunio, una squalifica, una gerarchia alla volta: due
+# note di questi tipi a pochi giorni di distanza sono lo stesso fatto anche
+# se scritte con parole diverse. Per forma e mercato invece contano le parole.
+TIPI_UNO_ALLA_VOLTA = {"infortunio", "squalifica", "rientro", "titolare", "panchina", "rigorista"}
+INDIZI_PRECISIONE = re.compile(r"\d|mes[ei]|settiman|giorn|rientr|operat|lesion|frattur|rottur|distorsion|stiram|elongaz|turn[oi]", re.I)
+PAROLE_VUOTE = {"per", "con", "del", "della", "dello", "dei", "delle", "nel", "nella", "una", "uno", "che", "non", "gli", "alla", "allo", "agli", "sul", "sulla", "dal", "dalla", "come", "anche", "dopo", "prima", "contro", "gia", "piu", "suo", "sua", "ancora", "solo", "verso", "tra", "fra", "essere", "stato", "sono", "sara", "viene", "gioca", "giocato", "partita", "gara", "serie", "fantacalcio", "giornata", "giornate"}
+
+
+def parole_chiave(testo):
+    return {p for p in re.findall(r"[a-z0-9]+", norm_testo(testo)) if len(p) > 2 and p not in PAROLE_VUOTE}
+
+
+def norm_testo(t):
+    return re.sub(r"[^a-z0-9 ]", " ", unicodedata.normalize("NFD", str(t)).encode("ascii", "ignore").decode().lower())
+
+
+def somiglianza(a, b):
+    """Jaccard sulle parole chiave, oppure quanto la piu' corta e' contenuta
+    nella piu' lunga: 'Locatelli operato' sta dentro 'Locatelli operato al
+    menisco, 5 mesi'."""
+    pa, pb = parole_chiave(a), parole_chiave(b)
+    if not pa or not pb:
+        return 0.0
+    inter = len(pa & pb)
+    return max(inter / len(pa | pb), inter / min(len(pa), len(pb)) * 0.8)
+
+
+def giorni_fra(d1, d2):
+    return abs((date.fromisoformat(d1) - date.fromisoformat(d2)).days)
+
+
+def raggruppa(note):
+    """Dalla lista grezza (ordinata dalla piu' recente) ai gruppi: ogni gruppo
+    e' una notizia con il testo migliore e l'elenco delle sue apparizioni."""
+    gruppi = []
+    for n in sorted(note, key=lambda n: n["data"], reverse=True):
+        for g in gruppi:
+            if g["tipo"] != n["tipo"]:
+                continue
+            # vicina a una qualunque delle apparizioni gia' nel gruppo: cosi' una
+            # notizia ripetuta per dieci giorni resta una notizia sola
+            vicina = any(giorni_fra(f["data"], n["data"]) <= GIORNI_UNIONE for f in g["fonti"])
+            if not vicina:
+                continue
+            if n["tipo"] in TIPI_UNO_ALLA_VOLTA or somiglianza(g["testo"], n["testo"]) >= SOMIGLIANZA_MINIMA:
+                g["fonti"].append(n)
+                break
+        else:
+            gruppi.append({"data": n["data"], "tipo": n["tipo"], "testo": n["testo"], "fonti": [n]})
+    # il testo che rappresenta il gruppo: il piu' recente fra quelli completi
+    # (almeno il 60% del piu' lungo). "Indisponibile" di oggi non deve coprire
+    # "rottura del menisco, 5 mesi" di ieri, ma la diagnosi vecchia e vaga non
+    # deve coprire quella nuova e precisa.
+    for g in gruppi:
+        lungo = max(len(f["testo"]) for f in g["fonti"])
+        completi = [f for f in g["fonti"] if len(f["testo"]) >= 0.6 * lungo]
+        # fra i completi, prima quelli che dicono quanto dura o cosa e' successo
+        # davvero (diagnosi, tempi, date), poi il piu' recente
+        con_cifre = [f for f in completi if INDIZI_PRECISIONE.search(f["testo"])]
+        g["testo"] = (con_cifre or completi)[0]["testo"]
+    return gruppi
+
 
 def esporta(dossier, listone):
     """La versione compatta per l'app, per nome del listone: stato, rigorista,
@@ -265,11 +333,15 @@ def esporta(dossier, listone):
     for nome, v in dossier["giocatori"].items():
         if nome not in listone or not (v["note"] or v["voti"]):
             continue
-        note = sorted(v["note"], key=lambda n: n["data"], reverse=True)
+        note = raggruppa(v["note"])
         voce = {
             "st": v["stato"],
             "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in v["voti"]],
-            "n": [{"d": n["data"], "t": n["tipo"], "x": n["testo"], "f": n.get("fonte", ""), **({"r": n["rif"]} if n.get("rif") else {})} for n in note[:NOTE_PER_APP]],
+            # ogni notizia: testo migliore, data piu' recente, e le sue fonti
+            # (data, fonte, riferimento) dalla piu' recente
+            "n": [{"d": g["data"], "t": g["tipo"], "x": g["testo"],
+                   "s": [{"d": f["data"], "f": f.get("fonte", ""), **({"r": f["rif"]} if f.get("rif") else {})} for f in g["fonti"]]}
+                  for g in note[:NOTE_PER_APP]],
         }
         if v["rigorista"]:
             voce["rig"] = v["rigorista"]
