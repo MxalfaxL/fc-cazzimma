@@ -50,6 +50,13 @@ if __name__ == "__main__":
     if lega.exists():
         blocco["lega"] = json.loads(lega.read_text(encoding="utf-8"))
         blocco["lega"].pop("_cosa_e", None)
+    # il dossier (note e voti dalla Gazzetta) viaggia dentro il listone, in
+    # forma compatta: l'app lo mostra nella scheda Dossier e nel tetto.
+    dossier = RADICE / "dati" / "dossier.json"
+    if dossier.exists():
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import dossier as modulo_dossier
+        blocco["dossier"] = modulo_dossier.esporta(modulo_dossier.carica(), modulo_dossier.carica_listone())
     # il marcatore di tempo e' quello che l'app confronta: piu' recente vince
     blocco["caricato"] = int(time.time() * 1000)
     contenuto = base64.b64encode(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).decode("ascii")

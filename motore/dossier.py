@@ -17,6 +17,7 @@ Uso:
     python3 motore/dossier.py mostra "Malen"                  # un giocatore
     python3 motore/dossier.py cerca lauta                     # come si chiama nel listone?
     python3 motore/dossier.py importa dati/gazzetta/2026-09-15/note.json   # le note di un giornale, tutte insieme
+    python3 motore/dossier.py esporta                         # report/dossier-app.json, la versione compatta per l'app
 
 Il file note.json e' quello che scrive chi legge un giornale:
     {"data": "2026-09-15", "note": [{"nome", "tipo", "testo"}],
@@ -214,6 +215,35 @@ def importa(dossier, listone, percorso):
     print(f"Importate {len(dati.get('note', []))} note, {len(dati.get('voti', []))} voti, {len(dati.get('rigoristi', []))} rigoristi da {percorso}")
 
 
+NOTE_PER_APP = 6   # le piu' recenti: sul telefono conta cosa e' successo negli ultimi giorni
+
+
+def esporta(dossier, listone):
+    """La versione compatta per l'app, per nome del listone: stato, rigorista,
+    tutti i voti e le ultime note (dalla piu' recente). Le medie le calcola
+    l'app, cosi' puo' pesare le giornate recenti come vuole."""
+    out = {}
+    for nome, v in dossier["giocatori"].items():
+        if nome not in listone or not (v["note"] or v["voti"]):
+            continue
+        note = sorted(v["note"], key=lambda n: n["data"], reverse=True)
+        voce = {
+            "st": v["stato"],
+            "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in v["voti"]],
+            "n": [{"d": n["data"], "t": n["tipo"], "x": n["testo"], "f": n.get("fonte", "")} for n in note[:NOTE_PER_APP]],
+        }
+        if v["rigorista"]:
+            voce["rig"] = v["rigorista"]
+        if note:
+            voce["agg"] = note[0]["data"]
+        out[nome] = voce
+    blocco = {"aggiornato": dossier["aggiornato"], "giocatori": out}
+    percorso = RADICE / "report" / "dossier-app.json"
+    percorso.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"{len(out)} giocatori in {percorso.relative_to(RADICE)} ({percorso.stat().st_size // 1024} KB)")
+    return blocco
+
+
 def cerca(listone, pezzo):
     chiave = norm(pezzo)
     for n, g in sorted(listone.items(), key=lambda kv: -kv[1]["pr"]):
@@ -238,6 +268,9 @@ def main(argv):
         return
     elif comando == "importa" and resto:
         importa(dossier, listone, resto[0])
+    elif comando == "esporta":
+        esporta(dossier, listone)
+        return
     elif comando == "cerca" and resto:
         cerca(listone, resto[0])
         return

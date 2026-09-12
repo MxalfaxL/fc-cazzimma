@@ -35,7 +35,8 @@ memoria separata da Safari.
 
 ## 2. Com'è fatta
 
-Quattro schede in basso: **Formazione**, **Asta**, **Rosa**, **Stagione**. In
+Cinque schede in basso: **Formazione**, **Asta**, **Rosa**, **Analisi**,
+**Stagione**. In
 alto a destra la **pillola** dice se l'app è allineata con GitHub
 (*sincronizzato*, *da inviare*, *errore*) e toccandola entri nelle
 impostazioni. Tutto si salva da solo e si ritrova sugli altri dispositivi.
@@ -128,6 +129,33 @@ A giornata finita: giornata, tuoi punti, punti avversario, **Registra la
 giornata**. L'app converte in gol (66 il primo, poi uno ogni 4) e tiene
 classifica e media. Sotto, **Le rose degli avversari** costruite in asta, e
 due calcolatori: modificatore da quattro voti, gol da un punteggio.
+
+## 7b. Analisi: cosa dicono i giornali
+
+La scheda **Analisi** raccoglie, per ogni giocatore del listone, quello che
+i giornali hanno scritto di lui: i voti in pagella giornata per giornata, gli
+infortuni con i tempi di rientro, chi è titolare e chi in panchina, chi tira
+i rigori, i trasferimenti. Arriva sul telefono insieme al listone, quindi si
+aggiorna da sola a ogni **Controlla aggiornamenti**; in alto a destra c'è la
+data dell'ultimo aggiornamento.
+
+Cerca per nome o squadra, filtra per ruolo e scegli l'ordine: **forma**
+(media dei voti con le ultime giornate che pesano di più: l'ultima vale tre,
+la precedente due, le altre una), **media** (semplice), **novità** (chi ha
+notizie più fresche in cima), **nome**. Chi non ha ancora voti sta in fondo,
+con un trattino.
+
+Tocca un nome: si aprono i voti con gli eventi (gol, assist, ammonizioni) e
+le note dalla più recente, ognuna con la data e il giornale da cui viene.
+Accanto al nome, **ko** rosso vuol dire infortunato o squalificato secondo
+l'ultima notizia, **rig** oro vuol dire rigorista.
+
+Le stesse informazioni compaiono anche nel listone d'asta: il **ko** accanto
+al nome e, toccando il nome, la riga **Dossier** sotto la spiegazione del
+tetto. La sera dell'asta è quella la cosa da guardare prima di alzare la mano.
+
+I voti sono quelli della Gazzetta, non quelli ufficiali della lega: sono un
+termometro della forma, non la classifica.
 
 ## 8. Impostazioni
 

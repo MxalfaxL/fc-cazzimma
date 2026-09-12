@@ -222,6 +222,24 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .segnale.su{background:var(--verde-tinta);color:var(--verde-testo)} .segnale.giu{background:var(--rosso-tinta);color:var(--rosso-testo)}
 .spiega{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
 .riga-filtro{display:flex;gap:6px;margin-bottom:10px}
+/* ---- analisi: il dossier per giocatore ---- */
+.an-riga{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--linea-2)}
+.an-riga:last-child{border-bottom:0}
+.an-riga .nome{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-align:left;background:none;border:0;padding:0;color:inherit;font-family:inherit}
+.an-riga .nome small{display:block;font-weight:400;font-size:10.5px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.an-riga .num{font-family:Anton,Impact,sans-serif;font-size:24px;color:var(--azzurro);line-height:1;text-align:right;min-width:44px}
+.an-riga .num small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--grigio);letter-spacing:.08em;text-align:right}
+.an-riga .num.muto{color:var(--grigio)}
+.segnale.ko{background:var(--rosso-tinta);color:var(--rosso-testo)} .segnale.rig{background:var(--oro);color:#fff} .segnale.neutro{background:var(--carta-2);color:var(--grigio)}
+.an-dett{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
+.an-dett .voti{font-family:"IBM Plex Mono",monospace;font-size:11.5px;margin-bottom:6px;word-break:break-word}
+.an-dett ul{margin:0;padding:0;list-style:none}
+.an-dett li{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:5px 0;border-top:1px solid rgba(0,0,0,.06)}
+.an-dett li:first-child{border-top:0}
+.an-dett li time{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--grigio);padding-top:2px;line-height:1.3}
+.an-dett li time small{display:block;font-size:9px;text-transform:capitalize;opacity:.85}
+.an-dett li b{font-weight:600;margin-right:4px}
+.an-dett li.infortunio b,.an-dett li.squalifica b{color:var(--rosso-testo)} .an-dett li.rientro b,.an-dett li.titolare b{color:var(--verde-testo)}
 .riga-filtro button{flex:1;border:1px solid var(--linea);background:var(--carta-2);color:var(--grigio);border-radius:8px;padding:8px 0;
   font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600}
 .riga-filtro button[aria-pressed="true"]{background:var(--azzurro);color:#fff;border-color:transparent}
@@ -605,6 +623,21 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 </section>
 
 <!-- ============ IMPOSTAZIONI E SINCRONIZZAZIONE ============ -->
+<!-- ============ ANALISI ============ -->
+<section class="pannello" id="p-analisi" hidden>
+  <div class="blocco">
+    <div class="eyebrow"><span>Analisi</span><small id="analisiAggiornato"></small></div>
+    <div id="analisiVuoto" class="nota" style="margin-top:0">Qui arriva il dossier: quello che i giornali dicono di ogni giocatore, con i voti giornata per giornata. Si aggiorna insieme al listone: apri <b>Controlla aggiornamenti</b> nella schermata di sincronizzazione.</div>
+    <div id="analisiPiena" hidden>
+      <input type="search" class="cerca" id="cercaAnalisi" placeholder="Cerca un giocatore o una squadra" autocomplete="off">
+      <div class="riga-filtro" id="analisiRuoli"></div>
+      <div class="riga-filtro" id="analisiOrdine"></div>
+      <div id="risultatiAnalisi"></div>
+      <p class="nota"><b>Forma</b> è la media dei voti Gazzetta con le ultime giornate che pesano di più (l'ultima vale tre, la precedente due, prima una). <b>Media</b> è la media semplice. <b>Novità</b> mette in cima chi ha notizie più fresche. I voti sono quelli della Gazzetta, non quelli ufficiali della lega: un termometro, non la classifica. Tocca un nome per leggere le note, dalla più recente, ognuna con la data e il giornale da cui viene.</p>
+    </div>
+  </div>
+</section>
+
 <section class="pannello" id="p-sync" hidden>
   <div class="blocco">
     <div class="eyebrow">Sincronizzazione</div>
@@ -648,6 +681,8 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM4 20l7-7M12 12l-1.5-1.5M3 21l2-2"/><path d="M15.5 12.5l3.5 3.5"/></svg>Asta</button>
     <button role="tab" aria-selected="false" data-p="rosa">
       <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c3 .3 5.5 2.6 5.5 5.8"/></svg>Rosa</button>
+    <button role="tab" aria-selected="false" data-p="analisi">
+      <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-5 3 3 5-7"/></svg>Analisi</button>
     <button role="tab" aria-selected="false" data-p="stagione">
       <svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/><path d="M12 13v4M8 21h8M10 17h4"/></svg>Stagione</button>
   </div>
@@ -807,7 +842,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.12d';
+const VERSIONE_APP = '2026.09.12e';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1366,6 +1401,7 @@ function normalizzaListone(dati){
   const piani = (dati && dati.piani && typeof dati.piani === 'object') ? dati.piani : {};
   const out = {piani:{}, voci:[], caricato: (dati && dati.caricato) || Date.now()};
   if(dati && dati.lega && typeof dati.lega === 'object') out.lega = dati.lega;
+  if(dati && dati.dossier && dati.dossier.giocatori && typeof dati.dossier.giocatori === 'object') out.dossier = dati.dossier;
   for(const [nome, ob] of Object.entries(piani)){
     if(ob && ORDINE.every(r=>isFinite(+ob[r]))) out.piani[nome] = Object.fromEntries(ORDINE.map(r=>[r, Math.round(+ob[r])]));
   }
@@ -1451,6 +1487,12 @@ function spiegaTetto(g){
   else s += `Sui ${NOME[g.r].toLowerCase()} hai già speso ${sp} dei ${t} previsti e restano ${rest} slot: il tetto scende a <b>${oggi}</b>.`;
   if(oggi >= maxOfferta() && maxOfferta() > 0) s += ` È anche il massimo che puoi offrire tenendo 1 credito per ogni slot che resta.`;
   if(g.gzn) s += `<br><b>Secondo parere:</b> ${esc(g.gzn)}`;
+  const d = dossierDi(g);
+  if(d){
+    const f = forma(d), m = mediaVoti(d);
+    s += `<br><b>Dossier:</b> ${d.st === 'infortunato' ? 'INFORTUNATO. ' : d.st === 'squalificato' ? 'SQUALIFICATO. ' : ''}${d.rig === 'si' ? 'Rigorista. ' : d.rig === 'dubbio' ? 'Rigorista in dubbio. ' : ''}${m !== null ? `${d.v.length} voti, media ${m.toFixed(2)}, forma ${f.toFixed(2)}. ` : 'Nessun voto finora. '}`;
+    if(d.n && d.n[0]) s += `Ultima notizia (${esc(d.n[0].f || 'giornale')} del ${dataBreve(d.n[0].d)}): ${esc(d.n[0].x)}`;
+  }
   return s;
 }
 
@@ -1484,7 +1526,7 @@ function disegnaListone(){
         const k = normNome(g.n)+'|'+g.r;
         return `<div class="esito-l">
           <div class="sigla ${g.r}">${g.r}</div>
-          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}<small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)}</small></button>
+          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}${segnaliDossier(g)}<small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)}</small></button>
           <div class="tetto ${oltre?'oltre':''}">${t}<small>tetto</small></div>
           <button class="prendi" data-prendi="${esc(k)}">preso</button>
           <button class="via" data-via="${esc(k)}" aria-label="Venduto a un avversario">via</button>
@@ -1495,6 +1537,88 @@ function disegnaListone(){
 }
 
 const trovaVoce = k => listone.voci.find(x=>normNome(x.n)+'|'+x.r === k);
+
+/* ======================= analisi: il dossier ======================= */
+/* Il dossier arriva dentro il listone, per nome del listone: stato, rigorista,
+   voti Gazzetta giornata per giornata e le ultime note. Le medie si fanno qui. */
+const dossierDi = g => (listone.dossier && listone.dossier.giocatori && listone.dossier.giocatori[g.n]) || null;
+const mediaVoti = d => d.v && d.v.length ? d.v.reduce((a,x)=>a+x.v, 0) / d.v.length : null;
+/* le ultime giornate pesano di piu': l'ultima disponibile nel dossier vale 3,
+   la precedente 2, le altre 1. Chi ha giocato solo all'inizio scivola. */
+function forma(d){
+  if(!d.v || !d.v.length) return null;
+  const G = ultimaGiornataDossier();
+  let somma = 0, pesi = 0;
+  d.v.forEach(x=>{ const w = x.g >= G ? 3 : x.g === G-1 ? 2 : 1; somma += x.v*w; pesi += w; });
+  return somma / pesi;
+}
+let _ultimaG = null;
+function ultimaGiornataDossier(){
+  if(_ultimaG !== null) return _ultimaG;
+  _ultimaG = 0;
+  for(const d of Object.values((listone.dossier && listone.dossier.giocatori) || {})) (d.v||[]).forEach(x=>{ if(x.g > _ultimaG) _ultimaG = x.g; });
+  return _ultimaG;
+}
+function segnaliDossier(g){
+  const d = dossierDi(g); if(!d) return '';
+  let s = '';
+  if(d.st === 'infortunato') s += `<span class="segnale ko">ko</span>`;
+  else if(d.st === 'squalificato') s += `<span class="segnale ko">squal.</span>`;
+  if(d.rig === 'si') s += `<span class="segnale rig">rig</span>`;
+  return s;
+}
+const dataBreve = iso => iso ? iso.slice(5).split('-').reverse().join('/') : '';
+const TIPO_NOTA = {infortunio:'Infortunio', rientro:'Rientro', squalifica:'Squalifica', titolare:'Titolare', panchina:'Panchina', forma:'Forma', rigorista:'Rigorista', mercato:'Mercato', altro:'Nota'};
+
+let filtroAnalisi = '', ordineAnalisi = 'forma', apertoAnalisi = null;
+function disegnaAnalisi(){
+  const dos = listone.dossier;
+  const c = !!(dos && dos.giocatori && Object.keys(dos.giocatori).length);
+  $('analisiVuoto').hidden = c; $('analisiPiena').hidden = !c;
+  $('analisiAggiornato').textContent = c && dos.aggiornato ? `aggiornato il ${dataBreve(dos.aggiornato)}` : '';
+  if(!c) return;
+  _ultimaG = null;
+  const tutti = listone.voci.filter(g=>dossierDi(g));
+  $('analisiRuoli').innerHTML = ORDINE.map(r=>`<button data-f="${r}" aria-pressed="${filtroAnalisi===r}">${r} ${tutti.filter(g=>g.r===r).length}</button>`).join('')
+    + `<button data-f="" aria-pressed="${filtroAnalisi===''}">tutti</button>`;
+  $('analisiOrdine').innerHTML = [['forma','forma'],['media','media'],['novita','novità'],['nome','nome']].map(([k,t])=>`<button data-o="${k}" aria-pressed="${ordineAnalisi===k}">${t}</button>`).join('');
+
+  const cerca = normNome($('cercaAnalisi').value);
+  let ris = tutti;
+  if(cerca) ris = ris.filter(g=>normNome(g.n).includes(cerca) || normNome(g.sq).startsWith(cerca));
+  else if(filtroAnalisi) ris = ris.filter(g=>g.r===filtroAnalisi);
+  const val = g => { const d = dossierDi(g); return ordineAnalisi==='forma' ? forma(d) : ordineAnalisi==='media' ? mediaVoti(d) : null; };
+  ris = [...ris].sort((a,b)=>{
+    if(ordineAnalisi === 'nome') return a.n.localeCompare(b.n, 'it');
+    if(ordineAnalisi === 'novita'){ const da = dossierDi(a).agg||'', db = dossierDi(b).agg||''; return db.localeCompare(da) || b.pr-a.pr; }
+    const va = val(a), vb = val(b);
+    if(va === null && vb === null) return b.pr-a.pr;
+    if(va === null) return 1; if(vb === null) return -1;
+    return vb-va || (dossierDi(b).v.length-dossierDi(a).v.length) || b.pr-a.pr;
+  }).slice(0, cerca ? 40 : 60);
+
+  $('risultatiAnalisi').innerHTML = ris.length ? ris.map(g=>{
+    const d = dossierDi(g), k = normNome(g.n)+'|'+g.r;
+    const f = forma(d), m = mediaVoti(d);
+    const numero = ordineAnalisi==='media' ? m : f;
+    const num = numero === null ? `<div class="num muto">–<small>no voti</small></div>` : `<div class="num">${numero.toFixed(2)}<small>${ordineAnalisi==='media' ? 'media' : 'forma'}</small></div>`;
+    const ultima = d.n && d.n[0] ? `${dataBreve(d.n[0].d)} · ${d.n[0].x}` : '';
+    let dett = '';
+    if(apertoAnalisi === k){
+      const voti = d.v && d.v.length ? `<div class="voti">Voti: ${d.v.map(x=>`g${x.g} <b>${x.v}</b>${x.ev ? ` (${esc(x.ev)})` : ''}`).join(' · ')}${m !== null ? ` · media ${m.toFixed(2)} · forma ${f.toFixed(2)}` : ''}</div>` : `<div class="voti">Nessun voto in pagella finora.</div>`;
+      const note = d.n && d.n.length ? `<ul>${d.n.map(x=>`<li class="${esc(x.t)}"><time>${dataBreve(x.d)}<small>${esc(x.f||'')}</small></time><span><b>${TIPO_NOTA[x.t]||'Nota'}</b>${esc(x.x)}</span></li>`).join('')}</ul>` : '';
+      dett = `<div class="an-dett">${voti}${note}</div>`;
+    }
+    return `<div class="an-riga">
+      <div class="sigla ${g.r}">${g.r}</div>
+      <button class="nome" data-apri="${esc(k)}">${esc(g.n)}${segnaliDossier(g)}<small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)}${d.v && d.v.length ? ` · ${d.v.length} voti` : ''}${ultima ? ` · ${esc(ultima)}` : ''}</small></button>
+      ${num}${dett}</div>`;
+  }).join('') : `<div class="vuoto">Nessuno con questo nome nel dossier.</div>`;
+}
+$('cercaAnalisi').addEventListener('input', ()=>{ apertoAnalisi = null; disegnaAnalisi(); });
+$('analisiRuoli').addEventListener('click', e=>{ const b = e.target.closest('button[data-f]'); if(!b) return; filtroAnalisi = b.dataset.f || ''; apertoAnalisi = null; disegnaAnalisi(); });
+$('analisiOrdine').addEventListener('click', e=>{ const b = e.target.closest('button[data-o]'); if(!b) return; ordineAnalisi = b.dataset.o; apertoAnalisi = null; disegnaAnalisi(); });
+$('risultatiAnalisi').addEventListener('click', e=>{ const b = e.target.closest('button[data-apri]'); if(!b) return; apertoAnalisi = apertoAnalisi === b.dataset.apri ? null : b.dataset.apri; disegnaAnalisi(); });
 
 $('btnCaricaListone').addEventListener('click', ()=>{
   const out = $('esitoListone');
@@ -2047,7 +2171,7 @@ function applicaTema(t){
 }
 $('temi').addEventListener('click', e=>{ const b = e.target.closest('button[data-tema]'); if(b) applicaTema(b.dataset.tema); });
 
-function disegnaTutto(){ disegnaPiani(); disegnaAsta(); disegnaListone(); disegnaMovimenti(); disegnaAvversari(); disegnaRosa(); disegnaFormazione(); disegnaStagione(); }
+function disegnaTutto(){ disegnaPiani(); disegnaAsta(); disegnaListone(); disegnaAnalisi(); disegnaMovimenti(); disegnaAvversari(); disegnaRosa(); disegnaFormazione(); disegnaStagione(); }
 
 function aggiornaCampi(){
   ORDINE.forEach(r=>$('tg'+r).value = stato.target[r]);
