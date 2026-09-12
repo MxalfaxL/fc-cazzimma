@@ -26,7 +26,8 @@ priorità su tutto il resto.
 
 ## Prima di tutto: la wiki privata
 
-In `wiki/` (git la ignora, resta sul Mac) c'è una wiki scritta per te: stato
+In `wiki/` (git la ignora, resta sul Mac) c'è una wiki scritta per te, **che
+riguarda solo questo progetto** e non va usata altrove: stato
 del progetto, prossimi passi, fatti della lega, procedure, errori già fatti,
 decisioni e diario. `wiki/STATO.md` e `wiki/LEGA.md` arrivano da soli in
 contesto all'avvio (hook in `.claude/settings.json`). Prima di toccare app,
