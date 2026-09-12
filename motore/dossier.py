@@ -100,17 +100,27 @@ def voce(dossier, nome):
     return dossier["giocatori"].setdefault(nome, {"stato": "ok", "rigorista": None, "voti": [], "note": []})
 
 
-def aggiungi(dossier, listone, nome, data, tipo, testo, fonte="gazzetta"):
+def aggiungi(dossier, listone, nome, data, tipo, testo, fonte="gazzetta", rif=None):
+    """rif e' da dove viene la nota: {"pagina": 23} per un giornale,
+    {"titolo", "link"} per un articolo web. Serve all'app per l'approfondimento."""
     nome = trova(nome, listone)
     if tipo not in TIPI:
         sys.exit(f"Tipo '{tipo}' sconosciuto. Uno fra: {', '.join(TIPI)}")
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", data):
         sys.exit(f"Data '{data}' non valida: serve AAAA-MM-GG")
     v = voce(dossier, nome)
-    if any(n["data"] == data and n["testo"] == testo for n in v["note"]):
-        print(f"{nome}: nota gia' presente, non la ripeto")
-        return
-    v["note"].append({"data": data, "fonte": fonte, "tipo": tipo, "testo": testo})
+    for n in v["note"]:
+        if n["data"] == data and n["testo"] == testo:
+            if rif and not n.get("rif"):
+                n["rif"] = rif      # la nota c'era gia', ora sappiamo anche da dove viene
+                print(f"{nome}: nota gia' presente, aggiunto il riferimento")
+            else:
+                print(f"{nome}: nota gia' presente, non la ripeto")
+            return
+    nuova = {"data": data, "fonte": fonte, "tipo": tipo, "testo": testo}
+    if rif:
+        nuova["rif"] = rif
+    v["note"].append(nuova)
     v["note"].sort(key=lambda n: n["data"])
     if tipo in STATO_DA_TIPO:
         v["stato"] = STATO_DA_TIPO[tipo]
@@ -206,8 +216,36 @@ def importa(dossier, listone, percorso):
         print(f"{percorso}: {len(problemi)} problemi, non importo niente:")
         print("\n".join(sorted(set(problemi))))
         sys.exit(1)
+    cartella = Path(percorso).resolve().parent
+    intestazioni = {}
+
+    def riferimento(n):
+        """Da dove viene la nota: la pagina del giornale, o titolo e link
+        dell'articolo (letti dall'intestazione del file salvato dal feed)."""
+        if n.get("pagina"):
+            return {"pagina": int(n["pagina"])}
+        if n.get("link"):
+            return {"titolo": n.get("titolo", ""), "link": n["link"]}
+        f = n.get("file")
+        if f:
+            if f not in intestazioni:
+                testa = {}
+                pf = cartella / f
+                if pf.exists():
+                    for riga in pf.read_text(encoding="utf-8").split("\n")[:6]:
+                        if ":" in riga:
+                            k, _, val = riga.partition(":")
+                            testa[k.strip().lower()] = val.strip()
+                intestazioni[f] = testa
+            t = intestazioni[f]
+            if t.get("link") or t.get("titolo"):
+                return {"titolo": t.get("titolo", ""), "link": t.get("link", "")}
+        return None
+
     for n in dati.get("note", []):
-        aggiungi(dossier, listone, n["nome"], data, n["tipo"], n["testo"], fonte)
+        # un file puo' raccogliere piu' fonti (pagine web diverse): la fonte
+        # della singola nota vince su quella del file
+        aggiungi(dossier, listone, n["nome"], n.get("data", data), n["tipo"], n["testo"], n.get("fonte", fonte), riferimento(n))
     for v in dati.get("voti", []):
         voto(dossier, listone, v["nome"], v["giornata"], v["voto"], v.get("fantavoto"), v.get("eventi"))
     for r in dati.get("rigoristi", []):
@@ -215,7 +253,7 @@ def importa(dossier, listone, percorso):
     print(f"Importate {len(dati.get('note', []))} note, {len(dati.get('voti', []))} voti, {len(dati.get('rigoristi', []))} rigoristi da {percorso}")
 
 
-NOTE_PER_APP = 6   # le piu' recenti: sul telefono conta cosa e' successo negli ultimi giorni
+NOTE_PER_APP = 10  # le piu' recenti: sul telefono conta cosa e' successo negli ultimi giorni
 
 
 def esporta(dossier, listone):
@@ -230,7 +268,7 @@ def esporta(dossier, listone):
         voce = {
             "st": v["stato"],
             "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in v["voti"]],
-            "n": [{"d": n["data"], "t": n["tipo"], "x": n["testo"], "f": n.get("fonte", "")} for n in note[:NOTE_PER_APP]],
+            "n": [{"d": n["data"], "t": n["tipo"], "x": n["testo"], "f": n.get("fonte", ""), **({"r": n["rif"]} if n.get("rif") else {})} for n in note[:NOTE_PER_APP]],
         }
         if v["rigorista"]:
             voce["rig"] = v["rigorista"]

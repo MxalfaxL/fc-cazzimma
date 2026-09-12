@@ -192,6 +192,13 @@ pubblico ma innocuo: non ci sono segreti nel codice.
 
 ## Come si scrive qui
 
+- **Agenti semplici per cose semplici.** Leggere giornali, pagine web,
+  estrarre testo e note: agenti con `model: sonnet` (o haiku), pochi alla
+  volta, un file ciascuno, salvando dopo ognuno. Opus o Fable solo per le
+  cose complesse: modello, classifica, decisioni, codice dell'app. Regola di
+  Marco del 12 settembre 2026, dopo che 17 lettori Fable in parallelo hanno
+  bruciato il limite mensile senza produrre nulla.
+
 - Codice leggibile prima che breve. I commenti spiegano **perché**, non cosa.
 - Ogni modulo si può lanciare da solo e stampa qualcosa di sensato:
   `python3 motore/ottimizzatore.py` gira su una rosa finta.

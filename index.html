@@ -223,6 +223,7 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .spiega{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
 .riga-filtro{display:flex;gap:6px;margin-bottom:10px}
 /* ---- analisi: il dossier per giocatore ---- */
+.spiega .apri-foglio{display:block;margin-top:8px;border:1px solid var(--azzurro);background:transparent;color:var(--azzurro);border-radius:8px;padding:7px 10px;font-weight:600;font-size:12.5px}
 .an-riga{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--linea-2)}
 .an-riga:last-child{border-bottom:0}
 .an-riga .nome{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-align:left;background:none;border:0;padding:0;color:inherit;font-family:inherit}
@@ -231,6 +232,31 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .an-riga .num small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--grigio);letter-spacing:.08em;text-align:right}
 .an-riga .num.muto{color:var(--grigio)}
 .segnale.ko{background:var(--rosso-tinta);color:var(--rosso-testo)} .segnale.rig{background:var(--oro);color:#fff} .segnale.neutro{background:var(--carta-2);color:var(--grigio)}
+/* il foglio: la scheda di un giocatore che sale dal basso, da telefono */
+.velo{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;animation:appare .18s ease-out}
+.foglio{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--carta);color:var(--testo);border-radius:18px 18px 0 0;
+  max-height:86vh;overflow:auto;padding:14px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.25);animation:sale .22s ease-out}
+@keyframes sale{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.foglio .maniglia{width:38px;height:4px;border-radius:2px;background:var(--linea);margin:0 auto 12px}
+.foglio .testa{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
+.foglio .testa h3{margin:0;font-size:17px;font-weight:700}
+.foglio .testa small{display:block;font-weight:400;font-size:11px;color:var(--grigio);font-family:"IBM Plex Mono",monospace}
+.foglio .chiudi{border:0;background:var(--carta-2);color:var(--grigio);border-radius:50%;width:32px;height:32px;font-size:18px;line-height:1}
+.foglio .riquadro{background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:10px}
+.foglio .riquadro b{font-weight:700}
+.foglio .voti{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--testo-2);margin-bottom:10px;word-break:break-word}
+.foglio .eyebrow{margin-top:6px}
+.note-l{margin:0;padding:0;list-style:none}
+.note-l li{border-top:1px solid var(--linea-2)}
+.note-l li:first-child{border-top:0}
+.note-l button.n{display:grid;grid-template-columns:44px 1fr;gap:8px;width:100%;text-align:left;background:none;border:0;padding:9px 0;color:inherit;font-family:inherit;font-size:13px;line-height:1.35;align-items:start}
+.note-l button.n time{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--grigio);padding-top:2px}
+.note-l button.n span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-l li[aria-expanded="true"] button.n span{white-space:normal}
+.note-l .tipo{font-weight:700;margin-right:5px}
+.note-l li.infortunio .tipo,.note-l li.squalifica .tipo{color:var(--rosso-testo)} .note-l li.rientro .tipo,.note-l li.titolare .tipo{color:var(--verde-testo)} .note-l li.rigorista .tipo{color:var(--oro)}
+.note-l .dett{margin:0 0 10px 52px;font-size:12.5px;color:var(--grigio);line-height:1.5}
+.note-l .dett a{display:inline-block;margin-top:6px;border:1px solid var(--linea);border-radius:8px;padding:6px 10px;color:var(--azzurro);text-decoration:none;font-weight:600}
 .an-dett{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
 .an-dett .voti{font-family:"IBM Plex Mono",monospace;font-size:11.5px;margin-bottom:6px;word-break:break-word}
 .an-dett ul{margin:0;padding:0;list-style:none}
@@ -688,6 +714,9 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   </div>
 </nav>
 
+<div class="velo" id="velo" hidden></div>
+<div class="foglio" id="foglio" role="dialog" aria-modal="true" aria-label="Scheda giocatore" hidden></div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -842,7 +871,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.12f';
+const VERSIONE_APP = '2026.09.12g';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1494,6 +1523,7 @@ function spiegaTetto(g){
     if(d.n && d.n[0]) s += `Ultima notizia (${esc(d.n[0].f || 'giornale')} del ${dataBreve(d.n[0].d)}): ${esc(d.n[0].x)}`;
     const c = consiglioDi(d);
     if(c) s += `<br><b>Consiglio:</b> ${(+c.at).toFixed(2)} fantapunti attesi a giornata${c.ve === 'su' ? ', <b>vale più di quanto costa</b>' : c.ve === 'giu' ? ', <b>costa più di quanto vale ora</b>' : ''}. ${esc(c.mo||'')}`;
+    s += ` <button class="apri-foglio" data-foglio="${esc(normNome(g.n)+'|'+g.r)}">Tutte le notizie ›</button>`;
   }
   return s;
 }
@@ -1628,7 +1658,45 @@ function disegnaAnalisi(){
 $('cercaAnalisi').addEventListener('input', ()=>{ apertoAnalisi = null; disegnaAnalisi(); });
 $('analisiRuoli').addEventListener('click', e=>{ const b = e.target.closest('button[data-f]'); if(!b) return; filtroAnalisi = b.dataset.f || ''; apertoAnalisi = null; disegnaAnalisi(); });
 $('analisiOrdine').addEventListener('click', e=>{ const b = e.target.closest('button[data-o]'); if(!b) return; ordineAnalisi = b.dataset.o; apertoAnalisi = null; disegnaAnalisi(); });
-$('risultatiAnalisi').addEventListener('click', e=>{ const b = e.target.closest('button[data-apri]'); if(!b) return; apertoAnalisi = apertoAnalisi === b.dataset.apri ? null : b.dataset.apri; disegnaAnalisi(); });
+$('risultatiAnalisi').addEventListener('click', e=>{ const b = e.target.closest('button[data-apri]'); if(!b) return; apriFoglio(b.dataset.apri); });
+
+/* Il foglio: tutto quello che sappiamo di un giocatore, breve in lista,
+   per intero toccando la singola nota (con la fonte e, se c'è, l'articolo). */
+let notaAperta = null;
+function apriFoglio(k){
+  const g = trovaVoce(k); if(!g) return;
+  apertoAnalisi = k; notaAperta = null;
+  disegnaFoglio(g);
+  $('velo').hidden = false; $('foglio').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function chiudiFoglio(){ $('velo').hidden = true; $('foglio').hidden = true; apertoAnalisi = null; document.body.style.overflow = ''; }
+function disegnaFoglio(g){
+  const d = dossierDi(g) || {st:'ok', v:[], n:[]};
+  const f = forma(d), m = mediaVoti(d), c = consiglioDi(d);
+  const cons = c ? `<div class="riquadro"><b>${(+c.at).toFixed(2)} fantapunti attesi a giornata</b>${c.ve === 'su' ? ' · vale più di quanto costa' : c.ve === 'giu' ? ' · costa più di quanto vale ora' : ''}<br>${esc(c.mo||'')}</div>` : '';
+  const voti = d.v && d.v.length
+    ? `<div class="voti">Voti Gazzetta: ${d.v.map(x=>`g${x.g} <b>${x.v}</b>${x.ev ? ` (${esc(x.ev)})` : ''}`).join(' · ')}${m !== null ? `<br>media ${m.toFixed(2)} · forma ${f.toFixed(2)}` : ''}</div>`
+    : `<div class="voti">Nessun voto in pagella finora.</div>`;
+  const note = d.n && d.n.length ? `<div class="eyebrow"><span>Notizie</span><small>dalla più recente · tocca per leggere tutto</small></div><ul class="note-l">${d.n.map((x,i)=>{
+      const aperta = notaAperta === i;
+      const r = x.r || {};
+      const dove = r.pagina ? `${esc(x.f||'giornale')} del ${dataBreve(x.d)}, pagina ${r.pagina}` : `${esc(x.f||'')} · ${dataBreve(x.d)}`;
+      const dett = aperta ? `<div class="dett">${r.titolo ? `<i>${esc(r.titolo)}</i><br>` : ''}Fonte: ${dove}${r.link ? `<br><a href="${esc(r.link)}" target="_blank" rel="noopener">Apri l'articolo ↗</a>` : ''}</div>` : '';
+      return `<li class="${esc(x.t)}" aria-expanded="${aperta}"><button class="n" data-nota="${i}"><time>${dataBreve(x.d)}</time><span><span class="tipo">${TIPO_NOTA[x.t]||'Nota'}</span>${esc(x.x)}</span></button>${dett}</li>`;
+    }).join('')}</ul>` : `<p class="nota">Nessuna notizia raccolta su di lui.</p>`;
+  $('foglio').innerHTML = `<div class="maniglia"></div>
+    <div class="testa"><div class="sigla ${g.r}">${g.r}</div><div><h3>${esc(g.n)}${segnaliDossier(g)}${segnaleConsiglio(c)}</h3><small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)} · tetto ${tettoPiano(g)}${d.v && d.v.length ? ` · ${d.v.length} voti` : ''}</small></div><button class="chiudi" aria-label="Chiudi">×</button></div>
+    ${cons}${voti}${note}`;
+}
+$('velo').addEventListener('click', chiudiFoglio);
+$('foglio').addEventListener('click', e=>{
+  if(e.target.closest('.chiudi')){ chiudiFoglio(); return; }
+  const b = e.target.closest('button[data-nota]'); if(!b) return;
+  const i = +b.dataset.nota; notaAperta = notaAperta === i ? null : i;
+  const g = trovaVoce(apertoAnalisi); if(g) disegnaFoglio(g);
+});
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && !$('foglio').hidden) chiudiFoglio(); });
 
 $('btnCaricaListone').addEventListener('click', ()=>{
   const out = $('esitoListone');
@@ -1666,6 +1734,7 @@ $('filtroRuoli').addEventListener('click', e=>{
 
 $('risultatiListone').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.foglio){ apriFoglio(b.dataset.foglio); return; }
   if(b.dataset.spiega !== undefined){ spiegato = spiegato === b.dataset.spiega ? null : b.dataset.spiega; disegnaListone(); return; }
   if(b.dataset.prendi !== undefined){
     const g = trovaVoce(b.dataset.prendi); if(!g) return;

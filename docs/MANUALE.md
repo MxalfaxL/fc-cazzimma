@@ -149,8 +149,13 @@ la precedente due, le altre una), **media** (semplice), **novità** (chi ha
 notizie più fresche in cima), **nome**. Chi non ha ancora voti sta in fondo,
 con un trattino.
 
-Tocca un nome: si aprono i voti con gli eventi (gol, assist, ammonizioni) e
-le note dalla più recente, ognuna con la data e il giornale da cui viene.
+Tocca un nome: sale un foglio con il consiglio, i voti con gli eventi (gol,
+assist, ammonizioni) e le notizie dalla più recente, una riga ciascuna con
+data e tipo. Tocca una notizia per leggerla per intero, con la fonte
+(Gazzetta con la pagina, SOS Fanta con il collegamento all'articolo, le
+altre pagine web con il nome del sito). Si chiude toccando fuori o la ×.
+Dal listone d'asta lo stesso foglio si apre con **Tutte le notizie ›** sotto
+la spiegazione del tetto.
 Accanto al nome, **ko** rosso vuol dire infortunato o squalificato secondo
 l'ultima notizia, **rig** oro vuol dire rigorista.
 
