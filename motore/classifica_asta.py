@@ -84,35 +84,51 @@ def interpola(coppia, p):
     return coppia[0] + (coppia[1] - coppia[0]) * p
 
 
-def giornate_per_squadra(dossier, listone_per_nome):
-    """Le giornate che ogni squadra ha davvero giocato, ricavate dai voti: se
-    un giocatore del Napoli ha un voto alla 3ª, il Napoli alla 3ª ha giocato.
+# Quanti voti servono, per una squadra in una giornata, per dire che di quella
+# giornata sappiamo chi ha giocato. In una pagella ci sono 11-14 nomi: sotto
+# questa soglia abbiamo solo briciole e non possiamo dedurre le assenze.
+COPERTURA_MINIMA = 8
 
-    Serve perche' una giornata puo' essere a meta': il 13 settembre la 4ª
-    aveva quattro partite giocate e sei da giocare. Contarla per tutti
-    penalizzava chi doveva ancora scendere in campo (Frattesi passava da
-    7.84 a 6.53 senza aver fatto niente)."""
-    per_squadra = {}
+
+def giornate_per_squadra(dossier, listone_per_nome):
+    """Per ogni squadra due insiemi di giornate:
+
+    - **giocate**: tutte quelle che ha davvero disputato. Il campionato non
+      salta giornate, quindi se un suo giocatore ha un voto alla 3ª allora la
+      1ª e la 2ª le ha giocate per forza, anche se in archivio non abbiamo
+      quelle pagelle. E' il denominatore del "3/4" che si legge nell'app.
+    - **coperte**: quelle di cui abbiamo abbastanza voti da sapere chi era in
+      campo. Solo su queste si puo' stimare la disponibilita': dove le pagelle
+      mancano, un giocatore non risulta assente, risulta ignoto.
+
+    Prima contavo solo le giornate con voti: della 1ª giornata abbiamo le
+    pagelle di una partita sola, e quindici squadre su venti risultavano ferme
+    a due giornate invece di tre."""
+    conteggio = {}
     for nome, v in dossier["giocatori"].items():
         squadra = listone_per_nome.get(nome, {}).get("sq")
         if not squadra:
             continue
         for x in v["voti"]:
-            per_squadra.setdefault(squadra, set()).add(x["g"])
+            conteggio[(squadra, x["g"])] = conteggio.get((squadra, x["g"]), 0) + 1
+    per_squadra = {}
+    for (squadra, g), quanti in conteggio.items():
+        voce = per_squadra.setdefault(squadra, {"massima": 0, "coperte": set()})
+        voce["massima"] = max(voce["massima"], g)
+        if quanti >= COPERTURA_MINIMA:
+            voce["coperte"].add(g)
+    for squadra, voce in per_squadra.items():
+        voce["giocate"] = set(range(1, voce["massima"] + 1))
     return per_squadra
 
 
 def giornate_giocate(dossier, listone_per_nome=None):
-    """Quante giornate ha giocato la squadra piu' avanti: serve solo per dirlo
-    nel titolo del rapporto. Il conto che conta e' per squadra."""
+    """Le giornate della squadra piu' avanti: serve per il titolo del
+    rapporto. Il conto che vale e' quello per squadra."""
     if listone_per_nome:
         per_squadra = giornate_per_squadra(dossier, listone_per_nome)
-        return max((len(g) for g in per_squadra.values()), default=0)
-    conteggio = set()
-    for v in dossier["giocatori"].values():
-        for x in v["voti"]:
-            conteggio.add(x["g"])
-    return len(conteggio)
+        return max((v["massima"] for v in per_squadra.values()), default=0)
+    return max((x["g"] for v in dossier["giocatori"].values() for x in v["voti"]), default=0)
 
 
 def bonus_da_eventi(voti, ruolo):
@@ -164,7 +180,7 @@ def stop_infortunio(voce):
     return 0.75, "stop breve o da valutare"
 
 
-def valuta(g, voce, pct, giornate_sua_squadra):
+def valuta(g, voce, pct, squadra):
     """Il numero e il suo perche', per un giocatore."""
     r = g["r"]
     perche = []
@@ -186,22 +202,32 @@ def valuta(g, voce, pct, giornate_sua_squadra):
             perche.append(f"bonus visti {bonus_visti:+.1f} a partita")
     else:
         voto, bonus = voto_priori, bonus_priori
-        perche.append("mai in pagella finora" if giornate_sua_squadra else "nessun voto ancora")
+        perche.append("mai in pagella finora" if squadra else "nessun voto ancora")
 
-    # disponibilita': quante volte in pagella sulle giornate che la SUA squadra
-    # ha giocato (non su quelle del campionato: una giornata puo' essere a meta')
-    G = len(giornate_sua_squadra)
-    pres = len({x["g"] for x in voti if x["g"] in giornate_sua_squadra}) if G else 0
-    if G:
-        disp_viste = pres / G
-        peso_d = G / (G + 2)
+    # Due conti diversi, e la differenza conta:
+    # - giocate: le giornate che la sua squadra ha disputato (il "3/4" da mostrare)
+    # - coperte: quelle di cui abbiamo le pagelle, le uniche su cui si puo'
+    #   stimare quanto gioca. Dove le pagelle mancano non e' assente: e' ignoto.
+    giocate = squadra.get("giocate", set()) if squadra else set()
+    coperte = squadra.get("coperte", set()) if squadra else set()
+    G = len(giocate)
+    pres = len({x["g"] for x in voti if x["g"] in giocate}) if G else 0
+    pres_note = len({x["g"] for x in voti if x["g"] in coperte})
+    C = len(coperte)
+    if C:
+        disp_viste = pres_note / C
+        peso_d = C / (C + 2)
         disp = disp_priori * (1 - peso_d) + disp_viste * peso_d
         if pres == G:
-            perche.append(f"sempre in campo ({pres}/{G} giornate della sua squadra)")
-        elif pres == 0:
-            perche.append(f"mai in campo nelle {G} giornate della sua squadra")
+            perche.append(f"sempre in campo ({pres}/{G})")
+        elif pres_note == 0:
+            perche.append(f"mai in campo ({pres}/{G})")
         else:
-            perche.append(f"in campo {pres}/{G} giornate della sua squadra")
+            perche.append(f"in campo {pres}/{G}")
+        if C < G:
+            mancanti = sorted(giocate - coperte)
+            perche.append("di " + ("una giornata" if len(mancanti) == 1 else f"{len(mancanti)} giornate")
+                          + f" (la {', la '.join(str(x) for x in mancanti)}ª) non abbiamo le pagelle")
     else:
         disp = disp_priori
 
@@ -234,7 +260,7 @@ def valuta(g, voce, pct, giornate_sua_squadra):
         "atteso": round(atteso, 2), "voto": round(voto, 2), "bonus": round(bonus, 2),
         "disp": round(disp, 2), "perche": perche,
         # presenze su giornate giocate dalla squadra: il "3/4" che Marco vuole vedere
-        "pres": pres, "gs": G,
+        "pres": pres, "gs": G, "cop": C,
     }
 
 
@@ -247,7 +273,7 @@ def classifica(listone, dossier):
     righe = []
     for g in voci:
         voce = dossier["giocatori"].get(g["n"])
-        v = valuta(g, voce, pct[g["n"]], per_squadra.get(g["sq"], set()))
+        v = valuta(g, voce, pct[g["n"]], per_squadra.get(g["sq"]))
         v.update({"n": g["n"], "sq": g["sq"], "r": g["r"], "pr": g["pr"], "qt": g["qt"],
                   "tt": g["tt"].get("equilibrio", next(iter(g["tt"].values()))) if isinstance(g["tt"], dict) else g["tt"]})
         righe.append(v)
@@ -307,7 +333,7 @@ def aggiorna_app(righe, dossier, listone_per_nome):
             continue
         voce = giocatori.setdefault(x["n"], {"st": "ok", "v": [], "n": []})
         voce["c"] = {"at": x["atteso"], "ve": x["verdetto"], "mo": "; ".join(x["perche"]),
-                     "pr": x["pres"], "gs": x["gs"]}
+                     "pr": x["pres"], "gs": x["gs"], "co": x["cop"]}
     blocco["giornate"] = giornate_giocate(dossier, listone_per_nome)
     USCITA_APP.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return blocco

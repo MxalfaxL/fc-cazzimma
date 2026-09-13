@@ -872,7 +872,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.13';
+const VERSIONE_APP = '2026.09.13b';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1624,8 +1624,8 @@ const consiglioDi = d => (d && d.c && isFinite(+d.c.at)) ? d.c : null;
    media dei voti: per quelle c'è questo numero. */
 function presenze(d){
   const c = consiglioDi(d);
-  if(c && isFinite(+c.gs) && +c.gs > 0) return {fatte: +c.pr, su: +c.gs};
-  if(d && d.v && d.v.length) return {fatte: d.v.length, su: null};
+  if(c && isFinite(+c.gs) && +c.gs > 0) return {fatte: +c.pr, su: +c.gs, conPagelle: isFinite(+c.co) ? +c.co : null};
+  if(d && d.v && d.v.length) return {fatte: d.v.length, su: null, conPagelle: null};
   return null;
 }
 const testoPresenze = p => p ? (p.su ? `${p.fatte}/${p.su} presenze` : `${p.fatte} presenze`) : '';
@@ -1701,7 +1701,8 @@ function disegnaFoglio(g){
   const voti = d.v && d.v.length
     ? `<div class="voti">Voti Gazzetta: ${d.v.map(x=>`g${x.g} <b>${x.v}</b>${x.ev ? ` (${esc(x.ev)})` : ''}`).join(' · ')}`
       + `${m !== null ? `<br>media ${m.toFixed(2)} sulle ${d.v.length} in cui ha giocato · forma ${f.toFixed(2)}` : ''}`
-      + `${pres && pres.su ? `<br>in campo ${pres.fatte} giornate su ${pres.su} giocate dal ${esc(g.sq||'suo club')}` : ''}</div>`
+      + `${pres && pres.su ? `<br>in campo ${pres.fatte} giornate su ${pres.su} giocate dal ${esc(g.sq||'suo club')}` : ''}`
+      + `${pres && pres.conPagelle !== null && pres.conPagelle < pres.su ? `<br><i>di ${pres.su - pres.conPagelle} di quelle giornate non abbiamo le pagelle: le presenze possono essere di più</i>` : ''}</div>`
     : `<div class="voti">Nessun voto in pagella finora.${pres && pres.su ? ` Il ${esc(g.sq||'suo club')} ha giocato ${pres.su} giornate.` : ''}</div>`;
   const note = d.n && d.n.length ? `<div class="eyebrow"><span>Notizie</span><small>dalla più recente · tocca per leggere tutto</small></div><ul class="note-l">${d.n.map((x,i)=>{
       const aperta = notaAperta === i;
