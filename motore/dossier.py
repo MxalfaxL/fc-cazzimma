@@ -203,10 +203,29 @@ def importa(dossier, listone, percorso):
     data = dati["data"]
     fonte = dati.get("fonte", "gazzetta")
     problemi = []
-    voci = [(n["nome"], "nota") for n in dati.get("note", [])]
-    voci += [(v["nome"], "voto") for v in dati.get("voti", [])]
-    voci += [(r["nome"], "rigorista") for r in dati.get("rigoristi", [])]
+    # i campi obbligatori, prima di tutto: un file a cui ne manca uno non deve
+    # entrare a meta' (e' successo il 13 settembre con un rigorista senza valore)
+    for i, n in enumerate(dati.get("note", [])):
+        for campo in ("nome", "tipo", "testo"):
+            if not n.get(campo):
+                problemi.append(f"  nota {i + 1}: manca il campo '{campo}' ({n.get('nome') or n.get('testo', '')[:40]})")
+    for i, v in enumerate(dati.get("voti", [])):
+        for campo in ("nome", "giornata", "voto"):
+            if v.get(campo) in (None, ""):
+                problemi.append(f"  voto {i + 1}: manca il campo '{campo}' ({v.get('nome', '')})")
+    for i, r in enumerate(dati.get("rigoristi", [])):
+        for campo in ("nome", "valore"):
+            if not r.get(campo):
+                problemi.append(f"  rigorista {i + 1}: manca il campo '{campo}' ({r.get('nome', '')})"
+                                + (" — se e' solo un fatto raccontato, va fra le note" if campo == "valore" else ""))
+        if r.get("valore") and r["valore"] not in ("si", "no", "dubbio"):
+            problemi.append(f"  rigorista {r.get('nome', '')}: valore '{r['valore']}' non valido (si, no, dubbio)")
+    voci = [(n.get("nome"), "nota") for n in dati.get("note", [])]
+    voci += [(v.get("nome"), "voto") for v in dati.get("voti", [])]
+    voci += [(r.get("nome"), "rigorista") for r in dati.get("rigoristi", [])]
     for nome, dove in voci:
+        if not nome:
+            continue
         if nome not in listone:
             chiave = norm(nome)
             simili = [n for n in listone if chiave and (chiave in norm(n) or norm(n) in chiave)]

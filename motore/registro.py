@@ -72,10 +72,10 @@ def stampa():
     if not registro:
         print("Nessuna estrazione registrata.")
         return
-    print(f"{'fonte':<18}{'ultimo controllo':<20}{'quanto fa':<14}{'ultimo articolo preso':<20}nuovi")
+    print(f"{'fonte':<20}  {'ultimo controllo':<18}{'quanto fa':<14}{'ultimo preso':<18}nuovi")
     for fonte, v in sorted(registro.items(), key=lambda kv: kv[1].get("ultimo_controllo", ""), reverse=True):
-        print(f"{fonte:<18}{v.get('ultimo_controllo','-'):<20}{quanto_fa(v.get('ultimo_controllo')):<14}"
-              f"{v.get('ultimo_articolo','-'):<20}{v.get('ultimi_nuovi', 0)}")
+        print(f"{fonte:<20}  {v.get('ultimo_controllo','-'):<18}{quanto_fa(v.get('ultimo_controllo')):<14}"
+              f"{v.get('ultimo_articolo') or '-':<18}{v.get('ultimi_nuovi', 0)}")
 
 
 if __name__ == "__main__":

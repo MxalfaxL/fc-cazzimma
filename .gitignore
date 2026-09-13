@@ -34,3 +34,13 @@ wiki/
 
 # i giornali di Marco: uso personale, mai su GitHub
 Gazzetta dello sport/
+
+# le credenziali non stanno nei file: rete di sicurezza contro le distrazioni
+# (il 13 settembre un "Chiave API Football.txt" era a un git add -A dal push)
+*chiave*.txt
+*Chiave*.txt
+*chiave*.json
+*.key
+*token*.txt
+*secret*
+!motore/chiave.py
