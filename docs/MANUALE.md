@@ -139,6 +139,12 @@ i rigori, i trasferimenti. Arriva sul telefono insieme al listone, quindi si
 aggiorna da sola a ogni **Controlla aggiornamenti**; in alto a destra c'è la
 data dell'ultimo aggiornamento.
 
+Accanto a ogni nome c'è **in campo 3/4**: le partite in cui è sceso in campo
+sulle giornate che la sua squadra ha davvero giocato. Serve perché le
+giornate saltate **non** entrano nella media dei voti: chi ha giocato una
+partita sola e ha preso 7 ha media 7 come chi ne ha giocate quattro. Il 3/4
+dice se è sempre titolare.
+
 Cerca per nome o squadra, filtra per ruolo e scegli l'ordine: **consiglio**
 (i fantapunti attesi a giornata calcolati sul Mac: partono da quanto costa
 nel listone e si spostano verso quello che il dossier sa davvero, voti,

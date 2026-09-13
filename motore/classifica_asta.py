@@ -191,17 +191,17 @@ def valuta(g, voce, pct, giornate_sua_squadra):
     # disponibilita': quante volte in pagella sulle giornate che la SUA squadra
     # ha giocato (non su quelle del campionato: una giornata puo' essere a meta')
     G = len(giornate_sua_squadra)
+    pres = len({x["g"] for x in voti if x["g"] in giornate_sua_squadra}) if G else 0
     if G:
-        pres = len({x["g"] for x in voti if x["g"] in giornate_sua_squadra})
         disp_viste = pres / G
         peso_d = G / (G + 2)
         disp = disp_priori * (1 - peso_d) + disp_viste * peso_d
         if pres == G:
-            perche.append(f"sempre in campo ({pres}/{G})")
+            perche.append(f"sempre in campo ({pres}/{G} giornate della sua squadra)")
         elif pres == 0:
-            perche.append(f"mai in campo su {G} giornate")
+            perche.append(f"mai in campo nelle {G} giornate della sua squadra")
         else:
-            perche.append(f"in campo {pres}/{G}")
+            perche.append(f"in campo {pres}/{G} giornate della sua squadra")
     else:
         disp = disp_priori
 
@@ -233,6 +233,8 @@ def valuta(g, voce, pct, giornate_sua_squadra):
     return {
         "atteso": round(atteso, 2), "voto": round(voto, 2), "bonus": round(bonus, 2),
         "disp": round(disp, 2), "perche": perche,
+        # presenze su giornate giocate dalla squadra: il "3/4" che Marco vuole vedere
+        "pres": pres, "gs": G,
     }
 
 
@@ -279,10 +281,10 @@ def scrivi_md(righe, G, quanti=45):
            "Tetto: piano equilibrio. Privato: non va su GitHub.", ""]
     for r in SLOT:
         gruppo = sorted([x for x in righe if x["r"] == r], key=lambda x: -x["atteso"])[:quanti]
-        out += [f"## {NOME_RUOLO[r]}", "", "| # | | giocatore | squadra | mercato | tetto | atteso | voto | bonus | disp | perché |", "|---|---|---|---|---|---|---|---|---|---|---|"]
+        out += [f"## {NOME_RUOLO[r]}", "", "| # | | giocatore | squadra | mercato | tetto | atteso | pres | voto | bonus | disp | perché |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
         for i, x in enumerate(gruppo, 1):
             v = {"su": "▲", "giu": "▼"}.get(x["verdetto"], "")
-            out.append(f"| {i} | {v} | **{x['n']}** | {x['sq']} | {x['pr']:.0f} | {x['tt']} | **{x['atteso']:.2f}** | {x['voto']:.2f} | {x['bonus']:+.2f} | {x['disp']:.2f} | {'; '.join(x['perche'])} |")
+            out.append(f"| {i} | {v} | **{x['n']}** | {x['sq']} | {x['pr']:.0f} | {x['tt']} | **{x['atteso']:.2f}** | {x['pres']}/{x['gs']} | {x['voto']:.2f} | {x['bonus']:+.2f} | {x['disp']:.2f} | {'; '.join(x['perche'])} |")
         out.append("")
         affari = [x for x in sorted([x for x in righe if x["r"] == r], key=lambda x: -x["atteso"]) if x["verdetto"] == "su"][:8]
         trappole = [x for x in sorted([x for x in righe if x["r"] == r], key=lambda x: -x["pr"]) if x["verdetto"] == "giu"][:8]
@@ -304,7 +306,8 @@ def aggiorna_app(righe, dossier, listone_per_nome):
         if x["pos_prezzo"] > COMPRATI[x["r"]] and x["n"] not in giocatori:
             continue
         voce = giocatori.setdefault(x["n"], {"st": "ok", "v": [], "n": []})
-        voce["c"] = {"at": x["atteso"], "ve": x["verdetto"], "mo": "; ".join(x["perche"])}
+        voce["c"] = {"at": x["atteso"], "ve": x["verdetto"], "mo": "; ".join(x["perche"]),
+                     "pr": x["pres"], "gs": x["gs"]}
     blocco["giornate"] = giornate_giocate(dossier, listone_per_nome)
     USCITA_APP.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return blocco
