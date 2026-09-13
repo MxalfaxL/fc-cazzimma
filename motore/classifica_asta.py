@@ -84,15 +84,35 @@ def interpola(coppia, p):
     return coppia[0] + (coppia[1] - coppia[0]) * p
 
 
-def giornate_giocate(dossier):
-    """L'ultima giornata con un numero serio di voti: la 4ª a meta' non conta
-    ancora come giornata intera."""
-    conteggio = {}
+def giornate_per_squadra(dossier, listone_per_nome):
+    """Le giornate che ogni squadra ha davvero giocato, ricavate dai voti: se
+    un giocatore del Napoli ha un voto alla 3ª, il Napoli alla 3ª ha giocato.
+
+    Serve perche' una giornata puo' essere a meta': il 13 settembre la 4ª
+    aveva quattro partite giocate e sei da giocare. Contarla per tutti
+    penalizzava chi doveva ancora scendere in campo (Frattesi passava da
+    7.84 a 6.53 senza aver fatto niente)."""
+    per_squadra = {}
+    for nome, v in dossier["giocatori"].items():
+        squadra = listone_per_nome.get(nome, {}).get("sq")
+        if not squadra:
+            continue
+        for x in v["voti"]:
+            per_squadra.setdefault(squadra, set()).add(x["g"])
+    return per_squadra
+
+
+def giornate_giocate(dossier, listone_per_nome=None):
+    """Quante giornate ha giocato la squadra piu' avanti: serve solo per dirlo
+    nel titolo del rapporto. Il conto che conta e' per squadra."""
+    if listone_per_nome:
+        per_squadra = giornate_per_squadra(dossier, listone_per_nome)
+        return max((len(g) for g in per_squadra.values()), default=0)
+    conteggio = set()
     for v in dossier["giocatori"].values():
         for x in v["voti"]:
-            conteggio[x["g"]] = conteggio.get(x["g"], 0) + 1
-    piene = [g for g, n in conteggio.items() if n >= 60]
-    return max(piene) if piene else (max(conteggio) if conteggio else 0)
+            conteggio.add(x["g"])
+    return len(conteggio)
 
 
 def bonus_da_eventi(voti, ruolo):
@@ -144,7 +164,7 @@ def stop_infortunio(voce):
     return 0.75, "stop breve o da valutare"
 
 
-def valuta(g, voce, pct, G):
+def valuta(g, voce, pct, giornate_sua_squadra):
     """Il numero e il suo perche', per un giocatore."""
     r = g["r"]
     perche = []
@@ -166,11 +186,13 @@ def valuta(g, voce, pct, G):
             perche.append(f"bonus visti {bonus_visti:+.1f} a partita")
     else:
         voto, bonus = voto_priori, bonus_priori
-        perche.append("mai in pagella finora" if G else "nessun voto ancora")
+        perche.append("mai in pagella finora" if giornate_sua_squadra else "nessun voto ancora")
 
-    # disponibilita': quante volte in pagella sulle giornate giocate
+    # disponibilita': quante volte in pagella sulle giornate che la SUA squadra
+    # ha giocato (non su quelle del campionato: una giornata puo' essere a meta')
+    G = len(giornate_sua_squadra)
     if G:
-        pres = len({x["g"] for x in voti if x["g"] <= G})
+        pres = len({x["g"] for x in voti if x["g"] in giornate_sua_squadra})
         disp_viste = pres / G
         peso_d = G / (G + 2)
         disp = disp_priori * (1 - peso_d) + disp_viste * peso_d
@@ -217,11 +239,13 @@ def valuta(g, voce, pct, G):
 def classifica(listone, dossier):
     voci = listone["listone"]
     pct = percentile_per_prezzo(voci)
-    G = giornate_giocate(dossier)
+    per_nome = {g["n"]: g for g in voci}
+    per_squadra = giornate_per_squadra(dossier, per_nome)
+    G = giornate_giocate(dossier, per_nome)
     righe = []
     for g in voci:
         voce = dossier["giocatori"].get(g["n"])
-        v = valuta(g, voce, pct[g["n"]], G)
+        v = valuta(g, voce, pct[g["n"]], per_squadra.get(g["sq"], set()))
         v.update({"n": g["n"], "sq": g["sq"], "r": g["r"], "pr": g["pr"], "qt": g["qt"],
                   "tt": g["tt"].get("equilibrio", next(iter(g["tt"].values()))) if isinstance(g["tt"], dict) else g["tt"]})
         righe.append(v)
@@ -249,7 +273,8 @@ def classifica(listone, dossier):
 
 def scrivi_md(righe, G, quanti=45):
     out = [f"# Classifica per l'asta — {date.today().strftime('%d/%m/%Y')}", "",
-           f"Fantapunti attesi a giornata, con {G} giornate di voti Gazzetta nel dossier. "
+           f"Fantapunti attesi a giornata, con fino a {G} giornate di voti Gazzetta nel dossier "
+           "(la disponibilita' di ognuno e' contata sulle giornate che la SUA squadra ha giocato). "
            "atteso = disponibilità × (voto atteso + bonus attesi). ▲ vale più di quanto costa, ▼ meno. "
            "Tetto: piano equilibrio. Privato: non va su GitHub.", ""]
     for r in SLOT:
@@ -280,7 +305,7 @@ def aggiorna_app(righe, dossier, listone_per_nome):
             continue
         voce = giocatori.setdefault(x["n"], {"st": "ok", "v": [], "n": []})
         voce["c"] = {"at": x["atteso"], "ve": x["verdetto"], "mo": "; ".join(x["perche"])}
-    blocco["giornate"] = giornate_giocate(dossier)
+    blocco["giornate"] = giornate_giocate(dossier, listone_per_nome)
     USCITA_APP.write_text(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return blocco
 
