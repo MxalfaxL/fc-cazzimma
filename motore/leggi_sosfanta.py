@@ -24,6 +24,7 @@ Nessuna dipendenza oltre la libreria standard.
 
 import html
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -32,7 +33,11 @@ from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import registro as reg
+
 RADICE = Path(__file__).resolve().parent.parent
+FONTE = "sosfanta"
 FEED = "https://www.sosfanta.com/feed/"
 CARTELLA = RADICE / "dati" / "sosfanta"
 VISTI = CARTELLA / "visti.json"
@@ -103,6 +108,10 @@ def main():
     CARTELLA.mkdir(parents=True, exist_ok=True)
     visti = json.loads(VISTI.read_text()) if VISTI.exists() else {}
     argomenti = sys.argv[1:]
+    prima = reg.carica().get(FONTE, {})
+    if prima.get("ultimo_controllo"):
+        print(f"Ultimo giro: {prima['ultimo_controllo']} ({reg.quanto_fa(prima['ultimo_controllo'])}), "
+              f"eravamo arrivati all'articolo delle {prima.get('ultimo_articolo', '?')}.")
     try:
         if "--da" in argomenti:
             da = argomenti[argomenti.index("--da") + 1]
@@ -128,6 +137,9 @@ def main():
         nuovi.append((giorno, quando.strftime("%H:%M"), titolo, categorie))
         per_giorno.setdefault(giorno, []).append(file.name)
     VISTI.write_text(json.dumps(visti, ensure_ascii=False, indent=0), encoding="utf-8")
+    # il segno del tempo: quando abbiamo guardato e fin dove siamo arrivati
+    piu_recente = max((f"{g} {o}" for g, o, _, _ in nuovi), default=None)
+    reg.segna(FONTE, len(nuovi), piu_recente, "archivio" if "--da" in argomenti else "feed")
     # indice del giorno: si aggiorna a ogni giro
     for giorno in per_giorno:
         cartella = CARTELLA / giorno
@@ -137,9 +149,9 @@ def main():
             righe.append(f"- {f.name} · {testa[1][6:]} · {testa[2][11:]}")
         (cartella / "indice.md").write_text("\n".join(righe) + "\n", encoding="utf-8")
     if not nuovi:
-        print("Niente di nuovo su SOS Fanta.")
+        print(f"Niente di nuovo su SOS Fanta (controllato adesso, {reg.adesso()}).")
         return
-    print(f"{len(nuovi)} articoli nuovi:")
+    print(f"{len(nuovi)} articoli nuovi (giro delle {reg.adesso()[11:]}):")
     for giorno, ora, titolo, cat in sorted(nuovi):
         print(f"  {giorno} {ora}  {titolo[:70]:<70}  [{', '.join(c for c in cat if c != 'News')[:40]}]")
     print("Cartelle: " + ", ".join(f"dati/sosfanta/{g}/" for g in sorted(per_giorno)) + " → lettore sonnet → dossier.py importa")

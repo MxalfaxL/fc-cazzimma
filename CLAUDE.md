@@ -142,6 +142,8 @@ motore/esporta_app.py      blocco settimanale da incollare nell'app
 motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il listone della Gazzetta
 motore/invia_listone.py    manda report/listone.json all'app, via repository dei dati
 motore/leggi_gazzetta.py   dal PDF del giornale, le pagine di Serie A e chi viene citato
+motore/registro.py         quando abbiamo guardato ogni fonte, e fin dove: dati/estrazioni.json
+motore/leggi_sosfanta.py   feed RSS di SOS Fanta (e arretrato dall'archivio), con il segno del tempo
 motore/dossier.py          note datate per giocatore (infortuni, rigoristi, voti), base della classifica d'asta
 motore/classifica_asta.py  fantapunti attesi a giornata per ruolo: listone + dossier, con il perché in parole
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
