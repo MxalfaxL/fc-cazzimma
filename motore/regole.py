@@ -24,6 +24,39 @@ SOSTITUZIONI = 5
 SOGLIA_PRIMO_GOL = 66
 AMPIEZZA_FASCIA = 4
 
+# --- bonus e malus ---
+# Il regolamento della lega non li elenca: al punto 9 dice che "l'applicazione
+# fa tutto automaticamente", quindi valgono quelli standard di Leghe
+# Fantacalcio. Le chiavi sono le colonne del file dei voti ufficiali.
+# Attenzione a Rf: nel file di Fantacalcio.it il rigore segnato NON e' dentro
+# Gf, e' una colonna a parte (verificato sul rigore di Maldini alla 4ª, Gf 0 e
+# Rf 1). Sommarli tutti e due e' giusto, considerarlo compreso nei gol
+# toglierebbe 3 punti a ogni rigorista.
+BONUS = {
+    "Gf": 3.0,      # gol su azione
+    "Rf": 3.0,      # rigore segnato
+    "Ass": 1.0,     # assist
+    "Rp": 3.0,      # rigore parato (portieri)
+    "Rs": -3.0,     # rigore sbagliato
+    "Au": -2.0,     # autogol
+    "Amm": -0.5,    # ammonizione
+    "Esp": -1.0,    # espulsione
+    "Gs": -1.0,     # gol subito (conta solo per i portieri)
+}
+
+
+def fantavoto(voto, eventi, ruolo):
+    """Voto piu' bonus e malus, come li conta la lega. `eventi` e' il
+    dizionario delle colonne del file ufficiale (Gf, Gs, Rp, ...). I gol
+    subiti pesano solo sul portiere: un difensore non perde punti perche' la
+    sua squadra ha preso gol."""
+    totale = float(voto)
+    for chiave, peso in BONUS.items():
+        if chiave == "Gs" and ruolo != "P":
+            continue
+        totale += peso * float(eventi.get(chiave) or 0)
+    return round(totale, 2)
+
 # --- modificatore difesa: (soglia superiore esclusa, punti) ---
 FASCE_MODIFICATORE = [(6.00, 0), (6.25, 1), (6.50, 2), (6.75, 3), (7.00, 4)]
 MODIFICATORE_MAX = 5

@@ -75,6 +75,11 @@ def carica_piani():
 PIANI = carica_piani()
 
 ALIAS = {
+    # l'id e' il codice giocatore di Fantacalcio.it: e' lo stesso nel file
+    # delle quotazioni e in quello dei voti, quindi tenerlo qui vuol dire
+    # abbinare i voti per codice invece che per cognome (niente piu' dubbi
+    # fra i due Pellegrini della Roma). Facoltativo: i CSV non ce l'hanno.
+    "id": ["id", "cod", "codice", "cod giocatore"],
     "nome": ["nome", "giocatore", "calciatore", "player"],
     "squadra": ["squadra", "team", "club"],
     "ruolo": ["r", "ruolo", "ruolo classic"],
@@ -135,6 +140,8 @@ def leggi(percorso):
     })
     out["fvm"] = (pd.to_numeric(df[mappa["fvm"]], errors="coerce")
                   if "fvm" in mappa else out["qt"])
+    out["id"] = (pd.to_numeric(df[mappa["id"]], errors="coerce")
+                 if "id" in mappa else pd.NA)
     out = out[out["ruolo"].isin(list(SLOT))]
     out = out[out["qt"].notna()]
     out = out[~out["nome"].isin(["", "nan", "None"])]
@@ -243,8 +250,11 @@ def esporta_app(per_piano, percorso):
         for nome, df in per_piano.items():
             riga = df[(df["nome"] == r["nome"]) & (df["ruolo"] == r["ruolo"])]
             tetti[nome] = int(riga["tetto"].iloc[0]) if not riga.empty else 1
-        voci.append({"n": r["nome"], "sq": r["squadra"], "r": r["ruolo"],
-                     "qt": int(r["qt"]), "pr": float(r["prezzo"]), "tt": tetti})
+        voce = {"n": r["nome"], "sq": r["squadra"], "r": r["ruolo"],
+                "qt": int(r["qt"]), "pr": float(r["prezzo"]), "tt": tetti}
+        if pd.notna(r.get("id")):
+            voce["id"] = int(r["id"])
+        voci.append(voce)
     voci.sort(key=lambda v: (v["r"], -max(v["tt"].values()), -v["pr"]))
     blocco = {
         "stagione": "2026/27",

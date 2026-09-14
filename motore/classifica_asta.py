@@ -137,6 +137,13 @@ def bonus_da_eventi(voti, ruolo):
     chiaro. Per i portieri i gol sono quelli subiti, mai quelli fatti."""
     tot = 0.0
     for x in voti:
+        # con i file ufficiali il bonus non si deduce: e' la differenza fra
+        # fantavoto e voto, contata dalla lega stessa. Il parsing del testo
+        # qui sotto resta per i voti che arrivano da un racconto (tabellini,
+        # pagelle incollate) e non portano il fantavoto.
+        if x.get("fv") is not None:
+            tot += x["fv"] - x["v"]
+            continue
         ev = (x.get("ev") or "").lower()
         if not ev:
             continue
