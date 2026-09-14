@@ -394,7 +394,9 @@ def esporta(dossier, listone):
         voti_app, scala = voti_utili(v)
         voce = {
             "st": v["stato"],
-            "sc": scala,
+            # la scala si dichiara solo se ci sono voti: scriverla su chi non
+            # ne ha nessuno faceva comparire "gazzetta" accanto al nulla
+            **({"sc": scala} if voti_app else {}),
             "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in voti_app],
             # ogni notizia: testo migliore, data piu' recente, e le sue fonti
             # (data, fonte, riferimento) dalla piu' recente
