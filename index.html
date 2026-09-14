@@ -660,7 +660,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <div class="riga-filtro" id="analisiRuoli"></div>
       <div class="riga-filtro" id="analisiOrdine"></div>
       <div id="risultatiAnalisi"></div>
-      <p class="nota"><b>Consiglio</b> sono i fantapunti attesi a giornata calcolati sul Mac: parte da quanto costa nel listone e si sposta verso quello che il dossier sa davvero (voti, presenze, infortuni, rigori). <b>▲ affare</b> vale più di quanto costa, <b>▼ caro</b> il contrario. Le notizie uguali da fonti o giorni diversi sono unite in una sola, con il numero di fonti accanto: aprendola le vedi tutte. <b>Forma</b> è la media dei voti Gazzetta con le ultime giornate che pesano di più (l'ultima vale tre, la precedente due, prima una). <b>Media</b> è la media semplice. Le giornate in cui non ha giocato <b>non</b> entrano nella media: per quelle guarda <b>in campo 3/4</b>, cioè le presenze sulle giornate che la sua squadra ha giocato. <b>Novità</b> mette in cima chi ha notizie più fresche. I voti sono quelli della Gazzetta, non quelli ufficiali della lega: un termometro, non la classifica. Tocca un nome per leggere le note, dalla più recente, ognuna con la data e il giornale da cui viene.</p>
+      <p class="nota"><b>Consiglio</b> sono i fantapunti attesi a giornata calcolati sul Mac: parte da quanto costa nel listone e si sposta verso quello che il dossier sa davvero (voti, presenze, infortuni, rigori). <b>▲ affare</b> vale più di quanto costa, <b>▼ caro</b> il contrario. Le notizie uguali da fonti o giorni diversi sono unite in una sola, con il numero di fonti accanto: aprendola le vedi tutte. <b>Forma</b> è la media dei voti con le ultime giornate che pesano di più (l'ultima vale tre, la precedente due, prima una). <b>Media</b> è la media semplice. Le giornate in cui non ha giocato <b>non</b> entrano nella media: per quelle guarda <b>in campo 3/4</b>, cioè le presenze sulle giornate che la sua squadra ha giocato. <b>Novità</b> mette in cima chi ha notizie più fresche. I voti sono quelli ufficiali di Leghe Fantacalcio, gli stessi che fanno i punti nella nostra lega. Tocca un nome per leggere le note, dalla più recente, ognuna con la data e il giornale da cui viene.</p>
     </div>
   </div>
 </section>
@@ -872,7 +872,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.13b';
+const VERSIONE_APP = '2026.09.14';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1573,7 +1573,8 @@ const trovaVoce = k => listone.voci.find(x=>normNome(x.n)+'|'+x.r === k);
 
 /* ======================= analisi: il dossier ======================= */
 /* Il dossier arriva dentro il listone, per nome del listone: stato, rigorista,
-   voti Gazzetta giornata per giornata e le ultime note. Le medie si fanno qui. */
+   voti ufficiali della lega giornata per giornata e le ultime note. Le medie si
+   fanno qui: il Mac manda una scala sola, mai due mescolate. */
 const dossierDi = g => (listone.dossier && listone.dossier.giocatori && listone.dossier.giocatori[g.n]) || null;
 const mediaVoti = d => d.v && d.v.length ? d.v.reduce((a,x)=>a+x.v, 0) / d.v.length : null;
 /* le ultime giornate pesano di piu': l'ultima disponibile nel dossier vale 3,

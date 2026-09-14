@@ -96,6 +96,17 @@ def trova(nome, listone):
     sys.exit(f"'{nome}' non e' nel listone. Prova: python3 motore/dossier.py cerca {nome[:4]}")
 
 
+# Le due scale di voti che teniamo, senza mai mescolarle in una media.
+# "leghe" e' quella di Fantacalcio.it: il regolamento della Lega Minuetto dice
+# che il risultato si fa con i voti pubblicati da Leghe, quindi e' la scala su
+# cui va stimato tutto. "gazzetta" e' quella dei giornali che leggiamo ogni
+# giorno: resta come secondo parere e come rete di sicurezza dove i voti
+# ufficiali non li abbiamo ancora.
+SCALA_LEGA = "leghe"
+SCALA_STORICA = "gazzetta"
+SCALE = (SCALA_LEGA, SCALA_STORICA)
+
+
 def voce(dossier, nome):
     return dossier["giocatori"].setdefault(nome, {"stato": "ok", "rigorista": None, "voti": [], "note": []})
 
@@ -130,18 +141,40 @@ def aggiungi(dossier, listone, nome, data, tipo, testo, fonte="gazzetta", rif=No
     print(f"{nome} ({listone[nome]['sq']}, {listone[nome]['r']}) · {data} · {tipo}: {testo}")
 
 
-def voto(dossier, listone, nome, giornata, v, fv=None, eventi=None):
-    """Un voto per giornata: se arriva di nuovo (stessa giornata) sostituisce.
-    eventi e' testo libero breve: 'gol', 'assist', 'rigore sbagliato', 'espulso'."""
+def voto(dossier, listone, nome, giornata, v, fv=None, eventi=None, fonte=SCALA_STORICA):
+    """Un voto per giornata E per scala: se arriva di nuovo lo stesso voto
+    (stessa giornata, stessa scala) sostituisce, mentre la stessa giornata
+    nell'altra scala convive. eventi e' testo libero breve: 'gol', 'assist',
+    'rigore sbagliato', 'espulso'."""
     nome = trova(nome, listone)
+    fonte = fonte if fonte in SCALE else SCALA_STORICA
     voci = voce(dossier, nome)["voti"]
-    voci[:] = [x for x in voci if x["g"] != int(giornata)]
-    x = {"g": int(giornata), "v": float(v), "fv": float(fv) if fv not in (None, "") else None}
+    voci[:] = [x for x in voci if not (x["g"] == int(giornata) and x.get("f", SCALA_STORICA) == fonte)]
+    x = {"g": int(giornata), "v": float(v), "fv": float(fv) if fv not in (None, "") else None,
+         "f": fonte}
     if eventi:
         x["ev"] = eventi
     voci.append(x)
-    voci.sort(key=lambda x: x["g"])
-    print(f"{nome}: giornata {giornata} voto {v}" + (f", fantavoto {fv}" if x["fv"] is not None else "") + (f" ({eventi})" if eventi else ""))
+    voci.sort(key=lambda x: (x["g"], x.get("f", SCALA_STORICA)))
+    print(f"{nome}: giornata {giornata} voto {v} ({fonte})"
+          + (f", fantavoto {fv}" if x["fv"] is not None else "") + (f" ({eventi})" if eventi else ""))
+
+
+def voti_di(v, scala):
+    """I voti di una scala sola. Mescolare Gazzetta e Leghe in una media non
+    ha senso: sono due redazioni con criteri diversi, e mezzo voto di scarto
+    sistematico sposta il modificatore difesa di una fascia intera."""
+    return [x for x in v.get("voti", []) if x.get("f", SCALA_STORICA) == scala]
+
+
+def voti_utili(v, preferita=SCALA_LEGA):
+    """I voti da usare e quale scala sono: quelli della lega se ci sono,
+    altrimenti la Gazzetta, che resta il secondo parere. Mai i due insieme."""
+    scelti = voti_di(v, preferita)
+    if scelti:
+        return scelti, preferita
+    altra = SCALA_STORICA if preferita == SCALA_LEGA else SCALA_LEGA
+    return voti_di(v, altra), altra
 
 
 def rigorista(dossier, listone, nome, valore):
@@ -267,8 +300,10 @@ def importa(dossier, listone, percorso):
         # un file puo' raccogliere piu' fonti (pagine web diverse): la fonte
         # della singola nota vince su quella del file
         aggiungi(dossier, listone, n["nome"], n.get("data", data), n["tipo"], n["testo"], n.get("fonte", fonte), riferimento(n))
+    scala_voti = fonte if fonte in SCALE else SCALA_STORICA
     for v in dati.get("voti", []):
-        voto(dossier, listone, v["nome"], v["giornata"], v["voto"], v.get("fantavoto"), v.get("eventi"))
+        voto(dossier, listone, v["nome"], v["giornata"], v["voto"], v.get("fantavoto"),
+             v.get("eventi"), v.get("fonte", scala_voti))
     for r in dati.get("rigoristi", []):
         rigorista(dossier, listone, r["nome"], r["valore"])
     print(f"Importate {len(dati.get('note', []))} note, {len(dati.get('voti', []))} voti, {len(dati.get('rigoristi', []))} rigoristi da {percorso}")
@@ -353,9 +388,14 @@ def esporta(dossier, listone):
         if nome not in listone or not (v["note"] or v["voti"]):
             continue
         note = raggruppa(v["note"])
+        # all'app va UNA scala sola, gia' scelta qui: se le mandassimo tutte e
+        # due farebbe la media su otto voti di due redazioni diverse. "sc" le
+        # dice quale sta guardando, cosi' puo' scriverlo accanto alla media.
+        voti_app, scala = voti_utili(v)
         voce = {
             "st": v["stato"],
-            "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in v["voti"]],
+            "sc": scala,
+            "v": [{"g": x["g"], "v": x["v"], **({"ev": x["ev"]} if x.get("ev") else {})} for x in voti_app],
             # ogni notizia: testo migliore, data piu' recente, e le sue fonti
             # (data, fonte, riferimento) dalla piu' recente
             "n": [{"d": g["data"], "t": g["tipo"], "x": g["testo"],

@@ -109,7 +109,7 @@ def giornate_per_squadra(dossier, listone_per_nome):
         squadra = listone_per_nome.get(nome, {}).get("sq")
         if not squadra:
             continue
-        for x in v["voti"]:
+        for x in modulo_dossier.voti_utili(v)[0]:
             conteggio[(squadra, x["g"])] = conteggio.get((squadra, x["g"]), 0) + 1
     per_squadra = {}
     for (squadra, g), quanti in conteggio.items():
@@ -128,7 +128,7 @@ def giornate_giocate(dossier, listone_per_nome=None):
     if listone_per_nome:
         per_squadra = giornate_per_squadra(dossier, listone_per_nome)
         return max((v["massima"] for v in per_squadra.values()), default=0)
-    return max((x["g"] for v in dossier["giocatori"].values() for x in v["voti"]), default=0)
+    return max((x["g"] for v in dossier["giocatori"].values() for x in modulo_dossier.voti_utili(v)[0]), default=0)
 
 
 def bonus_da_eventi(voti, ruolo):
@@ -184,7 +184,7 @@ def valuta(g, voce, pct, squadra):
     """Il numero e il suo perche', per un giocatore."""
     r = g["r"]
     perche = []
-    voti = voce["voti"] if voce else []
+    voti, scala = modulo_dossier.voti_utili(voce) if voce else ([], modulo_dossier.SCALA_LEGA)
     n = len(voti)
     voto_priori = interpola(VOTO_PRIORI[r], pct)
     bonus_priori = interpola(BONUS_PRIORI[r], pct)
@@ -197,7 +197,8 @@ def valuta(g, voce, pct, squadra):
         bonus_visti = bonus_da_eventi(voti, r) / n
         peso_b = n / (n + PESO_PRIORI_BONUS)
         bonus = bonus_priori * (1 - peso_b) + bonus_visti * peso_b
-        perche.append(f"{n} vot{'o' if n == 1 else 'i'} Gazzetta, media {media:.2f}")
+        etichetta = "della lega" if scala == modulo_dossier.SCALA_LEGA else "Gazzetta"
+        perche.append(f"{n} vot{'o' if n == 1 else 'i'} {etichetta}, media {media:.2f}")
         if abs(bonus_visti) > 0.4:
             perche.append(f"bonus visti {bonus_visti:+.1f} a partita")
     else:
@@ -301,7 +302,7 @@ def classifica(listone, dossier):
 
 def scrivi_md(righe, G, quanti=45):
     out = [f"# Classifica per l'asta — {date.today().strftime('%d/%m/%Y')}", "",
-           f"Fantapunti attesi a giornata, con fino a {G} giornate di voti Gazzetta nel dossier "
+           f"Fantapunti attesi a giornata, con fino a {G} giornate di voti ufficiali della lega (Leghe Fantacalcio) nel dossier "
            "(la disponibilita' di ognuno e' contata sulle giornate che la SUA squadra ha giocato). "
            "atteso = disponibilità × (voto atteso + bonus attesi). ▲ vale più di quanto costa, ▼ meno. "
            "Tetto: piano equilibrio. Privato: non va su GitHub.", ""]
