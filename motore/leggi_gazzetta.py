@@ -167,6 +167,13 @@ def data_del_giornale(pdf):
     m = re.search(r"(\d{4})-(\d{2})-(\d{2})", pdf.name)
     if m:
         return m.group(0)
+    # I file scaricati dall'edicola arrivano con nomi tipo
+    # "LaGazzettadelloSport_20260920_5d2bf466...pdf": la data e' attaccata,
+    # AAAAMMGG. Si valida mese e giorno, altrimenti un pezzo del codice
+    # casuale nel nome passerebbe per data.
+    for anno, mese, giorno in re.findall(r"(?<!\d)(20\d{2})(\d{2})(\d{2})(?!\d)", pdf.name):
+        if 1 <= int(mese) <= 12 and 1 <= int(giorno) <= 31:
+            return f"{anno}-{mese}-{giorno}"
     # "La Gazzetta dello Sport - 25 Agosto 2026.pdf", "..._05_ Settembre 2026.pdf"
     m = re.search(r"(\d{1,2})[ _\-]*(" + "|".join(MESI) + r")[ _\-]*(\d{4})", pdf.name.lower())
     if m:
