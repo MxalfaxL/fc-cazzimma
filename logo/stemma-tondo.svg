@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- FC Cazzimma - stemma tondo per LegheFC.
+       Napoli in maggioranza: cielo azzurro, Vesuvio, corno rosso in primo piano.
+       Venezia: remo da voga incrociato e gondola sull'acqua. -->
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#35B8EC"/>
+      <stop offset="0.42" stop-color="#1494D6"/>
+      <stop offset="1"    stop-color="#0A6698"/>
+    </linearGradient>
+    <linearGradient id="oro" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0"    stop-color="#F9E093"/>
+      <stop offset="0.3"  stop-color="#E5AE2B"/>
+      <stop offset="0.62" stop-color="#B8841A"/>
+      <stop offset="0.85" stop-color="#F3CE66"/>
+      <stop offset="1"    stop-color="#C9901E"/>
+    </linearGradient>
+    <linearGradient id="rosso" x1="0" y1="0" x2="1" y2="0.25">
+      <stop offset="0"    stop-color="#8C1A14"/>
+      <stop offset="0.3"  stop-color="#C02D23"/>
+      <stop offset="0.68" stop-color="#EA5B4C"/>
+      <stop offset="1"    stop-color="#9E2018"/>
+    </linearGradient>
+    <linearGradient id="legno" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0"   stop-color="#8A7757"/>
+      <stop offset="0.45" stop-color="#E2D2B8"/>
+      <stop offset="1"   stop-color="#75654B"/>
+    </linearGradient>
+    <linearGradient id="acqua" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B96D2"/>
+      <stop offset="0.45" stop-color="#0D6A9F"/>
+      <stop offset="1" stop-color="#084869"/>
+    </linearGradient>
+    <radialGradient id="alone" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#FFEFC2" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#FFD98A" stop-opacity="0.14"/>
+      <stop offset="1"   stop-color="#FFD98A" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="disco"><circle cx="256" cy="256" r="232"/></clipPath>
+  </defs>
+
+  <!-- cornice sottile: oro, nero, oro -->
+  <circle cx="256" cy="256" r="254" fill="url(#oro)"/>
+  <circle cx="256" cy="256" r="246" fill="#0E1319"/>
+  <circle cx="256" cy="256" r="238" fill="url(#oro)"/>
+  <circle cx="256" cy="256" r="232" fill="url(#cielo)"/>
+
+  <g clip-path="url(#disco)">
+    <!-- la scena riempie tutto il disco -->
+    <!-- raggi di sole dietro il vulcano -->
+    <g transform="translate(292,332)" fill="#FFFFFF" opacity="0.07">
+      <path d="M 0,0 L -240,-96 L -240,-44 Z"/>
+      <path d="M 0,0 L -180,-210 L -140,-232 Z"/>
+      <path d="M 0,0 L -30,-270 L 34,-270 Z"/>
+      <path d="M 0,0 L 140,-232 L 180,-210 Z"/>
+      <path d="M 0,0 L 240,-96 L 240,-44 Z"/>
+    </g>
+    <circle cx="292" cy="322" r="200" fill="url(#alone)"/>
+
+    <!-- pennacchio del Vesuvio -->
+    <path d="M 316,266 C 302,234 330,224 320,198 C 346,216 324,240 340,264 Z"
+          fill="#FDFDFD" opacity="0.16"/>
+
+    <!-- Vesuvio: Monte Somma, sella, cono con cratere tronco -->
+    <g transform="translate(-6,34)">
+    <path d="M 84,358 C 132,348 176,324 208,294 C 214,288 222,286 228,292
+             C 236,300 244,302 252,294 C 262,284 272,268 286,252
+             C 292,244 300,238 310,238 L 344,238 C 352,238 358,244 364,254
+             C 380,282 398,310 420,330 C 442,350 468,358 492,360 Z"
+          fill="#0A3B5C"/>
+    <!-- versante in luce -->
+    <path d="M 286,252 C 292,244 300,238 310,238 L 326,238
+             C 318,264 310,304 306,340 C 304,352 303,356 302,360 L 262,360
+             C 268,322 276,282 286,252 Z"
+          fill="#2298D8" opacity="0.42"/>
+    <!-- versante in ombra -->
+    <path d="M 344,238 C 352,238 358,244 364,254 C 380,282 398,310 420,330
+             C 442,350 468,358 492,360 L 352,360 C 352,318 348,272 344,238 Z"
+          fill="#021B2D" opacity="0.45"/>
+    <!-- bocca del cratere -->
+    <path d="M 306,238 C 316,232 338,232 348,238 C 338,244 316,244 306,238 Z"
+          fill="#021B2D" opacity="0.75"/>
+
+    </g>
+
+    <!-- campanile di San Marco: la sagoma di Venezia sulla laguna -->
+    <g transform="translate(114,392) scale(0.62)">
+      <g fill="#06222F">
+        <rect x="-21" y="-190" width="42" height="190"/>
+        <rect x="-26" y="-212" width="52" height="24" rx="2"/>
+        <rect x="-23" y="-238" width="46" height="28" rx="2"/>
+        <rect x="-17" y="-256" width="34" height="20" rx="2"/>
+        <path d="M -17,-254 L 0,-312 L 17,-254 Z"/>
+        <rect x="-3" y="-336" width="6" height="26" rx="3"/>
+        <circle cx="0" cy="-338" r="7"/>
+      </g>
+      <g fill="#2FB1E8" opacity="0.30">
+        <rect x="-21" y="-190" width="13" height="190"/>
+        <rect x="-26" y="-212" width="14" height="24"/>
+        <rect x="-23" y="-238" width="13" height="28"/>
+        <path d="M -17,-254 L 0,-312 L -6,-254 Z"/>
+      </g>
+      <g fill="#04161F" opacity="0.85">
+        <rect x="-15" y="-234" width="8" height="19" rx="4"/>
+        <rect x="-3" y="-234" width="8" height="19" rx="4"/>
+        <rect x="9" y="-234" width="6" height="19" rx="3"/>
+      </g>
+    </g>
+
+    <!-- acqua -->
+    <rect x="0" y="390" width="512" height="122" fill="url(#acqua)"/>
+    <path d="M 0,390 C 100,384 160,396 256,392 C 350,388 430,398 512,390 L 512,402 L 0,402 Z"
+          fill="#2FB1E8" opacity="0.45"/>
+    <path d="M 268,392 L 316,392 L 340,512 L 244,512 Z" fill="#BFE6FB" opacity="0.12"/>
+    <g fill="#CFE9F8" opacity="0.28">
+      <rect x="78"  y="416" width="92"  height="5" rx="2.5"/>
+      <rect x="336" y="418" width="74"  height="5" rx="2.5"/>
+      <rect x="140" y="444" width="130" height="5" rx="2.5"/>
+      <rect x="308" y="446" width="58"  height="5" rx="2.5"/>
+      <rect x="206" y="466" width="96" height="5" rx="2.5"/>
+    </g>
+    <!-- riflesso del campanile -->
+    <g fill="#04283F" opacity="0.4">
+      <rect x="101" y="392" width="26" height="38"/>
+    </g>
+
+    <!-- remo da voga veneziano, dietro il corno -->
+    <g transform="translate(258,298) rotate(-36)">
+      <g fill="url(#legno)" stroke="#241E15" stroke-width="3.5" stroke-linejoin="round">
+        <path d="M -6.5,-158 C -6.5,-158 -8,-40 -8,60 L 8,60 C 8,-40 6.5,-158 6.5,-158
+                 C 6.5,-163 -6.5,-163 -6.5,-158 Z"/>
+        <path d="M 0,50 C 26,84 30,132 14,174 C 7,190 -7,190 -14,174 C -30,132 -26,84 0,50 Z"/>
+        <circle cx="0" cy="-160" r="12"/>
+      </g>
+      <path d="M -2,-150 L -2,54" stroke="#FDFDFD" stroke-opacity="0.25" stroke-width="3.5" fill="none"/>
+      <path d="M 0,64 C 16,96 18,136 8,166" stroke="#FDFDFD" stroke-opacity="0.22" stroke-width="4" fill="none"/>
+    </g>
+
+    <!-- corno portafortuna, primo piano -->
+    <g transform="translate(304,196) rotate(13) scale(1.14)">
+      <path d="M -27,10 C -34,68 -50,122 -72,162 C -79,175 -65,185 -56,172
+               C -25,132 12,76 27,8 Z"
+            fill="url(#rosso)" stroke="#54100B" stroke-width="3.5" stroke-linejoin="round"/>
+      <g stroke="#6E150E" stroke-opacity="0.45" stroke-width="3.5" fill="none" stroke-linecap="round">
+        <path d="M -20,40 C -7,35 8,26 18,14"/>
+        <path d="M -29,78 C -17,72 -3,60 8,44"/>
+        <path d="M -42,114 C -33,108 -22,96 -13,82"/>
+        <path d="M -56,146 C -50,140 -43,130 -36,118"/>
+      </g>
+      <path d="M 16,16 C 3,60 -19,104 -46,144" stroke="#FF9E8E" stroke-opacity="0.5"
+            stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- cappuccio e anellino d'oro -->
+      <path d="M -29,12 C -20,-10 18,-18 30,4 C 24,16 -24,22 -29,12 Z"
+            fill="url(#oro)" stroke="#7A5510" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="4" cy="-20" r="12" fill="none" stroke="url(#oro)" stroke-width="7.5"/>
+      <circle cx="4" cy="-20" r="12" fill="none" stroke="#7A5510" stroke-width="1.5" stroke-opacity="0.65"/>
+    </g>
+
+    <!-- fascia del nome -->
+    <path d="M 0,0 L 512,0 L 512,146 L 0,146 Z" fill="#0E1319"/>
+    <rect x="0" y="146" width="512" height="5" fill="url(#oro)"/>
+    <text x="256" y="130" text-anchor="middle"
+          font-family="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"
+          font-size="50" fill="#FDFDFD" letter-spacing="2">FC CAZZIMMA</text>
+
+    <!-- vignettatura del disco -->
+    <circle cx="256" cy="256" r="232" fill="none" stroke="#04121D" stroke-opacity="0.4" stroke-width="12"/>
+  </g>
+</svg>

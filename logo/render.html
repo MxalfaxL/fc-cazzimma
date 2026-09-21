@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>render stemma</title>
+<!-- Da SVG a PNG senza dipendenze: il browser disegna lo stemma su un canvas e
+     manda i byte a logo/salva-png.js, che li scrive in logo/.
+       node logo/salva-png.js &                       (ascolta su 8766)
+       preview_start name "app"; poi apri /logo/render.html
+     Serve perche' il testo dell'insegna usa un font di sistema: rasterizzarlo
+     con il browser da' lo stesso risultato che si vede a schermo. -->
+<body style="background:#222;color:#eee;font:14px system-ui;padding:20px">
+<div id="esito">rendering...</div>
+<div id="anteprima"></div>
+<script>
+async function disegna(sorgente, misura, nome) {
+  const testo = await (await fetch(sorgente + '?t=' + Date.now())).text();
+  const url = URL.createObjectURL(new Blob([testo], {type: 'image/svg+xml'}));
+  const img = new Image();
+  await new Promise((ok, ko) => { img.onload = ok; img.onerror = ko; img.src = url; });
+  const c = document.createElement('canvas');
+  c.width = c.height = misura;
+  c.getContext('2d').drawImage(img, 0, 0, misura, misura);
+  const dati = c.toDataURL('image/png');
+  await fetch('http://localhost:8766/', {method:'POST', body: JSON.stringify({nome, dati})});
+  return dati;
+}
+(async () => {
+  try {
+    const d = await disegna('stemma-tondo.svg', 1024, 'logo-tondo-1024.png');
+    await disegna('stemma-tondo.svg', 512, 'logo-tondo-512.png');
+    await disegna('stemma-tondo.svg', 192, 'logo-tondo-192.png');
+    await disegna('stemma-app.svg', 1024, 'logo-app-1024.png');
+    await disegna('stemma-app.svg', 512, 'logo-app-512.png');
+    document.getElementById('esito').textContent = 'fatto';
+    const i = new Image(); i.src = d; i.width = 360;
+    document.getElementById('anteprima').appendChild(i);
+  } catch (e) { document.getElementById('esito').textContent = 'errore: ' + e.message; }
+})();
+</script>
