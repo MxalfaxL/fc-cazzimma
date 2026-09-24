@@ -49,6 +49,10 @@ INIZIO_GIORNATA = {
     3: "2026-09-03",
     4: "2026-09-10",
     5: "2026-09-17",
+    # sosta per le nazionali dal 21/9 al 9/10: la 6ª si gioca dopo l'asta
+    # (calendario in dati/calendario-2026-27.json, letto il 24/9)
+    6: "2026-10-09",
+    7: "2026-10-15",
 }
 
 GIORNATE = ["prima", "seconda", "terza", "quarta", "quinta", "sesta", "settima", "ottava",

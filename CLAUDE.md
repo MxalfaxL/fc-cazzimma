@@ -146,6 +146,11 @@ motore/registro.py         quando abbiamo guardato ogni fonte, e fin dove: dati/
 motore/leggi_sosfanta.py   feed RSS di SOS Fanta (e arretrato dall'archivio), con il segno del tempo
 motore/dossier.py          note datate per giocatore (infortuni, rigoristi, voti), base della classifica d'asta
 motore/classifica_asta.py  fantapunti attesi a giornata per ruolo: listone + dossier, con il perché in parole
+motore/squadre.py          difese vere, modificatore di squadra e rigori calciati, dai file dei voti ufficiali
+motore/titolari.py         titolari, subentrati e minuti di ogni giornata, dai tabellini e dalle formazioni del feed
+motore/stagione_scorsa.py  la stagione 2025/26 giocatore per giocatore, dall'archivio dei voti di SOS Fanta
+motore/calendario.py       gli avversari delle giornate dopo l'asta, con i loro gol fatti e subiti
+motore/guida_asta.py       le fasce della guida all'asta di SOS Fanta accanto ai nostri prezzi
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
