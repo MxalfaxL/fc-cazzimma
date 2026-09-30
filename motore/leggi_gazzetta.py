@@ -12,6 +12,7 @@ dei giocatori lo fa poi chi legge quelle pagine e scrive nel dossier
 Uso:
     python3 motore/leggi_gazzetta.py                       # tutti i PDF della cartella non ancora letti
     python3 motore/leggi_gazzetta.py "Gazzetta dello sport/x.pdf"   # uno solo, anche se gia' letto
+    python3 motore/leggi_gazzetta.py --controlla            # giorno per giorno: PDF, estratto, letto?
     ... --tutte                                            # salva ogni pagina, anche quelle vuote
 
 Tutto resta in dati/, che git ignora: e' un giornale comprato, uso personale.
@@ -217,7 +218,46 @@ def leggi_pdf(pdf, per_chiave, squadre, tutte=False):
     return etichetta
 
 
+def controlla():
+    """Giorno per giorno, dal primo giornale a oggi: c'e' il PDF? e' stato
+    estratto? un lettore ne ha tratto le note? L'ultima domanda e' quella che
+    conta: un giornale estratto ma mai letto e' un pezzo perso che nessun
+    elenco di file mostra (e i nomi dei PDF cambiano forma: "_29_Settembre_",
+    " 30 Settembre ", "- 25 Agosto": qui si usa la stessa data_del_giornale
+    dell'estrazione, non un'espressione scritta a mano)."""
+    import datetime
+    pdf_per_data = {}
+    for pdf in sorted(CARTELLA_PDF.glob("*.pdf")) + sorted(CARTELLA_PDF.glob("*.PDF")):
+        pdf_per_data.setdefault(data_del_giornale(pdf), []).append(pdf.name)
+    date = sorted(d for d in pdf_per_data if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d))
+    cartelle = {c.name for c in CARTELLA_TESTO.iterdir() if c.is_dir()} if CARTELLA_TESTO.exists() else set()
+    primo = min(date + sorted(c for c in cartelle if re.fullmatch(r"\d{4}-\d{2}-\d{2}", c)))
+    giorno, oggi = datetime.date.fromisoformat(primo), datetime.date.today()
+    buchi = 0
+    while giorno <= oggi:
+        k = giorno.isoformat()
+        cartella = CARTELLA_TESTO / k
+        estratto = (cartella / "indice.md").exists()
+        note = sorted(p.name for p in cartella.glob("note*.json")) if cartella.exists() else []
+        if k in pdf_per_data and estratto and note:
+            stato = f"ok ({', '.join(note)})"
+        elif k in pdf_per_data and estratto:
+            stato, buchi = "ESTRATTO MA NON LETTO: manca il lettore", buchi + 1
+        elif k in pdf_per_data:
+            stato, buchi = "PDF NON ESTRATTO: lanciare leggi_gazzetta.py", buchi + 1
+        elif estratto:
+            stato = "letto, PDF non piu' in cartella" if note else "estratto, PDF sparito, NON LETTO"
+        else:
+            stato, buchi = "manca il PDF", buchi + 1
+        print(f"  {k}  {stato}")
+        giorno += datetime.timedelta(days=1)
+    print(f"\n{buchi} giorni da sistemare." if buchi else "\nTutto letto.")
+
+
 def main(argv):
+    if "--controlla" in argv:
+        controlla()
+        return
     tutte = "--tutte" in argv
     espliciti = [Path(a) for a in argv[1:] if not a.startswith("--")]
     per_chiave, squadre = carica_listone()
