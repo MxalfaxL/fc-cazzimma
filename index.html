@@ -878,7 +878,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.09.21';
+const VERSIONE_APP = '2026.10.03';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1009,6 +1009,21 @@ async function invia(sha, messaggio){
   if(r && r.content) shaRemoto = r.content.sha;
 }
 
+/* Sopra 1 MB GitHub non mette il contenuto del file nella risposta
+   ("encoding": "none", content vuoto): va chiesto grezzo, con un Accept
+   diverso. Il listone col dossier ha passato 1 MB il 27 settembre e per una
+   settimana l'app e' rimasta ferma al listone vecchio senza dirlo. */
+async function leggiFileGrezzo(percorso){
+  const url = `https://api.github.com/repos/${cfg.utente}/${cfg.repo}/contents/${percorso}`;
+  const r = await fetch(url, {
+    headers: {'Authorization':'Bearer '+cfg.token, 'Accept':'application/vnd.github.raw',
+              'X-GitHub-Api-Version':'2022-11-28'},
+    cache: 'no-store'
+  });
+  if(!r.ok) throw new Error('errore ' + r.status + ' leggendo ' + percorso);
+  return r.text();
+}
+
 /* Il listone è un file a parte nel repository: si incolla una volta sul Mac
    e gli altri dispositivi lo prendono da lì. Vince il più recente. */
 async function sincronizzaListone(){
@@ -1020,7 +1035,8 @@ async function sincronizzaListone(){
       return;
     }
     shaListone = remoto.sha;
-    const dati = JSON.parse(daB64(remoto.content));
+    const testo = remoto.content ? daB64(remoto.content) : await leggiFileGrezzo('listone.json');
+    const dati = JSON.parse(testo);
     const remMs = dati.caricato || 0;
     if(remMs > locMs){
       listone = normalizzaListone(dati);
@@ -1030,7 +1046,11 @@ async function sincronizzaListone(){
     } else if(locMs > remMs){
       await inviaListone(shaListone);
     }
-  }catch(e){ /* il listone non è vitale per la sincronizzazione dello stato */ }
+  }catch(e){
+    /* il listone non è vitale per la sincronizzazione dello stato, ma se non
+       arriva bisogna saperlo: tacere qui ha nascosto per giorni dati vecchi */
+    toast('Listone non aggiornato: ' + (e && e.message ? e.message : e));
+  }
 }
 async function inviaListone(sha){
   const corpo = {message:`listone — ${new Date(listone.caricato||Date.now()).toISOString().slice(0,10)}`,
