@@ -215,6 +215,10 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .esito-l .punti{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;line-height:1.05}
 .esito-l .segnale{white-space:nowrap}
 .esito-l .punti small{display:block;font-size:9px;font-weight:400;color:var(--grigio);letter-spacing:.08em}
+.riga-cerca{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,42%);gap:8px}
+.scegli-squadra{width:100%;min-width:0;margin-bottom:10px;padding:10px 12px;border:1px solid var(--linea);border-radius:12px;background:var(--carta-2);color:var(--testo);font-size:15px}
+.scegli-squadra.attiva{border-color:var(--azzurro);background:var(--azzurro-tinta);font-weight:600}
+.gruppo-ruolo{margin-top:14px}
 .chips-lista{margin:0 0 10px}
 .chips-lista button{padding:6px 10px;font-size:12px}
 .consigli{margin:0 0 10px;border:1px solid var(--linea-2);border-radius:var(--r2);background:var(--carta-2);padding:10px 12px;font-size:13px}
@@ -579,7 +583,10 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <div class="eyebrow" id="titoloListone">Listone</div>
     <div id="listoneCaricato" hidden>
       <div class="testa-listone">
-        <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
+        <div class="riga-cerca">
+          <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
+          <select class="scegli-squadra" id="filtroSquadra" aria-label="Mostra i giocatori di una squadra"><option value="">Tutte le squadre</option></select>
+        </div>
         <div class="riga-filtro" id="filtroRuoli"></div>
       </div>
       <div id="consigliReparto"></div>
@@ -935,7 +942,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07c';
+const VERSIONE_APP = '2026.10.07d';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1528,6 +1535,8 @@ const sottoSquadra = g => { const sq = squadraDi(g); return sq ? `<span class="s
 let filtroRuolo = null, spiegato = null;
 /* la lista d'asta: ordine (punti attesi o tetto), fascia di prezzo, solo affari */
 let ordineListone = 'punti', fasciaListone = '', soloAffariListone = false, listoneTutti = false;
+// una squadra sola, tutti i suoi liberi divisi per ruolo; '' = tutte
+let squadraListone = '', squadreNelMenu = '';
 const consigliChiusi = new Set();
 // fasce sul prezzo di mercato, per reparto: [da qui in su e' top, sotto questo e' low cost]
 const FASCE_ASTA = {P:[15,5], D:[20,6], C:[30,9], A:[40,12]};
@@ -1667,11 +1676,25 @@ function disegnaListone(){
   const venduti = nomiVenduti();
   const miei = new Set(stato.rosa.map(g=>normNome(g.n)));
   const liberi = listone.voci.filter(g=>!venduti.has(normNome(g.n)) && !miei.has(normNome(g.n)));
-  $('titoloListone').innerHTML = `<span>Listone</span><small>${liberi.length} liberi su ${listone.voci.length}</small>`;
+  const sq = squadraListone;
+  const presiSq = sq ? listone.voci.filter(g=>g.sq===sq).length - liberi.filter(g=>g.sq===sq).length : 0;
+  $('titoloListone').innerHTML = sq
+    ? `<span>${esc(sq)}</span><small>${liberi.filter(g=>g.sq===sq).length} liberi${presiSq ? ` · ${presiSq} già presi` : ''}</small>`
+    : `<span>Listone</span><small>${liberi.length} liberi su ${listone.voci.length}</small>`;
+
+  // il menu delle squadre si rifà solo se cambia il listone: rifarlo a ogni
+  // tocco chiuderebbe la tendina mentre la si apre
+  const squadre = [...new Set(listone.voci.map(g=>g.sq).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+  if(squadre.join('|') !== squadreNelMenu){
+    squadreNelMenu = squadre.join('|');
+    $('filtroSquadra').innerHTML = `<option value="">Tutte le squadre</option>` + squadre.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  }
+  $('filtroSquadra').value = sq;
+  $('filtroSquadra').classList.toggle('attiva', !!sq);
 
   if(filtroRuolo === null) filtroRuolo = faseCorrente() || '';
   $('filtroRuoli').innerHTML = ORDINE.map(r=>{
-    const n = liberi.filter(g=>g.r===r).length;
+    const n = liberi.filter(g=>g.r===r && (!sq || g.sq===sq)).length;
     return `<button data-f="${r}" aria-pressed="${filtroRuolo===r}">${r} ${n}</button>`;
   }).join('') + `<button data-f="" aria-pressed="${filtroRuolo===''}">tutti</button>`;
 
@@ -1679,14 +1702,17 @@ function disegnaListone(){
   const conPunti = !!(listone.dossier && listone.dossier.giocatori);
 
   // le righe di strategia del reparto, dal Mac: si chiudono e restano chiuse
-  const cons = listone.consigli && filtroRuolo && !cerca ? (listone.consigli[filtroRuolo] || []) : [];
+  const cons = listone.consigli && filtroRuolo && !cerca && !sq ? (listone.consigli[filtroRuolo] || []) : [];
   $('consigliReparto').innerHTML = cons.length
     ? `<details class="consigli" ${consigliChiusi.has(filtroRuolo) ? '' : 'open'} data-r="${filtroRuolo}"><summary>Come giocarla: ${NOME[filtroRuolo].toLowerCase()}${listone.consigli.piano ? ` · piano ${esc(listone.consigli.piano)}` : ''}</summary><ul>${cons.map(x=>`<li>${grassetto(x)}</li>`).join('')}</ul></details>`
     : '';
 
   let risultati = liberi;
   if(cerca) risultati = risultati.filter(g=>normNome(g.n).includes(cerca) || normNome(g.sq).startsWith(cerca));
-  else {
+  else if(sq){
+    // una squadra: tutti i suoi liberi, niente fasce ne' tagli
+    risultati = risultati.filter(g=>g.sq===sq && (!filtroRuolo || g.r===filtroRuolo));
+  } else {
     if(filtroRuolo) risultati = risultati.filter(g=>g.r===filtroRuolo);
     risultati = risultati.filter(inFasciaAsta);
     if(soloAffariListone) risultati = risultati.filter(g=>{ const c = consiglioDi(dossierDi(g)); return c && c.ve === 'su'; });
@@ -1695,34 +1721,43 @@ function disegnaListone(){
   const perPunti = (a,b)=>(puntiDi(b) ?? -1)-(puntiDi(a) ?? -1) || b.pr-a.pr;
   risultati = [...risultati].sort(ordineListone === 'punti' && conPunti ? perPunti : perTetto);
   const totale = risultati.length;
-  if(!listoneTutti || cerca) risultati = risultati.slice(0, 30);
+  if(cerca || (!sq && !listoneTutti)) risultati = risultati.slice(0, 30);
 
   const fasce = filtroRuolo ? FASCE_ASTA[filtroRuolo] : null;
   $('filtroLista').hidden = !!cerca;
   $('filtroLista').innerHTML = (conPunti ? `<button data-ordine="punti" aria-pressed="${ordineListone==='punti'}">per punti</button><button data-ordine="tetto" aria-pressed="${ordineListone==='tetto'}">per tetto</button>` : '')
-    + [['', 'tutti i prezzi'], ['top', fasce ? `top ${fasce[0]}+` : 'top'], ['media', fasce ? `${fasce[1]}-${fasce[0]-1}` : 'media'], ['low', fasce ? `fino a ${fasce[1]-1}` : 'low cost']]
+    + (sq ? `<button data-squadra-via="1">✕ togli ${esc(sq)}</button>` :
+      [['', 'tutti i prezzi'], ['top', fasce ? `top ${fasce[0]}+` : 'top'], ['media', fasce ? `${fasce[1]}-${fasce[0]-1}` : 'media'], ['low', fasce ? `fino a ${fasce[1]-1}` : 'low cost']]
         .map(([k,l])=>`<button data-fascia="${k}" aria-pressed="${fasciaListone===k}">${l}</button>`).join('')
-    + (conPunti ? `<button class="verde" data-affari="1" aria-pressed="${soloAffariListone}">▲ affari</button>` : '');
+      + (conPunti ? `<button class="verde" data-affari="1" aria-pressed="${soloAffariListone}">▲ affari</button>` : ''));
   $('btnTuttiListone').hidden = !!cerca || totale <= risultati.length;
   $('btnTuttiListone').textContent = `Mostra tutti i ${totale}`;
 
-  $('risultatiListone').innerHTML = risultati.length
-    ? risultati.map(g=>{
-        const t = tettoOggi(g);
-        const oltre = t >= maxOfferta() && maxOfferta() > 0;
-        const k = normNome(g.n)+'|'+g.r;
-        const p = puntiDi(g);
-        return `<div class="esito-l">
-          <div class="sigla ${g.r}">${g.r}</div>
-          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}${segnaliAsta(g)}${g.sos ? `<span class="segnale neutro">SOS ${esc(sosBreve(g.sos))}</span>` : ''}<small>${esc(g.sq||'')} · merc. ${Math.round(g.pr)}</small></button>
-          <div class="punti">${p !== null ? p.toFixed(2) : '–'}<small>punti</small></div>
-          <div class="tetto ${oltre?'oltre':''}">${t}<small>tetto</small></div>
-          <button class="prendi" data-prendi="${esc(k)}">preso</button>
-          <button class="via" data-via="${esc(k)}" aria-label="Venduto a un avversario">via</button>
-          ${spiegato === k ? `<div class="spiega">${spiegaTetto(g)}</div>` : ''}
-        </div>`;
-      }).join('')
-    : `<div class="vuoto">${cerca ? 'Nessuno con questo nome fra i liberi.' : (fasciaListone || soloAffariListone) ? 'Nessun libero con questi filtri.' : 'Reparto esaurito.'}</div>`;
+  const vuoto = `<div class="vuoto">${cerca ? 'Nessuno con questo nome fra i liberi.' : sq ? `Nessun libero del ${esc(sq)}${filtroRuolo ? ' in questo reparto' : ''}.` : (fasciaListone || soloAffariListone) ? 'Nessun libero con questi filtri.' : 'Reparto esaurito.'}</div>`;
+  // con una squadra scelta, i liberi vanno divisi per ruolo
+  $('risultatiListone').innerHTML = !risultati.length ? vuoto
+    : (sq && !cerca)
+      ? ORDINE.map(r=>{
+          const gs = risultati.filter(g=>g.r===r);
+          return gs.length ? `<div class="eyebrow gruppo-ruolo"><span>${NOME[r]}</span><small>${gs.length}</small></div>` + gs.map(rigaListone).join('') : '';
+        }).join('')
+      : risultati.map(rigaListone).join('');
+}
+
+function rigaListone(g){
+  const t = tettoOggi(g);
+  const oltre = t >= maxOfferta() && maxOfferta() > 0;
+  const k = normNome(g.n)+'|'+g.r;
+  const p = puntiDi(g);
+  return `<div class="esito-l">
+    <div class="sigla ${g.r}">${g.r}</div>
+    <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}${segnaliAsta(g)}${g.sos ? `<span class="segnale neutro">SOS ${esc(sosBreve(g.sos))}</span>` : ''}<small>${esc(g.sq||'')} · merc. ${Math.round(g.pr)}</small></button>
+    <div class="punti">${p !== null ? p.toFixed(2) : '–'}<small>punti</small></div>
+    <div class="tetto ${oltre?'oltre':''}">${t}<small>tetto</small></div>
+    <button class="prendi" data-prendi="${esc(k)}">preso</button>
+    <button class="via" data-via="${esc(k)}" aria-label="Venduto a un avversario">via</button>
+    ${spiegato === k ? `<div class="spiega">${spiegaTetto(g)}</div>` : ''}
+  </div>`;
 }
 
 const trovaVoce = k => listone.voci.find(x=>normNome(x.n)+'|'+x.r === k);
@@ -1914,8 +1949,18 @@ $('filtroRuoli').addEventListener('click', e=>{
   const b = e.target.closest('button[data-f]'); if(!b) return;
   filtroRuolo = b.dataset.f || ''; spiegato = null; listoneTutti = false; disegnaListone();
 });
+// scegliere una squadra mostra tutti i reparti; tornare a "tutte" riporta alla fase
+function scegliSquadra(sq){
+  squadraListone = sq;
+  filtroRuolo = sq ? '' : (faseCorrente() || '');
+  spiegato = null; listoneTutti = false;
+  disegnaListone();
+  $('bloccoListone').scrollTop = 0;
+}
+$('filtroSquadra').addEventListener('change', e=>scegliSquadra(e.target.value));
 $('filtroLista').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.squadraVia){ scegliSquadra(''); return; }
   if(b.dataset.ordine) ordineListone = b.dataset.ordine;
   else if(b.dataset.fascia !== undefined) fasciaListone = b.dataset.fascia;
   else if(b.dataset.affari) soloAffariListone = !soloAffariListone;
