@@ -58,6 +58,19 @@ if __name__ == "__main__":
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         import classifica_asta
         _, _, blocco["dossier"] = classifica_asta.genera()
+    # le righe di strategia per reparto (dipendono dal piano scelto e citano
+    # prezzi: per questo stanno in un file privato e non nel codice)
+    consigli = RADICE / "dati" / "consigli-asta.json"
+    if consigli.exists():
+        blocco["consigli"] = json.loads(consigli.read_text(encoding="utf-8"))
+        blocco["consigli"].pop("_cosa_e", None)
+    # la fascia della guida SOS Fanta: e' dove gli altri nove fanno l'ancora
+    guida = RADICE / "dati" / "guida-asta-sosfanta.json"
+    if guida.exists():
+        fasce = {v["nome"]: v["fascia"] for v in json.loads(guida.read_text(encoding="utf-8"))["giocatori"] if v.get("fascia")}
+        for g in blocco["listone"]:
+            if g["n"] in fasce:
+                g["sos"] = fasce[g["n"]]
     # il marcatore di tempo e' quello che l'app confronta: piu' recente vince
     blocco["caricato"] = int(time.time() * 1000)
     contenuto = base64.b64encode(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).decode("ascii")

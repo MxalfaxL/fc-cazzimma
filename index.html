@@ -211,15 +211,23 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .nomeruolo{font-size:13.5px;font-weight:600}
 
 .cerca{margin-bottom:10px}
-.esito-l{display:grid;grid-template-columns:28px 1fr auto auto auto;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.esito-l{display:grid;grid-template-columns:28px minmax(0,1fr) auto auto auto auto;align-items:center;gap:6px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
+.esito-l .punti{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;line-height:1.05}
+.esito-l .segnale{white-space:nowrap}
+.esito-l .punti small{display:block;font-size:9px;font-weight:400;color:var(--grigio);letter-spacing:.08em}
+.chips-lista{margin:0 0 10px}
+.chips-lista button{padding:6px 10px;font-size:12px}
+.consigli{margin:0 0 10px;border:1px solid var(--linea-2);border-radius:var(--r2);background:var(--carta-2);padding:10px 12px;font-size:13px}
+.consigli summary{cursor:pointer;font-weight:600;font-size:12.5px;color:var(--testo-2)}
+.consigli ul{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}
 .esito-l:last-child{border-bottom:0}
 .esito-l .nome{font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-align:left;background:none;border:0;padding:0;color:inherit;font-family:inherit}
 .esito-l .nome small{display:block;font-weight:400;font-size:10.5px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .esito-l .tetto{font-family:Anton,Impact,sans-serif;font-size:26px;color:var(--azzurro);line-height:1;text-align:right;min-width:44px}
 .esito-l .tetto small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--grigio);letter-spacing:.08em;text-align:right}
 .esito-l .tetto.oltre{color:var(--rosso)}
-.esito-l button.prendi{border:0;background:var(--azione);color:var(--azione-testo);border-radius:8px;padding:9px 10px;font-size:12px;font-weight:700}
-.esito-l button.via{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:8px;padding:9px 10px;font-size:12px}
+.esito-l button.prendi{border:0;background:var(--azione);color:var(--azione-testo);border-radius:8px;padding:9px 8px;font-size:12px;font-weight:700}
+.esito-l button.via{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:8px;padding:9px 7px;font-size:12px}
 .segnale{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:5px;margin-left:5px;vertical-align:1px}
 .segnale.su{background:var(--verde-tinta);color:var(--verde-testo)} .segnale.giu{background:var(--rosso-tinta);color:var(--rosso-testo)}
 .spiega{grid-column:1 / -1;background:var(--azzurro-tinta);color:var(--azzurro-cupo);border-radius:var(--r2);padding:10px 12px;font-size:12.5px;line-height:1.5}
@@ -533,8 +541,11 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <div id="listoneCaricato" hidden>
       <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
       <div class="riga-filtro" id="filtroRuoli"></div>
+      <div id="consigliReparto"></div>
+      <div class="chips chips-lista" id="filtroLista"></div>
       <div id="risultatiListone"></div>
-      <p class="nota">Tocca un nome per capire da dove viene il tetto. <b>Preso</b> compila il modulo qui sotto, <b>via</b> lo segna a un avversario.</p>
+      <button class="azione secondaria" id="btnTuttiListone" hidden style="margin-top:8px"></button>
+      <p class="nota">In ordine di <b>punti</b> attesi a giornata, come nell'Analisi. Tocca un nome per il tetto, il consiglio e le notizie. <b>Preso</b> compila il modulo qui sotto, <b>via</b> lo segna a un avversario.</p>
       <button class="azione secondaria" id="btnSostituisciListone" style="margin-top:6px">Sostituisci il listone</button>
     </div>
     <div id="listoneVuoto">
@@ -883,7 +894,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07';
+const VERSIONE_APP = '2026.10.07b';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1474,6 +1485,25 @@ const conSquadra = g => { const sq = squadraDi(g); return sq ? ` <span class="sq
 // nelle righe strette (i movimenti) la squadra va sotto il nome, non accanto
 const sottoSquadra = g => { const sq = squadraDi(g); return sq ? `<span class="sq-sotto">${esc(sq)}</span>` : ''; };
 let filtroRuolo = null, spiegato = null;
+/* la lista d'asta: ordine (punti attesi o tetto), fascia di prezzo, solo affari */
+let ordineListone = 'punti', fasciaListone = '', soloAffariListone = false, listoneTutti = false;
+const consigliChiusi = new Set();
+// fasce sul prezzo di mercato, per reparto: [da qui in su e' top, sotto questo e' low cost]
+const FASCE_ASTA = {P:[15,5], D:[20,6], C:[30,9], A:[40,12]};
+const puntiDi = g => { const c = consiglioDi(dossierDi(g)); return c ? +c.at : null; };
+function inFasciaAsta(g){
+  const [alta, bassa] = FASCE_ASTA[g.r];
+  if(fasciaListone === 'top') return g.pr >= alta;
+  if(fasciaListone === 'media') return g.pr < alta && g.pr >= bassa;
+  if(fasciaListone === 'low') return g.pr < bassa;
+  return true;
+}
+// le fasce della guida SOS in poche lettere, per starci nella riga del listone
+const sosBreve = s => String(s).toLowerCase().replace(/^fascia /, '').replace(/(\d)ª fascia/, '$1')
+  .replace('leghe numerose', 'leghe num.').replace('possibili sorprese', 'sorpresa').replace('scommesse', 'scommessa')
+  .replace('sotto ai semitop', 'sotto semitop').replace('sopra ai low cost', 'sopra low cost');
+// **x** -> grassetto, dopo aver tolto ogni altro html
+const grassetto = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
 /* Accetta sia il file nuovo, con i quattro piani dentro, sia quello vecchio
    con un solo tetto per giocatore. */
@@ -1483,6 +1513,11 @@ function normalizzaListone(dati){
   const out = {piani:{}, voci:[], caricato: (dati && dati.caricato) || Date.now()};
   if(dati && dati.lega && typeof dati.lega === 'object') out.lega = dati.lega;
   if(dati && dati.dossier && dati.dossier.giocatori && typeof dati.dossier.giocatori === 'object') out.dossier = dati.dossier;
+  // le righe di strategia per reparto arrivano dal Mac, nel listone privato
+  if(dati && dati.consigli && typeof dati.consigli === 'object'){
+    out.consigli = {piano: String(dati.consigli.piano || '')};
+    ORDINE.forEach(r=>{ if(Array.isArray(dati.consigli[r])) out.consigli[r] = dati.consigli[r].map(String); });
+  }
   for(const [nome, ob] of Object.entries(piani)){
     if(ob && ORDINE.every(r=>isFinite(+ob[r]))) out.piani[nome] = Object.fromEntries(ORDINE.map(r=>[r, Math.round(+ob[r])]));
   }
@@ -1490,6 +1525,7 @@ function normalizzaListone(dati){
     const tt = (v.tt && typeof v.tt === 'object') ? v.tt : {personale: Math.round(+v.tt || 1)};
     const voce = {n:String(v.n), sq:String(v.sq || ''), r:v.r, qt:+v.qt || 0, pr:+v.pr || 0, tt};
     if(v.gz === 'su' || v.gz === 'giu'){ voce.gz = v.gz; voce.gzn = String(v.gzn || ''); }
+    if(v.sos) voce.sos = String(v.sos);
     return voce;
   });
   if(!Object.keys(out.piani).length){
@@ -1568,6 +1604,7 @@ function spiegaTetto(g){
   else s += `Sui ${NOME[g.r].toLowerCase()} hai già speso ${sp} dei ${t} previsti e restano ${rest} slot: il tetto scende a <b>${oggi}</b>.`;
   if(oggi >= maxOfferta() && maxOfferta() > 0) s += ` È anche il massimo che puoi offrire tenendo 1 credito per ogni slot che resta.`;
   if(g.gzn) s += `<br><b>Secondo parere:</b> ${esc(g.gzn)}`;
+  if(g.sos) s += `<br><b>Guida SOS Fanta:</b> fascia ${esc(g.sos.toLowerCase())}. È la guida più letta: lì gli altri fanno l'ancora.`;
   const d = dossierDi(g);
   if(d){
     const f = forma(d), m = mediaVoti(d);
@@ -1598,26 +1635,53 @@ function disegnaListone(){
   }).join('') + `<button data-f="" aria-pressed="${filtroRuolo===''}">tutti</button>`;
 
   const cerca = normNome($('cercaListone').value);
+  const conPunti = !!(listone.dossier && listone.dossier.giocatori);
+
+  // le righe di strategia del reparto, dal Mac: si chiudono e restano chiuse
+  const cons = listone.consigli && filtroRuolo && !cerca ? (listone.consigli[filtroRuolo] || []) : [];
+  $('consigliReparto').innerHTML = cons.length
+    ? `<details class="consigli" ${consigliChiusi.has(filtroRuolo) ? '' : 'open'} data-r="${filtroRuolo}"><summary>Come giocarla: ${NOME[filtroRuolo].toLowerCase()}${listone.consigli.piano ? ` · piano ${esc(listone.consigli.piano)}` : ''}</summary><ul>${cons.map(x=>`<li>${grassetto(x)}</li>`).join('')}</ul></details>`
+    : '';
+
   let risultati = liberi;
   if(cerca) risultati = risultati.filter(g=>normNome(g.n).includes(cerca) || normNome(g.sq).startsWith(cerca));
-  else if(filtroRuolo) risultati = risultati.filter(g=>g.r===filtroRuolo);
-  risultati = [...risultati].sort((a,b)=>tettoPiano(b)-tettoPiano(a) || b.pr-a.pr).slice(0, 30);
+  else {
+    if(filtroRuolo) risultati = risultati.filter(g=>g.r===filtroRuolo);
+    risultati = risultati.filter(inFasciaAsta);
+    if(soloAffariListone) risultati = risultati.filter(g=>{ const c = consiglioDi(dossierDi(g)); return c && c.ve === 'su'; });
+  }
+  const perTetto = (a,b)=>tettoPiano(b)-tettoPiano(a) || b.pr-a.pr;
+  const perPunti = (a,b)=>(puntiDi(b) ?? -1)-(puntiDi(a) ?? -1) || b.pr-a.pr;
+  risultati = [...risultati].sort(ordineListone === 'punti' && conPunti ? perPunti : perTetto);
+  const totale = risultati.length;
+  if(!listoneTutti || cerca) risultati = risultati.slice(0, 30);
+
+  const fasce = filtroRuolo ? FASCE_ASTA[filtroRuolo] : null;
+  $('filtroLista').hidden = !!cerca;
+  $('filtroLista').innerHTML = (conPunti ? `<button data-ordine="punti" aria-pressed="${ordineListone==='punti'}">per punti</button><button data-ordine="tetto" aria-pressed="${ordineListone==='tetto'}">per tetto</button>` : '')
+    + [['', 'tutti i prezzi'], ['top', fasce ? `top ${fasce[0]}+` : 'top'], ['media', fasce ? `${fasce[1]}-${fasce[0]-1}` : 'media'], ['low', fasce ? `fino a ${fasce[1]-1}` : 'low cost']]
+        .map(([k,l])=>`<button data-fascia="${k}" aria-pressed="${fasciaListone===k}">${l}</button>`).join('')
+    + (conPunti ? `<button class="verde" data-affari="1" aria-pressed="${soloAffariListone}">▲ affari</button>` : '');
+  $('btnTuttiListone').hidden = !!cerca || totale <= risultati.length;
+  $('btnTuttiListone').textContent = `Mostra tutti i ${totale}`;
 
   $('risultatiListone').innerHTML = risultati.length
     ? risultati.map(g=>{
         const t = tettoOggi(g);
         const oltre = t >= maxOfferta() && maxOfferta() > 0;
         const k = normNome(g.n)+'|'+g.r;
+        const p = puntiDi(g);
         return `<div class="esito-l">
           <div class="sigla ${g.r}">${g.r}</div>
-          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}${segnaliAsta(g)}<small>${esc(g.sq||'')} · mercato ${Math.round(g.pr)}</small></button>
+          <button class="nome" data-spiega="${esc(k)}">${esc(g.n)}${g.gz ? `<span class="segnale ${g.gz}">${g.gz==='su' ? '▲ sale' : '▼ cala'}</span>` : ''}${segnaliAsta(g)}${g.sos ? `<span class="segnale neutro">SOS ${esc(sosBreve(g.sos))}</span>` : ''}<small>${esc(g.sq||'')} · merc. ${Math.round(g.pr)}</small></button>
+          <div class="punti">${p !== null ? p.toFixed(2) : '–'}<small>punti</small></div>
           <div class="tetto ${oltre?'oltre':''}">${t}<small>tetto</small></div>
           <button class="prendi" data-prendi="${esc(k)}">preso</button>
           <button class="via" data-via="${esc(k)}" aria-label="Venduto a un avversario">via</button>
           ${spiegato === k ? `<div class="spiega">${spiegaTetto(g)}</div>` : ''}
         </div>`;
       }).join('')
-    : `<div class="vuoto">${cerca ? 'Nessuno con questo nome fra i liberi.' : 'Reparto esaurito.'}</div>`;
+    : `<div class="vuoto">${cerca ? 'Nessuno con questo nome fra i liberi.' : (fasciaListone || soloAffariListone) ? 'Nessun libero con questi filtri.' : 'Reparto esaurito.'}</div>`;
 }
 
 const trovaVoce = k => listone.voci.find(x=>normNome(x.n)+'|'+x.r === k);
@@ -1807,8 +1871,21 @@ $('btnSostituisciListone').addEventListener('click', ()=>{
 $('cercaListone').addEventListener('input', ()=>{ spiegato = null; disegnaListone(); });
 $('filtroRuoli').addEventListener('click', e=>{
   const b = e.target.closest('button[data-f]'); if(!b) return;
-  filtroRuolo = b.dataset.f || ''; spiegato = null; disegnaListone();
+  filtroRuolo = b.dataset.f || ''; spiegato = null; listoneTutti = false; disegnaListone();
 });
+$('filtroLista').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.ordine) ordineListone = b.dataset.ordine;
+  else if(b.dataset.fascia !== undefined) fasciaListone = b.dataset.fascia;
+  else if(b.dataset.affari) soloAffariListone = !soloAffariListone;
+  spiegato = null; listoneTutti = false; disegnaListone();
+});
+$('btnTuttiListone').addEventListener('click', ()=>{ listoneTutti = true; disegnaListone(); });
+// il riquadro "come giocarla" si chiude e resta chiuso per quel reparto
+$('consigliReparto').addEventListener('toggle', e=>{
+  const d = e.target.closest('details[data-r]'); if(!d) return;
+  d.open ? consigliChiusi.delete(d.dataset.r) : consigliChiusi.add(d.dataset.r);
+}, true);
 
 $('risultatiListone').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
