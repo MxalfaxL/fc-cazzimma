@@ -291,10 +291,12 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .movimento .testo b{font-weight:600;white-space:nowrap}
 .movimento .testo small{color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:auto;white-space:nowrap}
 .movimento .annulla{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
-.ms-riga{display:grid;grid-template-columns:28px 52px minmax(0,1fr);gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--linea-2)}
+.ms-riga{display:grid;grid-template-columns:28px 78px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--linea-2)}
 .ms-riga:last-child{border-bottom:0}
 .ms-conta{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.1}
-.ms-conta small{display:block;font-size:10px;color:var(--grigio)}
+.ms-conta small{display:block;font-size:10.5px;color:var(--grigio);white-space:nowrap;margin-top:2px}
+.ms-conta small.ms-sopra{color:var(--rosso)}
+.ms-conta .barra{margin-top:4px;height:5px}
 .ms-nomi{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13.5px;min-width:0}
 .ms-g b{font-family:"IBM Plex Mono",monospace;font-weight:600;margin-left:2px}
 .ms-vuoto{color:var(--grigio);font-size:12.5px}
@@ -638,10 +640,6 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <p class="nota">Di solito lasci <b>FC Cazzimma</b>. Se vuoi tenere il conto anche degli altri, scegli chi ha comprato: i nomi sono quelli del riquadro <b>Gli avversari</b> qui sotto. Da <b>via</b> nel listone il nome arriva già compilato.</p>
   </div>
 
-  <div class="blocco">
-    <div class="eyebrow">Budget per reparto</div>
-    <div id="reparti"></div>
-  </div>
 
   <div class="blocco">
     <div class="eyebrow"><span>Gli avversari</span><small>crediti e slot</small></div>
@@ -955,7 +953,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07g';
+const VERSIONE_APP = '2026.10.07h';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -2165,15 +2163,8 @@ function disegnaAsta(){
   if(res < lib){ cl='grave'; txt = `Attenzione: ${res} crediti per ${lib} slot. Non completi la rosa.`; }
   av.className = 'avviso '+cl; av.textContent = txt;
 
-  $('reparti').innerHTML = ORDINE.map(r=>{
-    const sp = spesoR(r), t = stato.target[r];
-    return `<div class="ruolo">
-      <div class="sigla ${r===fase?'corrente':r}">${r}</div>
-      <div><div class="nomeruolo">${NOME[r]}</div>
-        <div class="barra"><i class="${sp>t?'sopra':''}" style="width:${Math.min(100, t? sp/t*100:0)}%"></i></div></div>
-      <div class="numeri">${presi(r)}/${SLOT[r]}<br><em>${sp} / ${t} FM</em></div></div>`;
-  }).join('');
-
+  // il budget per reparto sta dentro "La mia squadra", accanto ai giocatori presi
+  disegnaMiaSquadra();
   disegnaAChi();
 }
 
@@ -2549,15 +2540,21 @@ function applicaTema(t){
 }
 $('temi').addEventListener('click', e=>{ const b = e.target.closest('button[data-tema]'); if(b) applicaTema(b.dataset.tema); });
 
-/* la rosa sempre sotto mano nella scheda Asta: una riga per reparto */
+/* la rosa sempre sotto mano nella scheda Asta: una riga per reparto, con il
+   budget del piano accanto (spesi / previsti e la barra) per non disperderlo */
 function disegnaMiaSquadra(){
+  const fase = faseCorrente();
   $('miaSquadraRiassunto').textContent = `${stato.rosa.length}/${slotTot()} · spesi ${spesoTot()} · restano ${residuo()}`;
   $('miaSquadra').innerHTML = ORDINE.map(r=>{
     const gs = stato.rosa.filter(g=>g.r===r).sort((a,b)=>b.p-a.p);
+    const sp = spesoR(r), t = stato.target[r];
     const nomi = gs.length
       ? gs.map(g=>`<span class="ms-g">${esc(g.n)}${squadraDi(g) ? ` <span class="sq">${esc(squadraDi(g))}</span>` : ''} <b>${g.p}</b></span>`).join('')
       : '<span class="ms-vuoto">ancora nessuno</span>';
-    return `<div class="ms-riga"><div class="sigla ${r}">${r}</div><div class="ms-conta"><b>${gs.length}/${SLOT[r]}</b><small>${spesoR(r)} FM</small></div><div class="ms-nomi">${nomi}</div></div>`;
+    return `<div class="ms-riga"><div class="sigla ${r===fase?'corrente':r}">${r}</div>
+      <div class="ms-conta"><b>${gs.length}/${SLOT[r]}</b><small class="${sp>t?'ms-sopra':''}">${sp} / ${t} FM</small>
+        <div class="barra"><i class="${sp>t?'sopra':''}" style="width:${Math.min(100, t ? sp/t*100 : 0)}%"></i></div></div>
+      <div class="ms-nomi">${nomi}</div></div>`;
   }).join('');
 }
 
