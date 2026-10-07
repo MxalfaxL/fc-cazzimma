@@ -276,7 +276,7 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .movimento{display:flex;flex-direction:column;gap:8px;padding:9px 0;border-bottom:1px solid var(--linea-2)}
 .movimento:last-child{border-bottom:0}
 .movimento .testo{display:flex;align-items:center;gap:8px;font-size:13.5px}
-.movimento .testo b{font-weight:600}
+.movimento .testo b{font-weight:600;white-space:nowrap}
 .movimento .testo small{color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:auto;white-space:nowrap}
 .movimento .annulla{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
 .assegna{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -323,13 +323,18 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
   background:repeating-linear-gradient(180deg,var(--prato-1) 0 12.5%,var(--prato-2) 12.5% 25%);box-shadow:var(--ombra),inset 0 0 60px rgba(0,0,0,.18)}
 .prato svg.linee{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--prato-linea);stroke-width:1.6}
 .prato .file{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr 1fr 1fr;padding:8px 6px 10px}
-.fila{display:flex;justify-content:space-evenly;align-items:center;gap:4px}
+.fila{display:flex;justify-content:space-evenly;align-items:center;gap:4px;min-width:0}
+/* con cinque in fila (5-3-2, 5-4-1) le tessere da 78px non ci stanno su un telefono: si stringono */
+.fila .tessera{flex:0 1 78px}
 .tessera{display:flex;flex-direction:column;align-items:center;width:78px;min-width:0;text-align:center;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55);animation:appare .3s ease-out both}
 .tessera .maglia{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:Anton,Impact,sans-serif;font-size:17px;border:2px solid rgba(255,255,255,.9);
   box-shadow:0 3px 8px rgba(0,0,0,.35);position:relative;text-shadow:none}
 .tessera.P .maglia{background:var(--oro)} .tessera.D .maglia{background:var(--azzurro)} .tessera.C .maglia{background:#2A6F49;background:linear-gradient(180deg,#F5F7F2,#DDE3DD);color:#0E1319} .tessera.A .maglia{background:var(--rosso)}
 .tessera .tnome{font-size:11px;font-weight:600;margin-top:5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.tessera .tsq{font-size:9.5px;opacity:.85;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
 .tessera .tval{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.9}
+.sq{font-weight:400;font-size:.88em;color:var(--grigio);white-space:nowrap}
+.sq-sotto{display:block;font-weight:400;font-size:11px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;white-space:nowrap}
 .tessera .marca{position:absolute;right:-7px;top:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--oro);color:#fff;border:2px solid var(--prato-1);
   font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:700;display:grid;place-items:center;text-shadow:none;line-height:1}
 .tessera.dubbio .maglia{border-color:var(--oro)}
@@ -878,7 +883,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.03';
+const VERSIONE_APP = '2026.10.07';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1082,7 +1087,7 @@ const slotLiberi = () => slotTot() - stato.rosa.length;
 const residuo = () => BUDGET - spesoTot();
 const maxOfferta = () => slotLiberi()<=0 ? 0 : Math.max(0, residuo() - (slotLiberi()-1));
 const faseCorrente = () => ORDINE.find(r => presi(r) < SLOT[r]) || null;
-const ufficiale = g => !!(g.sq && stato.ufficiali.includes(g.sq));
+const ufficiale = g => { const sq = squadraDi(g); return !!(sq && stato.ufficiali.includes(sq)); };
 const $ = id => document.getElementById(id);
 
 let timerToast;
@@ -1149,7 +1154,7 @@ function disegnaFormazione(){
     <div class="giocatore">
       <div class="sigla ${x.r}">${x.r}</div>
       <div class="nome">${esc(x.g.n)}<span class="dubbio-tag">${percento(x.p)}</span>${ufficiale(x.g) ? '<span class="spunta" title="formazione ufficiale">✓</span>' : ''}
-        <small>${x.sostituto ? 'al suo posto entra ' + esc(x.sostituto) : 'nessun ricambio: casella vuota'}</small></div>
+        <small>${squadraDi(x.g) ? esc(squadraDi(x.g)) + ' · ' : ''}${x.sostituto ? 'al suo posto entra ' + esc(x.sostituto) : 'nessun ricambio: casella vuota'}</small></div>
       <div class="costo ${classeCosto(x.costo)}">se perde −${f2(Math.max(0, x.costo))}</div>
     </div>`).join('')
     : '<div class="vuoto">Nessun ballottaggio in campo. Undici sicuro, salvo formazioni ufficiali.</div>';
@@ -1162,10 +1167,10 @@ function disegnaFormazione(){
     const testa = x.r !== ultimo ? `<div class="eyebrow" style="margin-top:12px">${SINGOLARE[x.r]}${x.r==='D' && s.mod ? ` · media difesa ${s.media.toFixed(3)}` : ''}</div>` : '';
     ultimo = x.r;
     const tag = g.st === 'B' ? `<span class="dubbio-tag">${percento(x.p)}</span>` : '';
-    const ok = ufficiale(g) ? '<span class="spunta" title="formazione ufficiale">✓</span>' : (g.sq ? '<span class="probabile-tag">probabile</span>' : '');
+    const ok = ufficiale(g) ? '<span class="spunta" title="formazione ufficiale">✓</span>' : (squadraDi(g) ? '<span class="probabile-tag">probabile</span>' : '');
     return `${testa}<div class="giocatore">
       <div class="sigla ${x.r}">${x.r}</div>
-      <div class="nome">${esc(g.n)}${tag}${ok}<small>${esc(g.sq || '')}${g.sq ? ' · ' : ''}atteso ${f2(x.atteso)}</small></div>
+      <div class="nome">${esc(g.n)}${tag}${ok}<small>${esc(squadraDi(g))}${squadraDi(g) ? ' · ' : ''}atteso ${f2(x.atteso)}</small></div>
       <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
     </div>`;
   }).join('');
@@ -1173,10 +1178,10 @@ function disegnaFormazione(){
   $('panchina').innerHTML = s.panchina.length
     ? s.panchina.map((g,i)=>`<div class="giocatore">
         <div class="sigla ${g.r}">${g.r}</div>
-        <div class="nome">${i+1}. ${esc(g.n)}${g.st==='B' ? `<span class="dubbio-tag">${percento(probabilita(g))}</span>` : ''}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}</div>
+        <div class="nome">${i+1}. ${esc(g.n)}${g.st==='B' ? `<span class="dubbio-tag">${percento(probabilita(g))}</span>` : ''}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}${squadraDi(g) ? `<small>${esc(squadraDi(g))}</small>` : ''}</div>
         <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
       </div>`).join('')
-      + (s.fuori.length ? `<p class="nota">Fuori questa giornata: ${s.fuori.map(g=>esc(g.n)).join(', ')}.</p>` : '')
+      + (s.fuori.length ? `<p class="nota">Fuori questa giornata: ${s.fuori.map(g=>esc(g.n) + (squadraDi(g) ? ` (${esc(squadraDi(g))})` : '')).join(', ')}.</p>` : '')
     : '<div class="vuoto">Nessuno in panchina.</div>';
 
   const peggio = Math.max(0.01, ...s.alternative.map(a=>s.totale - a.totale));
@@ -1214,9 +1219,11 @@ function disegnaMetro(s, nd){
 function disegnaPrato(s){
   const fila = r => `<div class="fila">${s.undici.filter(x=>x.r===r).map(x=>{
     const g = x.g, dubbio = x.p < 1;
-    return `<div class="tessera ${r} ${dubbio ? 'dubbio' : ''}" title="${esc(g.n)} · fv ${f2(g.fv)} · voto ${f2(g.voto)}">
+    const sq = squadraDi(g);
+    return `<div class="tessera ${r} ${dubbio ? 'dubbio' : ''}" title="${esc(g.n)}${sq ? ' · ' + esc(sq) : ''} · fv ${f2(g.fv)} · voto ${f2(g.voto)}">
       <div class="maglia">${r}${dubbio ? `<span class="marca">${Math.round(x.p*100)}</span>` : ''}${ufficiale(g) ? '<span class="ok">✓</span>' : ''}</div>
       <div class="tnome">${esc(g.n)}</div>
+      ${sq ? `<div class="tsq">${esc(sq)}</div>` : ''}
       <div class="tval">${f2(g.fv)}</div>
     </div>`;
   }).join('')}</div>`;
@@ -1255,7 +1262,7 @@ function disegnaDisponibilita(){
           aria-label="${{T:'titolare',B:'ballottaggio',F:'fuori'}[st]}">${st}</button>`).join('');
       const pb = g.st === 'B' ? ` · ${percento(probabilita(g))}` : '';
       return `${testa}<div class="giocatore">
-        <div class="nome">${esc(g.n)}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}<small>${esc(g.sq || 'squadra?')}${pb} · fv ${f2(g.fv)}</small></div>
+        <div class="nome">${esc(g.n)}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}<small>${esc(squadraDi(g) || 'squadra?')}${pb} · fv ${f2(g.fv)}</small></div>
         <div class="stato">${bottoni}</div>
       </div>`;
     })).join('') || '<div class="vuoto">Rosa ancora vuota.</div>';
@@ -1448,6 +1455,24 @@ $('btnImporta').addEventListener('click', ()=>{
 
 /* ======================= listone e piani ======================= */
 let listone = {piani:{}, voci:[], caricato:0};
+
+/* La squadra da scrivere accanto a un nome: quella salvata col giocatore
+   (in rosa si corregge a mano), altrimenti quella del listone, che arriva
+   aggiornata. La mappa si rifà solo quando cambia il listone: le rose degli
+   avversari arrivano a 225 nomi e ridisegnano a ogni acquisto. */
+let squadrePerNome = new Map(), squadreDi = null;
+function squadraDi(g){
+  if(!g) return '';
+  if(g.sq) return g.sq;
+  if(squadreDi !== listone.voci){
+    squadrePerNome = new Map(listone.voci.map(v=>[normNome(v.n), v.sq]));
+    squadreDi = listone.voci;
+  }
+  return squadrePerNome.get(normNome(g.n)) || '';
+}
+const conSquadra = g => { const sq = squadraDi(g); return sq ? ` <span class="sq">${esc(sq)}</span>` : ''; };
+// nelle righe strette (i movimenti) la squadra va sotto il nome, non accanto
+const sottoSquadra = g => { const sq = squadraDi(g); return sq ? `<span class="sq-sotto">${esc(sq)}</span>` : ''; };
 let filtroRuolo = null, spiegato = null;
 
 /* Accetta sia il file nuovo, con i quattro piani dentro, sia quello vecchio
@@ -1824,13 +1849,13 @@ function disegnaMovimenti(){
   $('movimenti').innerHTML = ms.map((m,i)=>{
     const ora = new Date(m.t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     if(m.tipo === 'mio') return `<div class="movimento"><div class="testo">
-      <div class="sigla ${m.g.r}">${m.g.r}</div><b>${esc(m.g.n)}</b> → FC Cazzimma · ${m.g.p} FM
+      <div class="sigla ${m.g.r}">${m.g.r}</div><b>${esc(m.g.n)}${sottoSquadra(m.g)}</b> → FC Cazzimma · ${m.g.p} FM
       <small>${ora}</small>
       <button class="annulla" data-annulla-mio="${esc(m.g.id)}">annulla</button></div></div>`;
     const v = m.v, assegnato = v.a !== null && v.a !== undefined && stato.avversari[v.a];
     const chips = stato.avversari.map((a,j)=>`<button data-avv="${j}" data-t="${v.t}" aria-pressed="${v.a===j}">${esc(a.n.replace(/^Avversario /,'Avv '))}</button>`).join('');
     return `<div class="movimento"><div class="testo">
-      <div class="sigla ${v.r||''}">${v.r||'?'}</div><b>${esc(v.n)}</b> → ${assegnato ? esc(stato.avversari[v.a].n.replace(/^Avversario /,'Avv ')) : 'via'}${v.p ? ' · ' + v.p + ' FM' : ''}
+      <div class="sigla ${v.r||''}">${v.r||'?'}</div><b>${esc(v.n)}${sottoSquadra(v)}</b> → ${assegnato ? esc(stato.avversari[v.a].n.replace(/^Avversario /,'Avv ')) : 'via'}${v.p ? ' · ' + v.p + ' FM' : ''}
       <small>${ora}</small>
       <button class="annulla" data-annulla-via="${v.t}">annulla</button></div>
       ${i === 0 || !assegnato ? `<div class="assegna">${chips}<input type="number" inputmode="numeric" placeholder="FM" value="${v.p ?? ''}" data-prezzo-via="${v.t}" aria-label="Prezzo pagato"></div>` : ''}
@@ -1885,7 +1910,7 @@ function disegnaRoseAvversari(){
   const con = stato.avversari.map((a,i)=>({a, i, rosa: stato.venduti.filter(v=>v.a === i)})).filter(x=>x.rosa.length);
   $('roseAvversari').innerHTML = con.length ? `<div class="rosa-avv">${con.map(x=>`
     <div class="scheda"><b>${esc(x.a.n)}</b><small>${x.rosa.length} giocatori · ${spesoAvv(x.i)} FM segnati</small>
-      ${ORDINE.map(r=>{ const gs = x.rosa.filter(v=>v.r===r); return gs.length ? `<div><b style="display:inline;font-size:12px">${r}</b> ${gs.map(v=>esc(v.n)+(v.p?' '+v.p:'')).join(', ')}</div>` : ''; }).join('')}
+      ${ORDINE.map(r=>{ const gs = x.rosa.filter(v=>v.r===r); return gs.length ? `<div><b style="display:inline;font-size:12px">${r}</b> ${gs.map(v=>esc(v.n)+conSquadra(v)+(v.p?' '+v.p:'')).join(', ')}</div>` : ''; }).join('')}
     </div>`).join('')}</div>`
     : '<div class="vuoto">Ancora niente. In asta, dopo <b>via</b>, tocca l\'avversario che ha comprato e scrivi il prezzo: le rose si costruiscono da sole.</div>';
 }
@@ -2034,7 +2059,7 @@ function disegnaRosa(){
 
   $('svincoli').innerHTML = stato.rosa.length
     ? `<table class="dati"><tr><th>Giocatore</th><th class="n">Pagato</th><th class="n">Svincolo</th></tr>`
-      + stato.rosa.map(g=>`<tr><td>${esc(g.n)}</td><td class="n">${g.p}</td><td class="n">${Math.floor(g.p/2)}</td></tr>`).join('')
+      + stato.rosa.map(g=>`<tr><td>${esc(g.n)}${conSquadra(g)}</td><td class="n">${g.p}</td><td class="n">${Math.floor(g.p/2)}</td></tr>`).join('')
       + `</table><p class="nota">Metà prezzo per chi resta in Serie A, prezzo pieno per chi va all'estero o si ritira. Le mezze cifre si concordano con lo staff.</p>`
     : '<div class="vuoto">Rosa vuota.</div>';
 
