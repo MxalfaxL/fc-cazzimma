@@ -13,8 +13,8 @@ giornata**, costruito in tre pezzi che si possono spiegare a voce:
    ruolo e prezzo per chi non ha ancora segnato; il rigorista prende un extra.
 3. **Disponibilita'**: quante volte e' finito in pagella rispetto alle giornate
    giocate (in pagella ci vai se giochi), corretta se l'ultima notizia lo da'
-   infortunato: stop lungo (mesi) quasi zero, medio (settimane) meta',
-   altrimenti tre quarti.
+   infortunato: si toglie la quota di giornate che perde da qui a fine
+   stagione (breve 3%, settimane 9%, mesi 30%, fino al 2027 45%, crociato 75%).
 
 atteso = disponibilita' x (voto atteso + bonus attesi)
 
@@ -54,8 +54,10 @@ VOTO_PRIORI = {"P": (5.7, 6.4), "D": (5.8, 6.4), "C": (5.8, 6.5), "A": (5.7, 6.5
 BONUS_PRIORI = {"P": (-1.4, -0.8), "D": (0.0, 0.5), "C": (0.1, 1.0), "A": (0.3, 1.7)}
 # Disponibilita' a priori: chi costa e' titolare, chi vale 1 e' una scommessa.
 DISP_PRIORI = (0.35, 0.9)
-# Il rigorista designato vale circa un rigore ogni 4 giornate: +3 x 0.25
-EXTRA_RIGORISTA = 0.6
+# Il rigorista designato: nel 2025/26 79 rigori segnati in 380 partite, cioe'
+# uno ogni dieci partite a squadra, +3 x 0.1 = 0.3 a giornata. Era 0.6 (un
+# rigore ogni 4 giornate), il doppio del dato: deciso con Marco il 7/10/2026.
+EXTRA_RIGORISTA = 0.3
 # Quanto pesa la Gazzetta contro il listone: n / (n + PESO_PRIORI). I bonus
 # sono piu' rumorosi dei voti (un gol in tre partite non fa una stagione),
 # quindi il loro prior pesa di piu'.
@@ -64,6 +66,9 @@ PESO_PRIORI_BONUS = 4.0
 # Soglie del verdetto: quante posizioni di differenza, in frazione del ruolo
 SOGLIA_VERDETTO = 0.12
 
+# Le parole che dicono quanto dura uno stop, dalla piu' grave alla meno grave.
+STOP_STAGIONE = re.compile(r"(crociato|stagione finita)", re.I)
+STOP_2027 = re.compile(r"(2027|gennaio|quattro mesi|[4-9]\s*mesi)", re.I)
 STOP_LUNGO = re.compile(r"(\d+\s*mesi|due mesi|tre mesi|quattro mesi|fine novembre|dicembre|gennaio|2027|crociato|operat|frattur|stagione finita)", re.I)
 STOP_MEDIO = re.compile(r"(un mese|mese|\d+\s*settimane|40 giorni|30 giorni|50 giorni|lesione)", re.I)
 
@@ -173,18 +178,26 @@ def bonus_da_eventi(voti, ruolo):
 def stop_infortunio(voce):
     """Quanto dura lo stop, letto dall'ultima nota di infortunio: lungo, medio
     o breve. Restituisce (fattore, parola)."""
+    # Il fattore e' la quota di stagione che gli resta: la classifica dice
+    # quanto fa a giornata da qui alla 38ª, e dalla 6ª (la prima dopo l'asta)
+    # ne restano 33. Uno stop di dieci giorni ne costa una, non un quarto di
+    # stagione come col vecchio 0.75 (deciso con Marco il 7/10/2026).
     note = [n for n in voce["note"] if n["tipo"] == "infortunio"]
     if not note:
-        return 0.75, "stop non quantificato"
+        return 0.97, "stop non quantificato"
     # tutte le note di infortunio recenti, perche' l'ultima e' spesso generica
     # ("indisponibile") e la diagnosi sta in quella prima
     recenti = sorted(note, key=lambda n: n["data"], reverse=True)[:3]
     testo = " ".join(n["testo"] for n in recenti)
+    if STOP_STAGIONE.search(testo):
+        return 0.25, "stop di stagione"
+    if STOP_2027.search(testo):
+        return 0.55, "fuori fino al 2027"
     if STOP_LUNGO.search(testo):
-        return 0.1, "stop lungo"
+        return 0.70, "stop di mesi"
     if STOP_MEDIO.search(testo):
-        return 0.5, "stop di settimane"
-    return 0.75, "stop breve o da valutare"
+        return 0.91, "stop di settimane"
+    return 0.97, "stop breve"
 
 
 def valuta(g, voce, pct, squadra):
