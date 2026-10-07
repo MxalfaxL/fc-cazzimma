@@ -292,6 +292,7 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .movimento .testo small{color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:auto;white-space:nowrap}
 .movimento .annulla{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
 .assegna{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.assegna .facoltativo{flex-basis:100%;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--grigio);letter-spacing:.04em}
 .assegna button{border:1px solid var(--linea);background:var(--carta-2);color:var(--testo-2);border-radius:999px;padding:6px 10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600}
 .assegna button[aria-pressed="true"]{background:var(--azzurro);color:#fff;border-color:transparent}
 .assegna input{width:70px;padding:7px 8px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:13px}
@@ -942,7 +943,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07e';
+const VERSIONE_APP = '2026.10.07f';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1987,15 +1988,13 @@ $('risultatiListone').addEventListener('click', e=>{
   }
   if(b.dataset.via !== undefined){
     const g = trovaVoce(b.dataset.via); if(!g) return;
-    // sparisce subito dai liberi; a chi e per quanto lo dici nel modulo, se vuoi
+    // Sparisce subito dai liberi e basta: niente modulo, niente tendina dei
+    // cognomi (all'asta Marco non li sa tutti, 7/10/2026). A chi e per quanto
+    // si puo' dire sull'ultimo movimento, se si vuole, o dopo con calma.
     stato.venduti.push({n:g.n, r:g.r, sq:g.sq, a:null, p:null, t:Date.now()});
     spiegato = null;
-    inNome.value = g.n; inRuolo.value = g.r; inPrezzo.value = ''; destinatario = null;
-    disegnaAsta(); disegnaListone(); disegnaMovimenti(); disegnaAChi(); salva();
-    const av = $('avviso'); av.className = 'avviso attenzione';
-    av.textContent = `${g.n} è andato via. Se vuoi tenere il conto, scegli chi lo ha preso e scrivi il prezzo. Altrimenti vai avanti.`;
-    inNome.scrollIntoView({behavior:'smooth', block:'center'});
-    $('aChi').focus();
+    disegnaAsta(); disegnaListone(); disegnaMovimenti(); salva();
+    toast(`${g.n} via`);
   }
 });
 
@@ -2021,7 +2020,7 @@ function disegnaMovimenti(){
       <div class="sigla ${v.r||''}">${v.r||'?'}</div><b>${esc(v.n)}${sottoSquadra(v)}</b> → ${assegnato ? esc(stato.avversari[v.a].n.replace(/^Avversario /,'Avv ')) : 'via'}${v.p ? ' · ' + v.p + ' FM' : ''}
       <small>${ora}</small>
       <button class="annulla" data-annulla-via="${v.t}">annulla</button></div>
-      ${i === 0 || !assegnato ? `<div class="assegna">${chips}<input type="number" inputmode="numeric" placeholder="FM" value="${v.p ?? ''}" data-prezzo-via="${v.t}" aria-label="Prezzo pagato"></div>` : ''}
+      ${i === 0 ? `<div class="assegna"><small class="facoltativo">a chi? facoltativo</small>${chips}<input type="number" inputmode="numeric" placeholder="FM" value="${v.p ?? ''}" data-prezzo-via="${v.t}" aria-label="Prezzo pagato"></div>` : ''}
     </div>`;
   }).join('');
 }
