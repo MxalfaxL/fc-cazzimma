@@ -291,6 +291,13 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .movimento .testo b{font-weight:600;white-space:nowrap}
 .movimento .testo small{color:var(--grigio);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:auto;white-space:nowrap}
 .movimento .annulla{border:1px solid var(--linea);background:transparent;color:var(--grigio);border-radius:7px;padding:5px 9px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.ms-riga{display:grid;grid-template-columns:28px 52px minmax(0,1fr);gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--linea-2)}
+.ms-riga:last-child{border-bottom:0}
+.ms-conta{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.1}
+.ms-conta small{display:block;font-size:10px;color:var(--grigio)}
+.ms-nomi{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13.5px;min-width:0}
+.ms-g b{font-family:"IBM Plex Mono",monospace;font-weight:600;margin-left:2px}
+.ms-vuoto{color:var(--grigio);font-size:12.5px}
 .assegna{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .assegna .facoltativo{flex-basis:100%;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--grigio);letter-spacing:.04em}
 .assegna button{border:1px solid var(--linea);background:var(--carta-2);color:var(--testo-2);border-radius:999px;padding:6px 10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600}
@@ -572,6 +579,11 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <span>Tieni lo schermo acceso<small>Per la sera dell'asta. Si spegne da solo quando chiudi l'app.</small></span>
       <button class="levetta" id="levettaSchermo" role="switch" aria-checked="false" aria-label="Tieni lo schermo acceso"></button>
     </div>
+  </div>
+
+  <div class="blocco" id="bloccoMiaSquadra">
+    <div class="eyebrow"><span>La mia squadra</span><small id="miaSquadraRiassunto"></small></div>
+    <div id="miaSquadra"></div>
   </div>
 
   <div class="blocco" id="bloccoPiano" hidden>
@@ -943,7 +955,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07f';
+const VERSIONE_APP = '2026.10.07g';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1070,8 +1082,44 @@ async function sincronizza(modo){
 async function invia(sha, messaggio){
   const corpo = {message:`${messaggio} — v${stato.v}`, content: inB64(JSON.stringify(stato, null, 1))};
   if(sha) corpo.sha = sha;
-  const r = await chiamaGitHub('PUT', corpo);
-  if(r && r.content) shaRemoto = r.content.sha;
+  try{
+    const r = await chiamaGitHub('PUT', corpo);
+    if(r && r.content) shaRemoto = r.content.sha;
+  }catch(e){
+    // un 5xx e' un guasto di GitHub, non nostro: si scrive per l'altra strada
+    if(!/^errore 5\d\d$/.test(e.message)) throw e;
+    shaRemoto = await scriviConGit(cfg.percorso, corpo.content, corpo.message);
+  }
+}
+
+/* La strada di riserva per scrivere un file: blob, albero, commit e ramo con
+   l'API git. Il 7/10/2026, a meta' asta, l'API dei contenuti rispondeva 500
+   alle scritture (stato.json e listone.json) mentre questa funzionava sempre.
+   Cambia solo quel file: l'albero parte da quello attuale del ramo. */
+async function chiamaGit(metodo, pezzo, corpo){
+  const base = `https://api.github.com/repos/${cfg.utente}/${cfg.repo}`;
+  const r = await fetch(pezzo ? `${base}/${pezzo}` : base, {
+    method: metodo,
+    headers: {'Authorization':'Bearer '+cfg.token, 'Accept':'application/vnd.github+json',
+              'X-GitHub-Api-Version':'2022-11-28', 'Content-Type':'application/json'},
+    body: corpo ? JSON.stringify(corpo) : undefined,
+    cache: 'no-store'
+  });
+  if(!r.ok) throw new Error('errore ' + r.status + ' anche sulla strada di riserva');
+  return r.json();
+}
+let ramoDati = null;
+async function scriviConGit(percorso, contenutoB64, messaggio){
+  if(!ramoDati) ramoDati = (await chiamaGit('GET')).default_branch || 'main';
+  const blob = await chiamaGit('POST', 'git/blobs', {content: contenutoB64, encoding: 'base64'});
+  const testa = (await chiamaGit('GET', `git/ref/heads/${ramoDati}`)).object.sha;
+  const alberoBase = (await chiamaGit('GET', `git/commits/${testa}`)).tree.sha;
+  const albero = await chiamaGit('POST', 'git/trees', {base_tree: alberoBase,
+    tree: [{path: percorso, mode: '100644', type: 'blob', sha: blob.sha}]});
+  const commit = await chiamaGit('POST', 'git/commits', {message: messaggio, tree: albero.sha, parents: [testa]});
+  // senza force: se nel frattempo qualcuno ha scritto, fallisce e si riprova al prossimo salvataggio
+  await chiamaGit('PATCH', `git/refs/heads/${ramoDati}`, {sha: commit.sha});
+  return blob.sha;   // lo sha di un file nell'API dei contenuti e' quello del suo blob
 }
 
 /* Sopra 1 MB GitHub non mette il contenuto del file nella risposta
@@ -1995,6 +2043,9 @@ $('risultatiListone').addEventListener('click', e=>{
     spiegato = null;
     disegnaAsta(); disegnaListone(); disegnaMovimenti(); salva();
     toast(`${g.n} via`);
+    // secondo passaggio facoltativo: il prezzo, nel campo FM dell'ultimo movimento
+    const campo = document.querySelector('#movimenti input[data-prezzo-via]');
+    if(campo) campo.focus({preventScroll:true});
   }
 });
 
@@ -2498,7 +2549,19 @@ function applicaTema(t){
 }
 $('temi').addEventListener('click', e=>{ const b = e.target.closest('button[data-tema]'); if(b) applicaTema(b.dataset.tema); });
 
-function disegnaTutto(){ disegnaPiani(); disegnaAsta(); disegnaListone(); disegnaAnalisi(); disegnaMovimenti(); disegnaAvversari(); disegnaRosa(); disegnaFormazione(); disegnaStagione(); }
+/* la rosa sempre sotto mano nella scheda Asta: una riga per reparto */
+function disegnaMiaSquadra(){
+  $('miaSquadraRiassunto').textContent = `${stato.rosa.length}/${slotTot()} · spesi ${spesoTot()} · restano ${residuo()}`;
+  $('miaSquadra').innerHTML = ORDINE.map(r=>{
+    const gs = stato.rosa.filter(g=>g.r===r).sort((a,b)=>b.p-a.p);
+    const nomi = gs.length
+      ? gs.map(g=>`<span class="ms-g">${esc(g.n)}${squadraDi(g) ? ` <span class="sq">${esc(squadraDi(g))}</span>` : ''} <b>${g.p}</b></span>`).join('')
+      : '<span class="ms-vuoto">ancora nessuno</span>';
+    return `<div class="ms-riga"><div class="sigla ${r}">${r}</div><div class="ms-conta"><b>${gs.length}/${SLOT[r]}</b><small>${spesoR(r)} FM</small></div><div class="ms-nomi">${nomi}</div></div>`;
+  }).join('');
+}
+
+function disegnaTutto(){ disegnaPiani(); disegnaAsta(); disegnaMiaSquadra(); disegnaListone(); disegnaAnalisi(); disegnaMovimenti(); disegnaAvversari(); disegnaRosa(); disegnaFormazione(); disegnaStagione(); }
 
 function aggiornaCampi(){
   ORDINE.forEach(r=>$('tg'+r).value = stato.target[r]);
