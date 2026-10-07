@@ -32,6 +32,31 @@ def gh(*argomenti, corpo=None):
     return esito.returncode, esito.stdout.strip(), esito.stderr.strip()
 
 
+def invia_con_git(contenuto, messaggio):
+    """Strada di riserva: blob, albero, commit e ramo con l'API git. Il 7/10/2026
+    l'API dei contenuti rispondeva 500 (vuoto) su listone.json per ore, con
+    GitHub 'tutto operativo'. Cambia solo listone.json: l'albero parte da
+    quello attuale, quindi stato.json resta come l'ha scritto l'app."""
+    base = f"repos/{UTENTE}/{REPO}"
+
+    def chiama(metodo, percorso, dati=None):
+        argomenti = ["api", "-X", metodo, f"{base}/{percorso}"] + (["--input", "-"] if dati is not None else [])
+        codice, out, err = gh(*argomenti, corpo=json.dumps(dati) if dati is not None else None)
+        if codice != 0:
+            raise SystemExit(f"GitHub non ha accettato il file nemmeno con l'API git ({metodo} {percorso}): {err or out}")
+        return json.loads(out)
+
+    _, ramo, _ = gh("api", base, "--jq", ".default_branch")
+    blob = chiama("POST", "git/blobs", {"content": contenuto, "encoding": "base64"})["sha"]
+    testa = chiama("GET", f"git/ref/heads/{ramo}")["object"]["sha"]
+    albero_base = chiama("GET", f"git/commits/{testa}")["tree"]["sha"]
+    albero = chiama("POST", "git/trees", {"base_tree": albero_base, "tree": [
+        {"path": FILE_REMOTO, "mode": "100644", "type": "blob", "sha": blob}]})["sha"]
+    commit = chiama("POST", "git/commits", {"message": messaggio, "tree": albero, "parents": [testa]})["sha"]
+    # senza force: se l'app ha appena scritto stato.json fallisce, e si rilancia
+    chiama("PATCH", f"git/refs/heads/{ramo}", {"sha": commit})
+
+
 def account_attivo():
     _, out, _ = gh("api", "user", "--jq", ".login")
     return out
@@ -90,7 +115,8 @@ if __name__ == "__main__":
         codice, out, err = gh("api", "-X", "PUT", f"repos/{UTENTE}/{REPO}/contents/{FILE_REMOTO}", "--input", "-",
                               corpo=json.dumps(corpo))
         if codice != 0:
-            raise SystemExit(f"GitHub non ha accettato il file: {err or out}")
+            print(f"  l'API dei contenuti ha rifiutato il file ({err or out}): riprovo con l'API git")
+            invia_con_git(contenuto, corpo["message"])
         n = len(blocco["listone"])
         print(f"\n  listone inviato: {n} giocatori, {len(blocco.get('piani', {}))} piani, "
               f"{sum(1 for v in blocco['listone'] if v.get('gz'))} con segnale Gazzetta.")
