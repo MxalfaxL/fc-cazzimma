@@ -393,6 +393,45 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 .toast.visibile{opacity:1;transform:translate(-50%,0)}
 
 @media (max-width:360px){ .cifra{font-size:64px} .tessera{width:66px} .tessera .maglia{width:36px;height:36px} }
+
+/* ---------------------------------------------------------------- iPad in orizzontale
+   All'asta si sta sull'iPad di traverso: lo schermo largo si usa tutto. Nella
+   scheda Asta il listone va a sinistra, fermo e con la sua barra di scorrimento,
+   mentre a destra scorrono offerta, modulo, movimenti, budget e avversari.
+   Righe e bottoni del listone piu' grandi, da toccare senza mirare. */
+@media (min-width:1000px) and (orientation:landscape){
+  body{max-width:1440px;padding-left:20px;padding-right:20px}
+  .schede>div{max-width:820px}
+  .pannello:not(#p-asta){max-width:900px;margin-inline:auto}
+  .foglio{left:max(0px,calc(50% - 380px));right:max(0px,calc(50% - 380px))}
+
+  #p-asta{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(380px,1fr);column-gap:16px;align-items:start}
+  #p-asta>.blocco{grid-column:2;min-width:0}
+  #p-asta>#bloccoListone{grid-column:1;grid-row:1 / span 20;position:sticky;top:calc(12px + env(safe-area-inset-top));
+    height:calc(100vh - 116px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height:calc(100dvh - 116px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:0;margin-bottom:0}
+  #bloccoListone>.eyebrow{padding-top:16px}
+  /* ricerca e reparti restano in cima mentre la lista scorre sotto */
+  .testa-listone{position:sticky;top:0;z-index:3;background:var(--carta);padding-top:8px;margin-top:-8px}
+  #listoneCaricato>.nota,#btnSostituisciListone{display:none}
+
+  #cercaListone{font-size:18px;padding:12px 14px}
+  .riga-filtro button{font-size:13px;padding:10px 0}
+  .chips-lista button{font-size:13.5px;padding:8px 14px}
+  .consigli{font-size:14.5px}
+  .esito-l{grid-template-columns:34px minmax(0,1fr) auto auto auto auto;gap:12px;padding:11px 0}
+  .esito-l .sigla{width:34px;height:34px;font-size:19px}
+  .esito-l .nome{font-size:17px}
+  .esito-l .nome small{font-size:12.5px;margin-top:2px}
+  .esito-l .segnale{font-size:11px}
+  .esito-l .punti{font-size:17px;min-width:52px}
+  .esito-l .punti small,.esito-l .tetto small{font-size:10px}
+  .esito-l .tetto{font-size:34px;min-width:58px}
+  .esito-l button.prendi,.esito-l button.via{padding:12px 16px;font-size:14.5px}
+  .spiega{font-size:14.5px;padding:12px 14px}
+  .spiega .apri-foglio{font-size:14px;padding:9px 12px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -539,8 +578,10 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <div class="blocco" id="bloccoListone">
     <div class="eyebrow" id="titoloListone">Listone</div>
     <div id="listoneCaricato" hidden>
-      <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
-      <div class="riga-filtro" id="filtroRuoli"></div>
+      <div class="testa-listone">
+        <input type="search" class="cerca" id="cercaListone" placeholder="Cerca un giocatore" autocomplete="off">
+        <div class="riga-filtro" id="filtroRuoli"></div>
+      </div>
       <div id="consigliReparto"></div>
       <div class="chips chips-lista" id="filtroLista"></div>
       <div id="risultatiListone"></div>
@@ -894,7 +935,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07b';
+const VERSIONE_APP = '2026.10.07c';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',

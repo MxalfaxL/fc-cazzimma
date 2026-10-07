@@ -344,14 +344,14 @@ def scrivi_md(righe, G, quanti=45):
 
 
 def aggiorna_app(righe, dossier, listone_per_nome):
-    """Aggiunge a report/dossier-app.json il consiglio per ogni giocatore
-    comprabile: atteso, verdetto e perche'. Chi non ha note ne' voti entra con
-    il solo consiglio."""
+    """Aggiunge a report/dossier-app.json il consiglio per ogni giocatore del
+    listone: atteso, verdetto e perche'. Chi non ha note ne' voti entra con il
+    solo consiglio: anche il terzo portiere da 1 credito ha i suoi punti,
+    perche' all'asta si sceglie anche quello (dal 7/10/2026, prima solo chi
+    aveva un prezzo vero)."""
     blocco = modulo_dossier.esporta(dossier, listone_per_nome)
     giocatori = blocco["giocatori"]
     for x in righe:
-        if x["pos_prezzo"] > COMPRATI[x["r"]] and x["n"] not in giocatori:
-            continue
         voce = giocatori.setdefault(x["n"], {"st": "ok", "v": [], "n": []})
         voce["c"] = {"at": x["atteso"], "ve": x["verdetto"], "mo": "; ".join(x["perche"]),
                      "pr": x["pres"], "gs": x["gs"], "co": x["cop"]}
