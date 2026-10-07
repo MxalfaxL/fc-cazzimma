@@ -942,7 +942,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07d';
+const VERSIONE_APP = '2026.10.07e';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -2261,8 +2261,16 @@ ORDINE.forEach(r=>{
 
 $('btnAzzera').addEventListener('click', ()=>{
   if(!confirm('Cancello rosa, giornate, movimenti, obiettivi e crediti avversari? Il listone resta.')) return;
+  // Il contatore di versione non torna indietro: con v ripartito da 1, alla
+  // sincronizzazione vinceva la copia vecchia sul cloud e lo svuotamento
+  // spariva (7/10/2026: sul cloud c'era ancora il "via" di Malen di una prova).
+  // Restano anche il piano scelto e i cognomi degli avversari.
+  const v = stato.v || 0, piano = stato.piano;
   stato = statoIniziale();
+  stato.v = v;
+  if(listone.piani[piano]) stato.piano = piano;
   if(listone.piani[stato.piano]) stato.target = {...listone.piani[stato.piano]};
+  applicaLega();
   aggiornaCampi(); disegnaTutto(); salva();
 });
 
