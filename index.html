@@ -401,6 +401,20 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 .rosa-avv .scheda b{display:block;font-size:13.5px;margin-bottom:2px}
 .rosa-avv .scheda small{font-family:"IBM Plex Mono",monospace;color:var(--grigio);font-size:10.5px;display:block;margin-bottom:6px}
 .rosa-avv .scheda div{color:var(--testo-2);line-height:1.5}
+/* la lega: una riga per squadra, si apre sulla rosa */
+.lega details{background:var(--carta-2);border:1px solid var(--linea-2);border-radius:var(--r2);margin-bottom:8px}
+.lega details.mia{border-color:var(--azzurro)}
+.lega summary{display:grid;grid-template-columns:1fr auto;gap:1px 10px;padding:10px 12px;cursor:pointer;list-style:none}
+.lega summary::-webkit-details-marker{display:none}
+.lega summary b{font-size:14px;overflow-wrap:anywhere}
+.lega summary small{color:var(--grigio);font-size:12px}
+.lega summary .cr{grid-column:2;grid-row:1 / span 2;align-self:center;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:700}
+.lega summary .cr small{display:block;font-size:10px;font-weight:400}
+.lega .reparto{padding:0 12px 8px;font-size:12.5px}
+.lega .reparto h4{margin:4px 0 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grigio);display:flex;justify-content:space-between}
+.lega .reparto div{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:var(--testo-2);border-bottom:1px solid var(--linea)}
+.lega .reparto div:last-child{border-bottom:0}
+.lega .reparto div span:last-child{font-family:"IBM Plex Mono",monospace;color:var(--testo)}
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:var(--azione);color:var(--azione-testo);
   padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
@@ -692,7 +706,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   </div>
 
   <div class="blocco">
-    <div class="eyebrow"><span>Le rose degli avversari</span><small>dall'asta</small></div>
+    <div class="eyebrow"><span>La lega</span><small id="legaConta"></small></div>
     <div id="roseAvversari"></div>
   </div>
 
@@ -953,7 +967,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.07h';
+const VERSIONE_APP = '2026.10.09';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -2117,13 +2131,37 @@ $('btnResetAvv').addEventListener('click', ()=>{
   stato.avversari.forEach(a=>a.c = BUDGET); disegnaAvversari(); salva();
 });
 
+/* La lega: tutte le squadre, la mia per prima. Nome della squadra e persona
+   arrivano dal listone privato (lega.squadre, chiave il cognome con cui
+   l'avversario e' nominato qui): nel codice pubblico non c'e' nessun nome. */
 function disegnaRoseAvversari(){
+  const info = (listone.lega && listone.lega.squadre) || {};
+  const io = (listone.lega && listone.lega.io) || '';
   const con = stato.avversari.map((a,i)=>({a, i, rosa: stato.venduti.filter(v=>v.a === i)})).filter(x=>x.rosa.length);
-  $('roseAvversari').innerHTML = con.length ? `<div class="rosa-avv">${con.map(x=>`
-    <div class="scheda"><b>${esc(x.a.n)}</b><small>${x.rosa.length} giocatori · ${spesoAvv(x.i)} FM segnati</small>
-      ${ORDINE.map(r=>{ const gs = x.rosa.filter(v=>v.r===r); return gs.length ? `<div><b style="display:inline;font-size:12px">${r}</b> ${gs.map(v=>esc(v.n)+conSquadra(v)+(v.p?' '+v.p:'')).join(', ')}</div>` : ''; }).join('')}
-    </div>`).join('')}</div>`
-    : '<div class="vuoto">Ancora niente. In asta, dopo <b>via</b>, tocca l\'avversario che ha comprato e scrivi il prezzo: le rose si costruiscono da sole.</div>';
+  if(!con.length){
+    $('legaConta').textContent = '';
+    $('roseAvversari').innerHTML = '<div class="vuoto">Ancora niente. In asta, dopo <b>via</b>, tocca l\'avversario che ha comprato e scrivi il prezzo: le rose si costruiscono da sole.</div>';
+    return;
+  }
+  const squadre = [{mia: true, chi: info[io] || {squadra: 'FC Cazzimma', persona: io},
+                    rosa: stato.rosa.map(g=>({n:g.n, r:g.r, sq:g.sq, p:g.p})), cr: residuo()}]
+    .concat(con.map(x=>({chi: info[x.a.n] || {squadra: x.a.n}, rosa: x.rosa, cr: x.a.c}))
+      .sort((a,b)=>a.chi.squadra.localeCompare(b.chi.squadra, 'it', {sensitivity:'base'})));
+  const giocatori = squadre.reduce((s,x)=>s + x.rosa.length, 0);
+  $('legaConta').textContent = `${squadre.length} squadre · ${giocatori} giocatori`;
+  $('roseAvversari').innerHTML = `<div class="lega">${squadre.map(x=>{
+    const spesi = x.rosa.reduce((s,v)=>s + (v.p || 0), 0);
+    const chi = [x.chi.persona, x.chi.piattaforma].filter(Boolean).join(' · ');
+    return `<details class="${x.mia ? 'mia' : ''}">
+      <summary><b>${esc(x.chi.squadra)}</b><span class="cr">${x.cr}<small>restano</small></span>
+        <small>${esc(chi)}${chi ? ' · ' : ''}spesi ${spesi} · ${x.rosa.length}/25</small></summary>
+      <div class="reparto">${ORDINE.map(r=>{
+        const gs = x.rosa.filter(v=>v.r===r).sort((a,b)=>(b.p||0) - (a.p||0));
+        return gs.length ? `<h4><span>${NOME[r]}</span><span>${gs.reduce((s,v)=>s + (v.p||0), 0)}</span></h4>`
+          + gs.map(v=>`<div><span>${esc(v.n)}${conSquadra(v)}</span><span>${v.p ?? '–'}</span></div>`).join('') : '';
+      }).join('')}</div>
+    </details>`;
+  }).join('')}</div>`;
 }
 
 /* ======================= asta ======================= */

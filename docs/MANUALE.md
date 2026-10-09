@@ -127,8 +127,11 @@ distanza. Se il margine è sotto mezzo punto, decidi tu.
 
 A giornata finita: giornata, tuoi punti, punti avversario, **Registra la
 giornata**. L'app converte in gol (66 il primo, poi uno ogni 4) e tiene
-classifica e media. Sotto, **Le rose degli avversari** costruite in asta, e
-due calcolatori: modificatore da quattro voti, gol da un punteggio.
+classifica e media. Sotto, **La lega**: tutte e dieci le squadre, la tua per
+prima, con nome della squadra, chi la allena, crediti rimasti e spesi. Tocchi
+una riga e si apre la rosa, reparto per reparto, con quanto e' stato pagato
+ogni giocatore. Nomi e squadre arrivano col listone privato, non stanno nel
+codice. Poi due calcolatori: modificatore da quattro voti, gol da un punteggio.
 
 ## 7b. Analisi: cosa dicono i giornali
 

@@ -151,6 +151,7 @@ motore/titolari.py         titolari, subentrati e minuti di ogni giornata, dai t
 motore/stagione_scorsa.py  la stagione 2025/26 giocatore per giocatore, dall'archivio dei voti di SOS Fanta
 motore/calendario.py       gli avversari delle giornate dopo l'asta, con i loro gol fatti e subiti
 motore/guida_asta.py       le fasce della guida all'asta di SOS Fanta accanto ai nostri prezzi
+motore/rose_lega.py        controlla le rose della lega ricopiate dagli screenshot (ruoli, crediti, listone)
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
