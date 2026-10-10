@@ -36,10 +36,10 @@ const voci = (Array.isArray(rosa) ? rosa : (rosa.rosa || rosa.giocatori)).map((v
 const s = consiglia(voci);
 if (!s) { console.log('null'); process.exit(0); }
 console.log(JSON.stringify({
-  modulo: s.modulo, totale: s.totale, mod: s.mod, media: s.media,
+  modulo: s.modulo, totale: s.totale, mod: s.mod, media: s.media, modAtteso: s.modAtteso,
   undici: s.undici.map(x => ({n: x.g.n, r: x.r, p: x.p, atteso: x.atteso, votoAtteso: x.votoAtteso, costo: x.costo, sostituto: x.sostituto})),
   panchina: s.panchina.map(g => g.n),
-  alternative: s.alternative.map(a => ({modulo: a.modulo, totale: a.totale, mod: a.mod})),
+  alternative: s.alternative.map(a => ({modulo: a.modulo, totale: a.totale, mod: a.mod, modAtteso: a.modAtteso})),
   gol: s.gol, alGolDopo: s.alGolDopo,
 }));
 """
@@ -81,6 +81,7 @@ def confronta(py, js):
         differenze.append(f"modulo: python {py['modulo']} · js {js['modulo']}")
     num("totale", py["totale"], js["totale"])
     num("modificatore", py["mod"], js["mod"])
+    num("modificatore atteso", py["modAtteso"], js["modAtteso"])
     num("media difesa", py["media"], js["media"])
     num("gol", py["gol"], js["gol"])
     num("al gol dopo", py["alGolDopo"], js["alGolDopo"], tol=0.006)
@@ -101,6 +102,7 @@ def confronta(py, js):
     else:
         for a, b in zip(py["alternative"], js["alternative"]):
             num(f"{a['modulo']} totale", a["totale"], b["totale"])
+            num(f"{a['modulo']} modificatore atteso", a["modAtteso"], b["modAtteso"])
     return differenze
 
 

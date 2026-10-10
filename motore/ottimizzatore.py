@@ -84,19 +84,81 @@ def catena(panca, campo):
     return resa
 
 
-def valuta_reparto(disponibili, scelti):
-    """Un reparto schierato: chi resta fuori fa da ricambio, e ogni titolare
-    in dubbio vale la sua parte piu' la parte del ricambio."""
+def esiti_reparto(scelti, panca, forza=None):
+    """Tutti gli esiti di un reparto schierato: per ogni combinazione di dubbi
+    che giocano o no, le sostituzioni fatte come le fa la lega (ruolo per
+    ruolo, in ordine di panchina, entra il primo che ha giocato). Ogni esito
+    porta la sua probabilita', chi occupa ogni casella (None = vuota, vale
+    zero), la somma dei fantavoti e i voti puri di chi e' in campo.
+
+    Fino al 10 ottobre 2026 ogni dubbio valeva p*fv + (1-p)*ricambio con lo
+    stesso ricambio per tutti: con tre ballottaggi in attacco il primo della
+    panchina "entrava" tre volte, e un titolare sicuro lasciato fuori sembrava
+    gratis (Thuram in panchina dietro a Lontani, Dovbyk e Vitinha). Enumerare
+    gli esiti costa 2^dubbi per reparto, al massimo 256: nulla.
+
+    `forza` e' un dizionario id(giocatore) -> probabilita' che sostituisce
+    quella del giocatore: serve al costo dell'errore (lui gioca di sicuro /
+    non gioca di sicuro, tutto il resto uguale)."""
+    forza = forza or {}
+    prob_di = lambda g: forza.get(id(g), g.p)
+    dubbi = [g for g in scelti + panca if 0 < prob_di(g) < 1]
+    esiti = []
+    for maschera in range(1 << len(dubbi)):
+        prob = 1.0
+        giocano = set()
+        for i, g in enumerate(dubbi):
+            if maschera >> i & 1:
+                prob *= prob_di(g)
+                giocano.add(id(g))
+            else:
+                prob *= 1 - prob_di(g)
+        gioca = lambda g: prob_di(g) >= 1 or id(g) in giocano
+        riserve = [g for g in panca if gioca(g)]
+        caselle = []
+        for g in scelti:
+            if gioca(g):
+                caselle.append(g)
+            elif riserve:
+                caselle.append(riserve.pop(0))
+            else:
+                caselle.append(None)
+        esiti.append({"p": prob, "caselle": caselle,
+                      "fv": sum(g.fv for g in caselle if g is not None),
+                      "voti": [g.voto for g in caselle if g is not None]})
+    return esiti
+
+
+def modificatore_atteso(esiti_p, esiti_d):
+    """Il modificatore mediato su tutti gli esiti di portiere e difesa: con
+    i dubbi in campo non e' un numero intero ma una media pesata."""
+    totale = 0.0
+    for ep in esiti_p:
+        por = ep["caselle"][0]
+        if por is None:
+            continue
+        for ed in esiti_d:
+            punti, _ = modificatore_difesa(por.voto, ed["voti"])
+            totale += ep["p"] * ed["p"] * punti
+    return totale
+
+
+def valuta_reparto(disponibili, scelti, forza=None):
+    """Un reparto schierato: chi resta fuori fa da panchina, in ordine di
+    fantavoto, e il valore e' la media dei fantavoti su tutti gli esiti."""
     ids = {id(g) for g in scelti}
     panca = ordina([g for g in disponibili if id(g) not in ids])
+    esiti = esiti_reparto(scelti, panca, forza)
+    attesi = []
+    for i, g in enumerate(scelti):
+        attesi.append({
+            "g": g, "p": g.p,
+            "atteso": sum(e["p"] * e["caselle"][i].fv for e in esiti if e["caselle"][i] is not None),
+            "voto_atteso": sum(e["p"] * e["caselle"][i].voto for e in esiti if e["caselle"][i] is not None),
+        })
     ricambio = {"fv": catena(panca, "fv"), "voto": catena(panca, "voto")}
-    attesi = [{
-        "g": g, "p": g.p,
-        "atteso": g.p * g.fv + (1 - g.p) * ricambio["fv"],
-        "voto_atteso": g.p * g.voto + (1 - g.p) * ricambio["voto"],
-    } for g in scelti]
-    return {"attesi": attesi, "panca": panca, "ricambio": ricambio,
-            "somma": sum(x["atteso"] for x in attesi)}
+    return {"scelti": list(scelti), "attesi": attesi, "panca": panca, "esiti": esiti,
+            "ricambio": ricambio, "somma": sum(e["p"] * e["fv"] for e in esiti)}
 
 
 def migliore_reparto(disponibili, n):
@@ -106,6 +168,17 @@ def migliore_reparto(disponibili, n):
         if migliore is None or v["somma"] > migliore["somma"]:
             migliore = v
     return migliore
+
+
+def totale_formazione(reparti, forza=None):
+    """Il totale atteso di una formazione gia' scelta: i quattro reparti
+    piu' il modificatore atteso. Serve al costo dell'errore."""
+    esiti = {}
+    somma = 0.0
+    for r in RUOLI:
+        esiti[r] = esiti_reparto(reparti[r]["scelti"], reparti[r]["panca"], forza)
+        somma += sum(e["p"] * e["fv"] for e in esiti[r])
+    return somma + modificatore_atteso(esiti["P"], esiti["D"])
 
 
 def valuta_modulo(disponibili, nome_modulo):
@@ -119,36 +192,31 @@ def valuta_modulo(disponibili, nome_modulo):
     c, a = migliore_reparto(C, nc), migliore_reparto(A, na)
 
     # portiere e difesa interagiscono col modificatore: si provano tutti
+    portieri = [valuta_reparto(P, [por]) for por in P]
     migliore = None
-    for por in P:
-        vp = valuta_reparto(P, [por])
-        for combo in combinations(D, nd):
-            vd = valuta_reparto(D, list(combo))
-            mod, media = modificatore_difesa(vp["attesi"][0]["voto_atteso"],
-                                             [x["voto_atteso"] for x in vd["attesi"]])
-            totale = vp["somma"] + vd["somma"] + c["somma"] + a["somma"] + mod
+    for combo in combinations(D, nd):
+        vd = valuta_reparto(D, list(combo))
+        for vp in portieri:
+            mod_atteso = modificatore_atteso(vp["esiti"], vd["esiti"])
+            totale = vp["somma"] + vd["somma"] + c["somma"] + a["somma"] + mod_atteso
             if migliore is None or totale > migliore["totale"]:
+                # sul misuratore l'app disegna il modificatore "se giocano tutti"
+                mod, media = modificatore_difesa(vp["scelti"][0].voto, [g.voto for g in combo])
                 migliore = {"modulo": nome_modulo, "totale": totale, "modificatore": mod,
-                            "media_difesa": media, "reparti": {"P": vp, "D": vd, "C": c, "A": a}}
+                            "media_difesa": media, "mod_atteso": mod_atteso,
+                            "reparti": {"P": vp, "D": vd, "C": c, "A": a}}
     return migliore
 
 
 def costo_errore(val, ruolo, indice):
-    """Quanto costa se un titolare in dubbio non gioca: la differenza fra il
-    punteggio con lui in campo e quello con il suo ricambio al suo posto,
-    modificatore compreso."""
+    """Quanto costa se un titolare in dubbio non gioca: il totale atteso con
+    lui sicuro in campo meno quello con lui sicuro fuori, tutto il resto
+    com'e' (gli altri dubbi restano dubbi, i ricambi entrano da soli,
+    modificatore compreso)."""
     rep = val["reparti"][ruolo]
-    x = rep["attesi"][indice]
-
-    def scenario(fv_suo, voto_suo):
-        voti_d = [voto_suo if (ruolo == "D" and i == indice) else d["voto_atteso"]
-                  for i, d in enumerate(val["reparti"]["D"]["attesi"])]
-        voto_p = voto_suo if ruolo == "P" else val["reparti"]["P"]["attesi"][0]["voto_atteso"]
-        mod, _ = modificatore_difesa(voto_p, voti_d)
-        return val["totale"] - x["atteso"] + fv_suo - val["modificatore"] + mod
-
-    con_lui = scenario(x["g"].fv, x["g"].voto)
-    senza = scenario(rep["ricambio"]["fv"], rep["ricambio"]["voto"])
+    g = rep["attesi"][indice]["g"]
+    con_lui = totale_formazione(val["reparti"], {id(g): 1.0})
+    senza = totale_formazione(val["reparti"], {id(g): 0.0})
     sostituto = rep["panca"][0].nome if rep["panca"] else None
     return con_lui - senza, sostituto
 
@@ -170,8 +238,8 @@ def consiglia(rosa):
     s["panchina"] = [g for r in RUOLI for g in s["reparti"][r]["panca"]]
     s["ricambi"] = {r: s["reparti"][r]["ricambio"] for r in RUOLI}
     s["fuori"] = [g for g in rosa if g.p <= 0]
-    s["alternative"] = [{"modulo": v["modulo"], "totale": v["totale"],
-                         "modificatore": v["modificatore"], "media_difesa": v["media_difesa"]}
+    s["alternative"] = [{"modulo": v["modulo"], "totale": v["totale"], "modificatore": v["modificatore"],
+                         "media_difesa": v["media_difesa"], "mod_atteso": v["mod_atteso"]}
                         for v in valutazioni[1:]]
     s["gol"] = gol_da_punti(s["totale"])
     s["al_gol_dopo"] = punti_per_gol_successivo(s["totale"])
@@ -183,11 +251,13 @@ def come_json(s):
     """La stessa forma che produce l'app, per confrontare le due implementazioni."""
     return {
         "modulo": s["modulo"], "totale": s["totale"], "mod": s["modificatore"], "media": s["media_difesa"],
+        "modAtteso": s["mod_atteso"],
         "undici": [{"n": x["g"].nome, "r": x["ruolo"], "p": x["p"], "atteso": x["atteso"],
                     "votoAtteso": x["voto_atteso"], "costo": x["costo"], "sostituto": x["sostituto"]}
                    for x in s["undici"]],
         "panchina": [g.nome for g in s["panchina"]],
-        "alternative": [{"modulo": a["modulo"], "totale": a["totale"], "mod": a["modificatore"]} for a in s["alternative"]],
+        "alternative": [{"modulo": a["modulo"], "totale": a["totale"], "mod": a["modificatore"],
+                         "modAtteso": a["mod_atteso"]} for a in s["alternative"]],
         "gol": s["gol"], "alGolDopo": s["al_gol_dopo"],
     }
 
@@ -195,8 +265,9 @@ def come_json(s):
 def stampa(s):
     ruoli = {"P": "Portiere", "D": "Difesa", "C": "Centrocampo", "A": "Attacco"}
     print(f"\n  {s['modulo']}   {s['totale']:.2f} punti attesi   {s['gol']} gol")
-    if s["modificatore"]:
-        print(f"  modificatore +{s['modificatore']} (media difesa {s['media_difesa']:.3f})")
+    if s["media_difesa"] is not None:
+        print(f"  modificatore +{s['modificatore']} se giocano tutti (media difesa {s['media_difesa']:.3f}),"
+              f" atteso +{s['mod_atteso']:.2f} contando i dubbi")
     else:
         print("  modificatore non attivo")
     print(f"  al gol successivo mancano {s['al_gol_dopo']} punti\n")
@@ -221,7 +292,7 @@ def stampa(s):
     print("\n  Gli altri moduli")
     for alt in s["alternative"]:
         delta = alt["totale"] - s["totale"]
-        mod = f"+{alt['modificatore']}" if alt["modificatore"] else "  "
+        mod = f"+{alt['mod_atteso']:.2f}" if alt["media_difesa"] is not None else "     "
         print(f"    {alt['modulo']}   {alt['totale']:>6.2f}   ({delta:+.2f})   mod {mod}")
 
     if s["dubbi"]:

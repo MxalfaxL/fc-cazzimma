@@ -878,17 +878,64 @@ function combinazioni(arr, k){
   return out;
 }
 
-/* Un reparto schierato: chi resta fuori fa da ricambio, e ogni titolare in
-   dubbio vale la sua parte più la parte del ricambio. */
-function valutaReparto(disponibili, scelti){
+/* Tutti gli esiti di un reparto schierato: per ogni combinazione di dubbi
+   che giocano o no, le sostituzioni fatte come le fa la lega (ruolo per
+   ruolo, in ordine di panchina, entra il primo che ha giocato). Ogni esito
+   porta la probabilità, chi occupa ogni casella (null = vuota, vale zero),
+   la somma dei fantavoti e i voti puri di chi è in campo.
+   Fino al 10 ottobre 2026 ogni dubbio valeva p·fv + (1−p)·ricambio con lo
+   stesso ricambio per tutti: con tre ballottaggi in attacco il primo della
+   panchina "entrava" tre volte e un titolare sicuro in panchina sembrava
+   gratis. Enumerare costa 2^dubbi per reparto, al massimo 256: nulla.
+   `forza` (id → probabilità) sostituisce la probabilità di un giocatore:
+   serve al costo dell'errore. */
+function esitiReparto(scelti, panca, forza){
+  forza = forza || {};
+  const probDi = g => (g.id in forza) ? forza[g.id] : probabilita(g);
+  const dubbi = scelti.concat(panca).filter(g => { const p = probDi(g); return p > 0 && p < 1; });
+  const esiti = [];
+  for(let maschera = 0; maschera < (1 << dubbi.length); maschera++){
+    let prob = 1;
+    const giocano = new Set();
+    dubbi.forEach((g, i) => {
+      if((maschera >> i) & 1){ prob *= probDi(g); giocano.add(g.id); }
+      else prob *= 1 - probDi(g);
+    });
+    const gioca = g => probDi(g) >= 1 || giocano.has(g.id);
+    const riserve = panca.filter(gioca);
+    const caselle = scelti.map(g => gioca(g) ? g : (riserve.length ? riserve.shift() : null));
+    esiti.push({p: prob, caselle,
+      fv: caselle.reduce((s,g)=> s + (g ? g.fv : 0), 0),
+      voti: caselle.filter(g=>g).map(g=>g.voto)});
+  }
+  return esiti;
+}
+
+/* Il modificatore mediato su tutti gli esiti di portiere e difesa: con i
+   dubbi in campo non è un intero ma una media pesata. */
+function modificatoreAtteso(esitiP, esitiD){
+  let totale = 0;
+  for(const ep of esitiP){
+    const por = ep.caselle[0];
+    if(!por) continue;
+    for(const ed of esitiD) totale += ep.p * ed.p * modificatore(por.voto, ed.voti).punti;
+  }
+  return totale;
+}
+
+/* Un reparto schierato: chi resta fuori fa da panchina, in ordine di
+   fantavoto, e il valore è la media dei fantavoti su tutti gli esiti. */
+function valutaReparto(disponibili, scelti, forza){
   const ids = new Set(scelti.map(g=>g.id));
   const panca = ordina(disponibili.filter(g=>!ids.has(g.id)));
+  const esiti = esitiReparto(scelti, panca, forza);
+  const attesi = scelti.map((g, i) => ({
+    g, p: probabilita(g),
+    atteso: esiti.reduce((s,e)=> s + (e.caselle[i] ? e.p * e.caselle[i].fv : 0), 0),
+    votoAtteso: esiti.reduce((s,e)=> s + (e.caselle[i] ? e.p * e.caselle[i].voto : 0), 0),
+  }));
   const ricambio = {fv: catena(panca, 'fv'), voto: catena(panca, 'voto')};
-  const attesi = scelti.map(g=>{
-    const p = probabilita(g);
-    return {g, p, atteso: p*g.fv + (1-p)*ricambio.fv, votoAtteso: p*g.voto + (1-p)*ricambio.voto};
-  });
-  return {attesi, panca, ricambio, somma: attesi.reduce((s,x)=>s+x.atteso, 0)};
+  return {scelti: scelti.slice(), attesi, panca, esiti, ricambio, somma: esiti.reduce((s,e)=>s + e.p*e.fv, 0)};
 }
 
 function miglioreReparto(disponibili, n){
@@ -898,6 +945,18 @@ function miglioreReparto(disponibili, n){
     if(!migliore || v.somma > migliore.somma) migliore = v;
   }
   return migliore;
+}
+
+/* Il totale atteso di una formazione già scelta: i quattro reparti più il
+   modificatore atteso. Serve al costo dell'errore. */
+function totaleFormazione(reparti, forza){
+  const esiti = {};
+  let somma = 0;
+  for(const r of ORDINE){
+    esiti[r] = esitiReparto(reparti[r].scelti, reparti[r].panca, forza);
+    somma += esiti[r].reduce((s,e)=>s + e.p*e.fv, 0);
+  }
+  return somma + modificatoreAtteso(esiti.P, esiti.D);
 }
 
 function valutaModulo(disponibili, nomeModulo){
@@ -910,32 +969,31 @@ function valutaModulo(disponibili, nomeModulo){
   const c = miglioreReparto(C, nc), a = miglioreReparto(A, na);
 
   // portiere e difesa interagiscono col modificatore: si provano tutti
+  const portieri = P.map(por => valutaReparto(P, [por]));
   let migliore = null;
-  for(const por of P){
-    const vp = valutaReparto(P, [por]);
-    for(const combo of combinazioni(D, nd)){
-      const vd = valutaReparto(D, combo);
-      const m = modificatore(vp.attesi[0].votoAtteso, vd.attesi.map(x=>x.votoAtteso));
-      const totale = vp.somma + vd.somma + c.somma + a.somma + m.punti;
-      if(!migliore || totale > migliore.totale)
-        migliore = {modulo:nomeModulo, totale, mod:m.punti, media:m.media, reparti:{P:vp, D:vd, C:c, A:a}};
+  for(const combo of combinazioni(D, nd)){
+    const vd = valutaReparto(D, combo);
+    for(const vp of portieri){
+      const modAtteso = modificatoreAtteso(vp.esiti, vd.esiti);
+      const totale = vp.somma + vd.somma + c.somma + a.somma + modAtteso;
+      if(!migliore || totale > migliore.totale){
+        // sul misuratore si disegna il modificatore "se giocano tutti"
+        const m = modificatore(vp.scelti[0].voto, combo.map(g=>g.voto));
+        migliore = {modulo:nomeModulo, totale, mod:m.punti, media:m.media, modAtteso, reparti:{P:vp, D:vd, C:c, A:a}};
+      }
     }
   }
   return migliore;
 }
 
-/* Quanto costa se un titolare in dubbio non gioca: la differenza fra il
-   punteggio con lui in campo e quello con il suo ricambio al suo posto,
-   modificatore compreso. È il numero da guardare prima di schierarlo. */
+/* Quanto costa se un titolare in dubbio non gioca: il totale atteso con lui
+   sicuro in campo meno quello con lui sicuro fuori, tutto il resto com'è
+   (gli altri dubbi restano dubbi, i ricambi entrano da soli, modificatore
+   compreso). È il numero da guardare prima di schierarlo. */
 function costoErrore(val, ruolo, indice){
-  const rep = val.reparti[ruolo], x = rep.attesi[indice];
-  const scenario = (fvSuo, votoSuo) => {
-    const votiD = val.reparti.D.attesi.map((d,i)=> ruolo==='D' && i===indice ? votoSuo : d.votoAtteso);
-    const vP = ruolo === 'P' ? votoSuo : val.reparti.P.attesi[0].votoAtteso;
-    return val.totale - x.atteso + fvSuo - val.mod + modificatore(vP, votiD).punti;
-  };
-  const conLui = scenario(x.g.fv, x.g.voto);
-  const senza  = scenario(rep.ricambio.fv, rep.ricambio.voto);
+  const rep = val.reparti[ruolo], g = rep.attesi[indice].g;
+  const conLui = totaleFormazione(val.reparti, {[g.id]: 1});
+  const senza  = totaleFormazione(val.reparti, {[g.id]: 0});
   return {costo: conLui - senza, sostituto: rep.panca[0] ? rep.panca[0].n : null};
 }
 
@@ -953,7 +1011,7 @@ function consiglia(rosa){
   s.panchina = ORDINE.flatMap(r => s.reparti[r].panca);
   s.ricambi = Object.fromEntries(ORDINE.map(r=>[r, s.reparti[r].ricambio]));
   s.fuori = rosa.filter(g=>g.st === 'F');
-  s.alternative = valutazioni.slice(1).map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media}));
+  s.alternative = valutazioni.slice(1).map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media, modAtteso:v.modAtteso}));
   s.gol = golDaPunti(s.totale);
   s.alGolDopo = alGolDopo(s.totale);
   s.dubbi = s.undici.filter(x=>x.p < 1).sort((a,b)=>b.costo - a.costo);
@@ -967,7 +1025,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.09';
+const VERSIONE_APP = '2026.10.10';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1326,7 +1384,8 @@ function disegnaMetro(s, nd){
   const tracce = [0,1,2,3,4,5].map(i=>`<span class="${i < s.mod ? 'raggiunto' : i === s.mod ? 'attivo' : ''}"></span>`).join('');
   const prossima = s.mod < MOD_MAX ? soglie[s.mod+1] : null;
   const sotto = s.mod > 0 ? soglie[s.mod] : null;
-  let lettura = `media difesa <b>${m.toFixed(3)}</b> → modificatore <b>+${s.mod}</b>`;
+  let lettura = `media difesa <b>${m.toFixed(3)}</b> → modificatore <b>+${s.mod}</b> se giocano tutti`;
+  if(Math.abs(s.modAtteso - s.mod) > 0.005) lettura += ` (atteso <b>+${s.modAtteso.toFixed(2)}</b> contando i dubbi)`;
   if(prossima) lettura += ` · alla fascia +${s.mod+1} mancano ${(prossima - m + 0.0001).toFixed(2)}`;
   if(sotto) lettura += ` · scendi a +${s.mod-1} sotto ${sotto.toFixed(2)} (margine ${(m - sotto).toFixed(2)})`;
   return `<div class="metro">
