@@ -432,12 +432,32 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 .lega summary small{color:var(--grigio);font-size:12px}
 .lega summary .cr{grid-column:2;grid-row:1 / span 2;align-self:center;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:700}
 .lega summary .cr small{display:block;font-size:10px;font-weight:400}
-.lega .reparto{padding:0 12px 8px;font-size:12.5px}
-.lega .reparto h4{margin:4px 0 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grigio);display:flex;justify-content:space-between}
-.lega .reparto div{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:var(--testo-2);border-bottom:1px solid var(--linea)}
-.lega .reparto div:last-child{border-bottom:0}
-.lega .reparto div span:last-child{font-family:"IBM Plex Mono",monospace;color:var(--testo)}
-.lega .reparto div span.muto{color:var(--grigio);font-size:11px}
+.lega summary .cr.attesi{color:var(--grigio);font-weight:400}
+/* dentro una squadra (La lega) o una giornata (Le mie giornate) i reparti sono
+   blocchi separati, ognuno col titolo e la sigla colorata del ruolo: prima era
+   una lista unica che Marco chiamava "infinita". Su iPad e Mac due colonne. */
+.lega .reparti{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:2px 12px 10px}
+.lega .rep h4{display:flex;align-items:center;gap:7px;margin:0 0 3px;padding-bottom:3px;border-bottom:1px solid var(--linea);
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grigio)}
+.lega .rep h4 .sigla{width:20px;height:20px;flex:0 0 20px;font-size:12px;border-radius:6px;letter-spacing:0}
+.lega .rep h4 .somma{margin-left:auto;font-family:"IBM Plex Mono",monospace;color:var(--testo-2);letter-spacing:0}
+.lega .rg{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12.5px;line-height:1.3;border-bottom:1px solid var(--linea-2)}
+.lega .rg:last-child{border-bottom:0}
+.lega .rg .chi{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--testo)}
+.lega .rg .chi .sq{font-size:10.5px;margin-left:3px}
+.lega .rg .chi small{display:block;font-size:10.5px;color:var(--grigio);overflow:hidden;text-overflow:ellipsis}
+.lega .rg .prezzo,.lega .rg .rr{font-family:"IBM Plex Mono",monospace;color:var(--testo);min-width:24px;text-align:right}
+.lega .rg .rr{color:var(--grigio);font-size:11px}
+.lega .rg .v{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--grigio);min-width:26px;text-align:right}
+.lega .rg .fv{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:700;color:var(--testo);min-width:34px;text-align:right}
+.lega .rg.entrato .chi small{color:var(--verde-testo)}
+.lega .rg.senza .chi,.lega .rg.senza .chi small,.lega .rg.senza .fv,.lega .rosso{color:var(--rosso)}
+.lega .piede-giornata{margin:0;padding:8px 12px 10px;border-top:1px solid var(--linea-2);font-size:12px;color:var(--testo-2);line-height:1.5}
+/* il riepilogo della stagione: quattro numeri in fila */
+.riepilogo-stagione{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:2px 0 12px}
+.riepilogo-stagione div{background:var(--carta-2);border:1px solid var(--linea-2);border-radius:var(--r2);padding:8px 4px 7px;text-align:center;min-width:0}
+.riepilogo-stagione b{display:block;font-family:Anton,Impact,sans-serif;font-weight:400;font-size:24px;line-height:1.1;color:var(--azzurro)}
+.riepilogo-stagione small{display:block;margin-top:3px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;line-height:1.25;letter-spacing:.04em;text-transform:uppercase;color:var(--grigio);overflow-wrap:anywhere}
 /* gli avversari nella scheda Asta: la riga della lega, in sola lettura */
 .avv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:10px 12px;margin-bottom:8px;background:var(--carta-2);border:1px solid var(--linea-2);border-radius:var(--r2)}
 .avv b{font-size:14px;overflow-wrap:anywhere}
@@ -503,6 +523,12 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   /* "probabile" lo dice già il verdetto (N/11 ufficiali): nelle colonne strette
      lascia il posto alla percentuale del ballottaggio, che invece conta */
   #p-formazione .undici .probabile-tag{display:none}
+  /* i reparti di una squadra o di una giornata aperta, due per riga; la
+     panchina, che e' una lista sola, prende tutta la larghezza */
+  .lega .reparti.due{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px}
+  .lega .reparti.due .rep.panca{grid-column:1 / -1;columns:2;column-gap:18px}
+  .lega .reparti.due .rep.panca h4{column-span:all}
+  .lega .reparti.due .rep.panca .rg{break-inside:avoid}
 }
 /* sugli schermi da 1000 a 1100 (iPad vecchi di traverso, 1024) il campetto
    cede un po' di posto: con 460px le liste su due colonne avrebbero nomi da 70px */
@@ -804,8 +830,9 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 <section class="pannello largo" id="p-stagione" hidden>
   <div class="col-sx">
   <div class="blocco">
-    <div class="eyebrow">Il campionato</div>
+    <div class="eyebrow"><span>Le mie giornate</span><small id="formazioniConta"></small></div>
     <div id="classifica"></div>
+    <!-- tolto il 10/10/2026: la Stagione e' personale, i punti arrivano dal Mac
     <div class="duecol" style="margin-top:12px">
       <label class="campo"><span>Giornata</span><input type="number" id="gN" inputmode="numeric" min="1" max="38"></label>
       <label class="campo"><span>Miei punti</span><input type="number" id="gPF" inputmode="decimal" step="0.5"></label>
@@ -813,11 +840,9 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     </div>
     <button class="azione secondaria" id="btnGiornata">Registra la giornata</button>
     <div id="storico" style="margin-top:12px"></div>
-  </div>
-
-  <div class="blocco">
-    <div class="eyebrow"><span>Le formazioni mandate</span><small id="formazioniConta"></small></div>
+    -->
     <div id="formazioniStorico"></div>
+    <p class="nota">Qui finisce la formazione quando tocchi <b>Conferma: questa l'ho mandata</b>. Il lunedì, con i voti ufficiali, il Mac fa i conti come la lega (sostituzioni, modificatore, fasce gol) e i punti veri arrivano col listone.</p>
   </div>
 
   <div class="blocco">
@@ -1187,7 +1212,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.10e';
+const VERSIONE_APP = '2026.10.10f';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1397,7 +1422,11 @@ async function sincronizzaListone(){
     // vecchia dell'app li aveva persi pur avendo lo stesso marcatore (10/10/2026)
     const remW = (dati.settimana && +dati.settimana.aggiornata) || 0;
     const locW = (listone.settimana && +listone.settimana.aggiornata) || 0;
-    if(remMs > locMs || remW > locW){
+    // e i risultati delle giornate, per lo stesso motivo: un'app piu' vecchia
+    // della 2026.10.10f li avrebbe scartati tenendo lo stesso marcatore
+    const ultimoRisultato = l => Math.max(0, ...Object.values((l && l.risultati && l.risultati.giornate) || {}).map(x=>+(x && x.calcolato) || 0));
+    const remR = ultimoRisultato(dati), locR = ultimoRisultato(listone);
+    if(remMs > locMs || remW > locW || remR > locR){
       listone = normalizzaListone(dati);
       locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
       // tutte e due, sempre: con || la seconda salterebbe quando la prima cambia qualcosa
@@ -1643,6 +1672,8 @@ function disegnaPrato(s){
       <div class="tval">${f2(g.fv)}</div>
     </div>`;
   }).join('')}</div>`;
+  // portiere in alto e attacco in basso, come nell'app di Leghe (Marco, 10/10/2026):
+  // le linee del campo sono simmetriche, cambia solo l'ordine delle file
   return `<div class="prato" role="group" aria-label="Schieramento ${s.modulo}: tocca un giocatore per cambiarlo">
     <svg class="linee" viewBox="0 0 300 390" preserveAspectRatio="none">
       <rect x="8" y="8" width="284" height="374" rx="2"/>
@@ -1653,7 +1684,7 @@ function disegnaPrato(s){
     </svg>
     <div class="cartellino">${s.modulo}</div>
     <div class="cartellino destra">${s.mod ? 'mod +'+s.mod : 'senza mod'}</div>
-    <div class="file">${fila('A')}${fila('C')}${fila('D')}${fila('P')}</div>
+    <div class="file">${fila('P')}${fila('D')}${fila('C')}${fila('A')}</div>
   </div>`;
 }
 
@@ -2003,6 +2034,9 @@ function normalizzaListone(dati){
   if(dati && dati.dossier && dati.dossier.giocatori && typeof dati.dossier.giocatori === 'object') out.dossier = dati.dossier;
   // i dati della giornata per la rosa (fv, voto, stato), dal Mac: li applica applicaSettimana
   if(dati && dati.settimana && typeof dati.settimana === 'object' && Array.isArray(dati.settimana.giocatori)) out.settimana = dati.settimana;
+  // i punti veri delle giornate giocate (formazione confermata ai voti ufficiali), dal Mac: li mostra la Stagione
+  if(dati && dati.risultati && typeof dati.risultati === 'object' && dati.risultati.giornate && typeof dati.risultati.giornate === 'object'
+     && !Array.isArray(dati.risultati.giornate)) out.risultati = dati.risultati;
   // le righe di strategia per reparto arrivano dal Mac, nel listone privato
   if(dati && dati.consigli && typeof dati.consigli === 'object'){
     out.consigli = {piano: String(dati.consigli.piano || '')};
@@ -2595,10 +2629,13 @@ function disegnaRoseAvversari(){
     return `<details class="${x.mia ? 'mia' : ''}">
       <summary><b>${esc(x.chi.squadra)}</b><span class="cr">${x.cr}<small>restano</small></span>
         <small>${esc(chi)}${chi ? ' · ' : ''}spesi ${spesi} · ${x.rosa.length}/25</small></summary>
-      <div class="reparto">${ORDINE.map(r=>{
+      <div class="reparti due">${ORDINE.map(r=>{
+        // un blocco per reparto, con la sigla colorata e la spesa del reparto a destra
         const gs = x.rosa.filter(v=>v.r===r).sort((a,b)=>(b.p||0) - (a.p||0));
-        return gs.length ? `<h4><span>${NOME[r]}</span><span>${gs.reduce((s,v)=>s + (v.p||0), 0)}</span></h4>`
-          + gs.map(v=>`<div><span>${esc(v.n)}${conSquadra(v)}</span><span>${v.p ?? '–'}</span></div>`).join('') : '';
+        return gs.length ? `<section class="rep"><h4><span class="sigla ${r}">${r}</span><span>${NOME[r]} · ${gs.length}</span>`
+          + `<span class="somma">${gs.reduce((s,v)=>s + (v.p||0), 0)}</span></h4>`
+          + gs.map(v=>`<div class="rg"><span class="chi">${esc(v.n)}${conSquadra(v)}</span><span class="prezzo">${v.p ?? '–'}</span></div>`).join('')
+          + '</section>' : '';
       }).join('')}</div>
     </details>`;
   }).join('')}</div>`;
@@ -2802,76 +2839,124 @@ $('btnCopia').addEventListener('click', async ()=>{
 });
 
 /* ======================= stagione ======================= */
+/* Dal 10/10/2026 la Stagione e' personale: la lega ha piu' competizioni tutte
+   contro tutti, quindi niente avversario e niente classifica V/N/P. Restano le
+   mie giornate (formazione confermata e, dal Mac, i punti veri) e la lega.
+   stato.giornate (i punti registrati a mano) resta nello stato per
+   compatibilita', ma non si disegna piu'. */
 function disegnaStagione(){
-  const gs = [...stato.giornate].sort((a,b)=>a.g-b.g);
-  const tot = {v:0, n:0, p:0, gf:0, gs:0, pf:0};
-  gs.forEach(x=>{
-    const mf = golDaPunti(x.pf), ms = golDaPunti(x.ps);
-    x.gf = mf; x.gs = ms;
-    tot.gf += mf; tot.gs += ms; tot.pf += x.pf;
-    if(mf > ms) tot.v++; else if(mf === ms) tot.n++; else tot.p++;
-  });
-  const punti = tot.v*3 + tot.n;
-
-  $('classifica').innerHTML = gs.length
-    ? `<div class="esito">${punti}<small>punti in ${gs.length} giornate</small></div>
-       <div class="righetta">${tot.v}V ${tot.n}N ${tot.p}P · gol ${tot.gf}-${tot.gs} · media punteggio ${(tot.pf/gs.length).toFixed(2)}</div>`
-    : '<div class="vuoto">Nessuna giornata registrata.</div>';
-
-  $('storico').innerHTML = gs.length
-    ? `<table class="dati"><tr><th>G</th><th class="n">Punti</th><th class="n">Avv.</th><th class="n">Gol</th><th></th></tr>`
-      + gs.map(x=>{
-          const e = x.gf > x.gs ? 'V' : (x.gf === x.gs ? 'N' : 'P');
-          return `<tr><td>${x.g}</td><td class="n">${x.pf}</td><td class="n">${x.ps}</td>
-            <td class="n">${x.gf}-${x.gs}</td><td class="n"><b>${e}</b>
-            <button class="elimina" data-gdel="${x.g}" aria-label="Togli giornata ${x.g}">×</button></td></tr>`;
-        }).join('') + `</table>`
-    : '';
-  disegnaFormazioniMandate();
+  disegnaMieGiornate();
   disegnaRoseAvversari();
 }
 
-/* Le formazioni confermate, dalla più recente: modulo, totale atteso, quando
-   è stata mandata e, se la giornata è registrata, com'è andata davvero. */
-function disegnaFormazioniMandate(){
-  const giornate = Object.keys(stato.formazioni || {}).map(Number).filter(n=>n > 0 && stato.formazioni[n]).sort((a,b)=>b-a);
-  $('formazioniConta').textContent = giornate.length ? `${giornate.length} ${giornate.length === 1 ? 'giornata' : 'giornate'}` : '';
-  if(!giornate.length){
+// 6 -> "6", 6.5 -> "6.5", 70.4 -> "70.4": voti e punti come si leggono sul giornale
+const breve = n => (n === null || n === undefined || n === '' || !isFinite(+n)) ? '–' : String(Math.round(+n*100)/100);
+const risultatiMac = () => (listone.risultati && listone.risultati.giornate) || {};
+
+/* Le mie giornate, dalla piu' recente: l'unione delle formazioni confermate
+   (stato.formazioni) e dei risultati calcolati dal Mac (listone.risultati,
+   da motore/punteggio_giornata.py: formazione confermata ai voti ufficiali,
+   con sostituzioni, modificatore e fasce gol come la lega). */
+function disegnaMieGiornate(){
+  const form = stato.formazioni || {}, ris = risultatiMac();
+  const numeri = [...new Set([...Object.keys(form).filter(k=>form[k]), ...Object.keys(ris).filter(k=>ris[k])].map(Number))]
+    .filter(n=>n > 0).sort((a,b)=>b-a);
+  const giocate = numeri.filter(n=>ris[n] && isFinite(+ris[n].totale));
+  $('formazioniConta').textContent = numeri.length ? `${numeri.length} ${numeri.length === 1 ? 'giornata' : 'giornate'}` : '';
+  if(giocate.length){
+    const somma = giocate.reduce((s,n)=>s + +ris[n].totale, 0);
+    const gol = giocate.reduce((s,n)=>s + (+ris[n].gol || 0), 0);
+    const migliore = giocate.reduce((a,n)=>+ris[n].totale > +ris[a].totale ? n : a);
+    $('classifica').innerHTML = `<div class="riepilogo-stagione">
+      <div><b>${giocate.length}</b><small>${giocate.length === 1 ? 'giocata' : 'giocate'}</small></div>
+      <div><b>${breve(somma/giocate.length)}</b><small>media punti</small></div>
+      <div><b>${gol}</b><small>gol fatti</small></div>
+      <div><b>${breve(ris[migliore].totale)}</b><small>migliore G${migliore}</small></div>
+    </div>`;
+  } else {
+    $('classifica').innerHTML = numeri.length
+      ? '<p class="nota" style="margin-top:0">Ancora nessun punto vero: arrivano dal Mac quando ci sono i voti ufficiali. Intanto qui sotto le formazioni mandate, con i punti attesi.</p>' : '';
+  }
+  if(!numeri.length){
     $('formazioniStorico').innerHTML = '<div class="vuoto">Nessuna formazione confermata. Dalla scheda Formazione, quando l\'hai mandata sulla piattaforma, tocca <b>Conferma</b>.</div>';
     return;
   }
-  $('formazioniStorico').innerHTML = `<div class="lega">${giornate.map(n=>{
-    const f = stato.formazioni[n];
-    const esito = stato.giornate.find(x=>x.g === n);
-    const quando = f.quando ? 'mandata il ' + dataOra(f.quando) : '';
-    const fatti = esito ? `fatti ${esito.pf} punti, avversario ${esito.ps}` : '';
-    const undici = f.undici || [], panchina = f.panchina || [];
-    return `<details>
-      <summary><b>Giornata ${n} · ${esc(f.modulo)}</b><span class="cr">${f2(f.totale)}<small>attesi</small></span>
-        <small>${esc([quando, fatti].filter(Boolean).join(' · '))}</small></summary>
-      <div class="reparto">${ORDINE.map(r=>{
-        const gs = undici.filter(x=>x.r === r);
-        return gs.length ? `<h4><span>${SINGOLARE[r]}</span><span>${gs.length}</span></h4>`
-          + gs.map(x=>`<div><span>${esc(x.n)}</span><span class="muto">${esc(x.sq || '')}</span></div>`).join('') : '';
-      }).join('')}${panchina.length ? `<h4><span>Panchina</span><span>${panchina.length}</span></h4>`
-          + panchina.map((g,i)=>`<div><span>${i+1}. ${esc(g.n)}</span><span class="muto">${esc(g.r)}</span></div>`).join('') : ''}</div>
-    </details>`;
-  }).join('')}</div>`;
+  $('formazioniStorico').innerHTML = `<div class="lega">${numeri.map(n=>schedaGiornata(n, form[n], ris[n])).join('')}</div>`;
 }
 
-$('btnGiornata').addEventListener('click', ()=>{
-  const g = parseInt($('gN').value, 10), pf = parseFloat($('gPF').value), ps = parseFloat($('gPS').value);
-  if(isNaN(g) || isNaN(pf) || isNaN(ps)){ toast('Servono giornata, punti tuoi e punti avversario'); return; }
-  stato.giornate = stato.giornate.filter(x=>x.g !== g);
-  stato.giornate.push({g, pf, ps});
-  ['gN','gPF','gPS'].forEach(i=>$(i).value='');
-  disegnaStagione(); salva();
-});
-$('storico').addEventListener('click', e=>{
-  const g = e.target.dataset.gdel; if(!g) return;
-  stato.giornate = stato.giornate.filter(x=>x.g !== +g);
-  disegnaStagione(); salva();
-});
+/* Una giornata: in testa modulo e punti (veri se il Mac li ha calcolati,
+   altrimenti gli attesi in grigio); dentro i reparti con chi ha giocato
+   davvero, voto, bonus e fantavoto, poi la panchina nell'ordine mandato. */
+function schedaGiornata(n, f, r){
+  f = f || null;
+  r = (r && Array.isArray(r.undici)) ? r : null;
+  const modulo = (r && r.modulo) || (f && f.modulo) || '';
+  const quando = f && f.quando ? 'mandata ' + dataOra(f.quando) : '';
+  const dettagli = r
+    ? [quando, `${+r.gol || 0} gol · ${+r.mod ? 'mod +' + r.mod : 'senza mod'}`, f && isFinite(+f.totale) ? `attesi ${breve(f.totale)}` : '']
+    : [quando, 'in attesa dei voti ufficiali'];
+  const punti = r
+    ? `<span class="cr">${breve(r.totale)}<small>punti</small></span>`
+    : `<span class="cr attesi">${f && isFinite(+f.totale) ? breve(f.totale) : '–'}<small>attesi</small></span>`;
+  // in campo: dal risultato chi ha preso il voto (e i ricambi entrati), se no la formazione mandata
+  const undici = r ? r.undici : ((f && f.undici) || []);
+  const entrati = new Set(r ? r.undici.filter(x=>x.entrato_per).map(x=>x.n) : []);
+  const reparti = ORDINE.map(ruolo=>{
+    const gs = undici.filter(x=>x.r === ruolo);
+    if(!gs.length) return '';
+    const destra = r ? breve(gs.reduce((s,x)=>s + (+x.fv || 0), 0)) : gs.length;
+    return `<section class="rep"><h4><span class="sigla ${ruolo}">${ruolo}</span><span>${SINGOLARE[ruolo]}</span><span class="somma">${destra}</span></h4>`
+      + gs.map(x=>{
+        const sq = x.sq || squadraDi(x);
+        const testaNome = `${esc(x.n)}${sq ? ` <span class="sq">${esc(sq)}</span>` : ''}`;
+        if(!r) return `<div class="rg"><span class="chi">${testaNome}</span></div>`;
+        if(x.vuoto) return `<div class="rg senza"><span class="chi">${testaNome}<small>senza voto e senza ricambio: 0 punti</small></span><span class="fv">0</span></div>`;
+        const sotto = [x.entrato_per ? `entrato per ${esc(x.entrato_per)}` : '', esc(x.eventi || '')].filter(Boolean).join(' · ');
+        return `<div class="rg${x.entrato_per ? ' entrato' : ''}"><span class="chi">${testaNome}${sotto ? `<small>${sotto}</small>` : ''}</span>
+          <span class="v">${breve(x.voto)}</span><span class="fv">${breve(x.fv)}</span></div>`;
+      }).join('') + '</section>';
+  }).join('');
+  const panchina = (f && f.panchina) || [];
+  const panca = panchina.length ? `<section class="rep panca"><h4><span>Panchina</span><span class="somma">${panchina.length}</span></h4>`
+    + panchina.map((g,i)=>`<div class="rg"><span class="chi">${i+1}. ${esc(g.n)}${entrati.has(g.n) ? ' <span class="sq">entrato</span>' : ''}</span><span class="rr">${esc(g.r)}</span></div>`).join('')
+    + '</section>' : '';
+  let piede = '';
+  if(r){
+    const difesa = r.undici.filter(x=>x.r === 'D' && !x.vuoto).map(x=>+x.voto).sort((a,b)=>b-a).slice(0,3);
+    const portiere = r.undici.find(x=>x.r === 'P' && !x.vuoto);
+    const mod = r.media !== null && r.media !== undefined && portiere
+      ? `Modificatore: portiere ${breve(portiere.voto)}, difensori ${difesa.map(breve).join(', ')} → media ${(+r.media).toFixed(3)} → <b>+${+r.mod || 0}</b>`
+      : 'Modificatore: niente, in campo meno di 4 difensori con un voto';
+    const cambi = (r.sostituzioni || []).length ? ` · ${r.sostituzioni.length} ${r.sostituzioni.length === 1 ? 'sostituzione' : 'sostituzioni'} su 5` : '';
+    const vuoti = (r.senza_voto || []).length ? `<br><span class="rosso">Rimasti senza voto e senza ricambio: ${r.senza_voto.map(esc).join(', ')}</span>` : '';
+    piede = `<p class="piede-giornata">${mod}${cambi}${vuoti}</p>`;
+  }
+  return `<details>
+    <summary><b>Giornata ${n}${modulo ? ' · ' + esc(modulo) : ''}</b>${punti}
+      <small>${esc(dettagli.filter(Boolean).join(' · '))}</small></summary>
+    <div class="reparti due">${reparti}${panca}</div>${piede}
+  </details>`;
+}
+
+/* tolto il 10/10/2026 insieme al modulo "Registra la giornata": i gestori
+   restano protetti, cosi' se l'HTML torna funzionano di nuovo */
+{
+  const b = $('btnGiornata');
+  if(b) b.addEventListener('click', ()=>{
+    const g = parseInt($('gN').value, 10), pf = parseFloat($('gPF').value), ps = parseFloat($('gPS').value);
+    if(isNaN(g) || isNaN(pf) || isNaN(ps)){ toast('Servono giornata, punti tuoi e punti avversario'); return; }
+    stato.giornate = stato.giornate.filter(x=>x.g !== g);
+    stato.giornate.push({g, pf, ps});
+    ['gN','gPF','gPS'].forEach(i=>$(i).value='');
+    disegnaStagione(); salva();
+  });
+  const st = $('storico');
+  if(st) st.addEventListener('click', e=>{
+    const g = e.target.dataset.gdel; if(!g) return;
+    stato.giornate = stato.giornate.filter(x=>x.g !== +g);
+    disegnaStagione(); salva();
+  });
+}
 
 function calcolaMod(){
   const v = ['m0','m1','m2','m3'].map(i=>parseFloat($(i).value));

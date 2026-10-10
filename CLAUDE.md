@@ -154,6 +154,7 @@ motore/stagione_scorsa.py  la stagione 2025/26 giocatore per giocatore, dall'arc
 motore/calendario.py       gli avversari delle giornate dopo l'asta, con i loro gol fatti e subiti
 motore/guida_asta.py       le fasce della guida all'asta di SOS Fanta accanto ai nostri prezzi
 motore/rose_lega.py        controlla le rose della lega ricopiate dagli screenshot (ruoli, crediti, listone)
+motore/punteggio_giornata.py  i fantapunti veri di una giornata: formazione confermata (stato.json, sola lettura) ai voti ufficiali, scrive report/risultati.json
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)

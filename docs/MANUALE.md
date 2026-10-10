@@ -12,7 +12,7 @@ le cose ti serviranno. L'app è su <https://mxalfaxl.github.io/fc-cazzimma/>.
 | 7 ottobre, sera | l'asta: ogni acquisto va segnato subito |
 | dopo l'asta | sistema la rosa: squadra e voti attesi, una volta sola |
 | ogni sabato | la formazione: dati dal Mac, dubbi, modulo, copia, schiera, conferma |
-| dopo ogni giornata | registra il risultato in Stagione |
+| il lunedì dopo la giornata | i voti ufficiali nella cartella del Mac: i punti veri arrivano da soli in Stagione |
 
 ## 1. Entrare
 
@@ -135,7 +135,7 @@ mano. Niente più testo da incollare.
 4. **Copia la formazione** e schierala a mano sulla piattaforma: chiude 15
    minuti **prima** del fischio della prima partita.
 5. **Conferma: questa l'ho mandata**: la salva nello storico (Stagione → Le
-   formazioni mandate). Nel verdetto compare *mandata il … alle …*; se poi
+   mie giornate), ed e' quella su cui il Mac fara' i conti coi voti veri. Nel verdetto compare *mandata il … alle …*; se poi
    cambi qualcosa o arrivano dati nuovi, accanto c'è *diversa da quella
    mandata* (o *panchina diversa*): sulla piattaforma c'è ancora la vecchia.
 
@@ -143,7 +143,8 @@ In cima: il **verdetto** (modulo, punti attesi, gol, quanti confermati), il
 **misuratore del modificatore** (sei tacche, cursore sulla media difesa,
 quanto manca alla fascia sopra e quanto margine sotto), il **campetto**
 (cerchietto oro con il numero = ballottaggio con percentuale, spunta verde =
-confermato). Sotto: undici, panchina in ordine (su iPad e Mac tutte e due su
+confermato). Dalla 2026.10.10f il campetto si legge come sull'app di Leghe:
+**portiere in alto, attaccanti in basso**. Sotto: undici, panchina in ordine (su iPad e Mac tutte e due su
 due colonne), **Scegli il modulo** con la distanza. Se il margine è sotto
 mezzo punto, decidi tu.
 
@@ -158,18 +159,39 @@ riaccendono.
 
 ## 7. La stagione
 
-A giornata finita: giornata, tuoi punti, punti avversario, **Registra la
-giornata**. L'app converte in gol (66 il primo, poi uno ogni 4) e tiene
-classifica e media. Sotto, **La lega**: tutte e dieci le squadre, la tua per
-prima, con nome della squadra, chi la allena, crediti rimasti e spesi. Tocchi
-una riga e si apre la rosa, reparto per reparto, con quanto e' stato pagato
-ogni giocatore. Nomi e squadre arrivano col listone privato, non stanno nel
-codice. Poi due calcolatori: modificatore da quattro voti, gol da un punteggio.
+La Stagione e' **personale**: la lega ha piu' competizioni tutte contro
+tutti, quindi niente avversario e niente classifica da tenere a mano (il
+vecchio *Registra la giornata* non c'e' piu', dal 10/10/2026).
 
-**Le formazioni mandate**, sotto il campionato: una riga per ogni giornata
-confermata, dalla più recente, con modulo, punti attesi, quando l'hai mandata
-e, se hai registrato la giornata, i punti tuoi e dell'avversario. Toccala e
-vedi l'undici reparto per reparto e la panchina in ordine.
+**Le mie giornate**, in cima. Il giro e' questo:
+
+1. Mandi la formazione sulla piattaforma e nell'app tocchi **Conferma: questa
+   l'ho mandata** (scheda Formazione). La giornata compare qui con modulo e
+   **punti attesi in grigio**, *in attesa dei voti ufficiali*.
+2. Il lunedi' metti il file dei voti di Fantacalcio.it in `Voti Fantacalcio/`
+   sul Mac: il Mac applica la formazione confermata ai voti con le regole
+   della lega (sostituzioni ruolo per ruolo in ordine di panchina, massimo 5;
+   modificatore; fasce gol) e manda i punti all'app col listone.
+3. Alla prossima apertura la giornata mostra i **punti veri**, i gol e il
+   modificatore. Toccala: i reparti con la sigla colorata, per ognuno chi ha
+   giocato con voto, bonus e **fantavoto**; chi e' entrato dalla panchina ha
+   *entrato per …* in verde; chi e' rimasto senza voto e senza ricambio e'
+   **in rosso** (vale 0: la piattaforma li' cambierebbe modulo, noi no, quindi
+   il nostro conto puo' essere un filo piu' basso). Sotto la panchina numerata
+   e il conto del modificatore.
+
+In cima quattro numeri: giornate giocate, media punti, gol fatti, migliore
+giornata.
+
+**La lega**, sotto: tutte e dieci le squadre, la tua per prima, con nome
+della squadra, chi la allena, crediti rimasti e spesi. Tocchi una riga e si
+apre la rosa **divisa per reparti**, ognuno col suo titolo, la sigla colorata,
+quanti sono e quanto e' costato; una riga per giocatore con squadra e prezzo.
+Su iPad e Mac i quattro reparti stanno su due colonne. Nomi e squadre arrivano
+col listone privato, non stanno nel codice.
+
+A destra (sotto, sull'iPhone) i due calcolatori, modificatore da quattro voti
+e gol da un punteggio, e le regole da tenere a mente.
 
 ## 7b. Analisi: cosa dicono i giornali
 

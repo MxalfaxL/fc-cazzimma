@@ -103,6 +103,11 @@ if __name__ == "__main__":
     settimana = RADICE / "report" / "settimana.json"
     if settimana.exists():
         blocco["settimana"] = json.loads(settimana.read_text(encoding="utf-8"))
+    # i fantapunti veri delle giornate giocate (formazione confermata ai voti
+    # ufficiali, da punteggio_giornata.py): l'app li mostra in Stagione
+    risultati = RADICE / "report" / "risultati.json"
+    if risultati.exists():
+        blocco["risultati"] = json.loads(risultati.read_text(encoding="utf-8"))
     # il marcatore di tempo e' quello che l'app confronta: piu' recente vince
     blocco["caricato"] = int(time.time() * 1000)
     contenuto = base64.b64encode(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).decode("ascii")
@@ -131,6 +136,10 @@ if __name__ == "__main__":
             print(f"  con la lega: {blocco['lega'].get('lega')} · asta {blocco['lega'].get('asta_testo')} · {len(blocco['lega'].get('avversari', []))} avversari")
         if blocco.get("settimana"):
             print(f"  con i dati della giornata {blocco['settimana'].get('giornata')}: {len(blocco['settimana'].get('giocatori', []))} giocatori")
+        if blocco.get("risultati"):
+            giocate = sorted(blocco["risultati"].get("giornate", {}), key=int)
+            print(f"  con i risultati di {len(giocate)} {'giornata' if len(giocate) == 1 else 'giornate'}"
+                  + (f" ({', '.join(giocate)})" if giocate else ""))
         print("  L'app lo prende alla prossima apertura, su tutti i dispositivi collegati.\n")
     finally:
         if precedente and precedente != UTENTE:

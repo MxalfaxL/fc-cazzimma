@@ -23,7 +23,10 @@ Uso:
     python3 motore/voti_ufficiali.py --prova            # non scrive niente
 
 Scrive `dati/voti-ufficiali/giornata-N.json` nel formato di dossier.py
-(fonte "leghe"), pronto per `dossier.py importa`.
+(fonte "leghe"), pronto per `dossier.py importa`. Ogni voto porta anche le
+`colonne` del file diverse da zero (Gf, Rf, Ass, ...) e `ufficio` per il 6*:
+servono a `punteggio_giornata.py` per rifare il fantavoto della formazione
+(dal 10 ottobre 2026; dossier.py le ignora).
 """
 
 import json
@@ -52,6 +55,14 @@ COLONNE = ["Cod.", "Ruolo", "Nome", "Voto", "Gf", "Gs", "Rp", "Rs", "Rf", "Au", 
 COME_SI_DICE = [("Gf", "gol"), ("Rf", "rigore segnato"), ("Ass", "assist"),
                 ("Rp", "rigore parato"), ("Rs", "rigore sbagliato"), ("Au", "autogol"),
                 ("Gs", "gol subito"), ("Amm", "ammonito"), ("Esp", "espulso")]
+# Il plurale a regola ("aggiungi una i") scriveva "2 gol subitoi" e "2 rigore
+# segnatoi": meglio un elenco esplicito delle sole parole che cambiano.
+PLURALE = {"rigore segnato": "rigori segnati", "rigore parato": "rigori parati",
+           "rigore sbagliato": "rigori sbagliati", "gol subito": "gol subiti"}
+# Le colonne che fanno bonus e malus, salvate cosi' come sono nel file: il
+# fantavoto di una formazione si ricalcola da qui (punteggio_giornata.py), con
+# il ruolo con cui il giocatore e' stato schierato.
+EVENTI = ["Gf", "Gs", "Rp", "Rs", "Rf", "Au", "Amm", "Esp", "Ass"]
 
 
 def carica_listone():
@@ -77,7 +88,7 @@ def racconta(eventi, ruolo):
         elif quanti == 1:
             pezzi.append(parola)
         else:
-            pezzi.append(f"{quanti} {parola}{'i' if parola.endswith('o') else ''}")
+            pezzi.append(f"{quanti} {PLURALE.get(parola, parola)}")
     return ", ".join(pezzi)
 
 
@@ -121,6 +132,11 @@ def leggi_file(percorso, per_codice):
             parole = (parole + ", " if parole else "") + "voto d'ufficio"
         if parole:
             voce["eventi"] = parole
+        # solo le colonne diverse da zero: un voto senza eventi resta corto
+        colonne = {k: int(float(dati.get(k) or 0)) for k in EVENTI}
+        voce["colonne"] = {k: n for k, n in colonne.items() if n}
+        if ufficio:
+            voce["ufficio"] = True
         voti.append(voce)
     return voti, mancati
 
