@@ -140,7 +140,7 @@ motore/regole.py           le regole della lega, unica fonte
 motore/ottimizzatore.py    modulo, undici, costo dei ballottaggi, versione Python
 motore/verifica_parita.py  controlla che Python e JavaScript diano gli stessi numeri
 motore/listone.py          prezzi d'asta e piani dal listone ufficiale
-motore/esporta_app.py      blocco settimanale da incollare nell'app
+motore/esporta_app.py      i dati della settimana (report/settimana.json): viaggiano nell'app dentro listone.json
 motore/confronta_gazzetta.py  secondo parere: posizioni nel ruolo contro il listone della Gazzetta
 motore/invia_listone.py    manda report/listone.json all'app, via repository dei dati
 motore/leggi_gazzetta.py   dal PDF del giornale, le pagine di Serie A e chi viene citato
