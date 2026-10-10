@@ -11,7 +11,7 @@ le cose ti serviranno. L'app è su <https://mxalfaxl.github.io/fc-cazzimma/>.
 | fino al 7 ottobre | prova a secco con un'asta finta; procurati i rigoristi |
 | 7 ottobre, sera | l'asta: ogni acquisto va segnato subito |
 | dopo l'asta | sistema la rosa: squadra e voti attesi, una volta sola |
-| ogni sabato | la formazione: probabili, ufficiali, dubbi, copia e schiera |
+| ogni sabato | la formazione: dati dal Mac, dubbi, modulo, copia, schiera, conferma |
 | dopo ogni giornata | registra il risultato in Stagione |
 
 ## 1. Entrare
@@ -43,8 +43,8 @@ colonne (campetto a sinistra, liste a destra). In
 alto a destra la **pillola** dice se l'app è allineata con GitHub
 (*sincronizzato*, *da inviare*, *errore*) e toccandola entri nelle
 impostazioni. Tutto si salva da solo e si ritrova sugli altri dispositivi.
-L'app si riapre sull'ultima scheda che stavi guardando; la prima volta su
-Asta finché la rosa non è completa, poi su Formazione.
+L'app si apre sempre su **Formazione** (su Asta solo finché la rosa non è
+completa).
 
 ## 3. Caricare il listone
 
@@ -74,8 +74,10 @@ Nel riquadro in alto: la **fase** (P → D → C → A, non si torna indietro), 
 **numero grande** con il massimo che puoi offrire senza restare senza crediti
 per gli slot che mancano (rosso se sei al limite), la colonna che si riempie
 con quello che spendi, e l'**avviso** che ti parla in italiano: arancione se
-sei sopra il piano, rosso se rischi di non completare la rosa. C'è anche
-l'interruttore per tenere lo schermo acceso.
+sei sopra il piano, rosso se rischi di non completare la rosa. Sotto, in
+quest'ordine: La mia squadra, Piano di spesa, il listone, Aggiudicato, Ultimi
+movimenti, Gli avversari. L'interruttore per tenere lo schermo acceso sta in
+Impostazioni → Aspetto.
 
 **Quando compri tu**: cerca il giocatore, tocca **preso**, scrivi il prezzo,
 **Aggiungi alla rosa**. La tendina **Comprato da** resta su *FC Cazzimma*. Se il prezzo
@@ -88,9 +90,11 @@ crediti e rose degli altri si costruiscono da soli. Se non vuoi, vai avanti:
 il conto degli altri è facoltativo, il tuo no. Su ogni movimento c'è
 **annulla**.
 
-**Gli avversari**: puoi dare loro il nome vero; l'app mostra quanti giocatori
-hanno per ruolo e quanto hanno speso da quello che hai segnato. Dopo i
-centrocampisti i crediti sono pubblici: se non torna, correggi a mano.
+**Gli avversari**: in sola lettura. Per ognuno il nome della squadra in
+grassetto e sotto chi la allena (arrivano col listone privato; senza, resta il
+cognome), a destra i crediti che restano, in piccolo gli slot per ruolo e
+quanto ha speso da quello che hai segnato. Dopo l'asta non si scrivono più a
+mano e *Riporta tutti a 500* non c'è più: tornano l'anno prossimo.
 
 **Prova a secco** prima del 7 ottobre: compra, segna via, cambia piano,
 annulla. Alla fine *Rosa → Svuota tutto e ricomincia*: il listone resta.
@@ -105,27 +109,48 @@ la tabella degli **svincoli** per gennaio: metà del prezzo pagato.
 
 ## 6. Ogni settimana: la formazione
 
-Il sabato, quando escono le probabili definitive:
+I dati della giornata (fantavoto, voto, **T B F** con la percentuale dei
+ballottaggi) li prepara il Mac e arrivano **da soli** col listone: apri l'app
+e compare *Dati della giornata N dal Mac: K giocatori aggiornati*. Se la
+giornata è nuova l'app passa al numero nuovo e azzera ufficiali e scelte a
+mano. Niente più testo da incollare.
 
-1. **Leggi le probabili formazioni**: copia tutto il testo della pagina delle
-   probabili e incollalo, poi *Leggi e aggiorna gli stati*. L'app riconosce i
-   tuoi: titolari, ballottaggi con la percentuale, fuori. Chi non trova lo
-   dice, e lo sistemi con i bottoni **T B F** (secondo tocco su B: la
-   percentuale).
-2. **Formazioni ufficiali già uscite**: tocca le squadre che hanno già dato
-   la formazione. Sui loro giocatori compare la spunta verde: certi.
-3. **I dubbi di questa giornata**: per ogni titolare in ballottaggio, quanto
+1. **I dubbi di questa giornata**: per ogni titolare in ballottaggio, quanto
    ti costa se non gioca e chi entrerebbe. Verde sotto 0,6, oro fino a 1,5,
    rosso sopra. Il rosso è la scelta della giornata: aspetta le ufficiali.
-4. **Copia la formazione** e schierala a mano sulla piattaforma, entro 15
-   minuti dalla prima partita.
+2. **Scegli il modulo**, se vuoi: tocca una riga e l'app ti prepara il meglio
+   con quel modulo. La riga evidenziata è quella che stai guardando, la barra
+   oro il totale più alto.
+3. **Cambia un giocatore**, se vuoi: toccalo sul campetto e sale l'elenco di
+   chi può prendere il suo posto (stesso ruolo, non fuori, dal fantavoto più
+   alto). Un tocco e il totale si rifà con lo stesso conto del consiglio. Nel
+   verdetto c'è scritto **la tua scelta** al posto di **consiglio**, e nei
+   moduli la prima riga è la tua. **Torna al consiglio automatico**, sotto i
+   moduli, rimette tutto com'era. Se un giocatore della tua scelta finisce F,
+   l'app torna da sola al consiglio e te lo dice.
+4. **Copia la formazione** e schierala a mano sulla piattaforma: chiude 15
+   minuti **prima** del fischio della prima partita.
+5. **Conferma: questa l'ho mandata**: la salva nello storico (Stagione → Le
+   formazioni mandate). Nel verdetto compare *mandata il … alle …*; se poi
+   cambi qualcosa o arrivano dati nuovi, accanto c'è *diversa da quella
+   mandata* (o *panchina diversa*): sulla piattaforma c'è ancora la vecchia.
 
 In cima: il **verdetto** (modulo, punti attesi, gol, quanti confermati), il
 **misuratore del modificatore** (sei tacche, cursore sulla media difesa,
 quanto manca alla fascia sopra e quanto margine sotto), il **campetto**
 (cerchietto oro con il numero = ballottaggio con percentuale, spunta verde =
-confermato). Sotto: undici, panchina in ordine, **Gli altri moduli** con la
-distanza. Se il margine è sotto mezzo punto, decidi tu.
+confermato). Sotto: undici, panchina in ordine (su iPad e Mac tutte e due su
+due colonne), **Scegli il modulo** con la distanza. Se il margine è sotto
+mezzo punto, decidi tu.
+
+**Regola a mano chi gioca**, in fondo, è chiuso: di solito non serve. Aprilo
+se esce una notizia all'ultimo: i bottoni **T B F** per ogni giocatore
+(secondo tocco su B: la percentuale), il numero della giornata, **Tutti
+titolari**, e le **Formazioni ufficiali già uscite**: tocca le squadre che
+hanno già dato la formazione e sui loro giocatori compare la spunta verde.
+I vecchi riquadri per incollare probabili e dati della settimana sono
+nascosti, non cancellati: se un giorno il Mac non può mandare il listone, si
+riaccendono.
 
 ## 7. La stagione
 
@@ -136,6 +161,11 @@ prima, con nome della squadra, chi la allena, crediti rimasti e spesi. Tocchi
 una riga e si apre la rosa, reparto per reparto, con quanto e' stato pagato
 ogni giocatore. Nomi e squadre arrivano col listone privato, non stanno nel
 codice. Poi due calcolatori: modificatore da quattro voti, gol da un punteggio.
+
+**Le formazioni mandate**, sotto il campionato: una riga per ogni giornata
+confermata, dalla più recente, con modulo, punti attesi, quando l'hai mandata
+e, se hai registrato la giornata, i punti tuoi e dell'avversario. Toccala e
+vedi l'undici reparto per reparto e la panchina in ordine.
 
 ## 7b. Analisi: cosa dicono i giornali
 
@@ -182,8 +212,10 @@ termometro della forma, non la classifica.
 
 ## 8. Impostazioni
 
-Dalla pillola: stato della sincronizzazione, *Sincronizza adesso*, tema
-chiaro/scuro/come il telefono, *Controlla aggiornamenti*. **Esci** chiede la
+Dalla pillola (su iPad e Mac anche da **Impostazioni** in fondo alla barra):
+stato della sincronizzazione, *Sincronizza adesso*, in **Aspetto** il tema
+chiaro/scuro/come il telefono e **Tieni lo schermo acceso**, *Controlla
+aggiornamenti*. **Esci** chiede la
 password alla prossima apertura. **Scollega** toglie token e password dal
 dispositivo. Token nuovo: incollalo e *Salva e sincronizza*, la password resta.
 
@@ -209,9 +241,10 @@ dispositivo. Token nuovo: incollalo e *Salva e sincronizza*, la password resta.
   dispositivo; altrimenti *Password dimenticata*.
 - **Token non valido**: spazi prima o dopo; se non basta, rigenera.
 - **Listone non valido**: negli appunti c'era altro, rimettilo e incolla.
-- **Giocatore non riconosciuto**: soprannome o cognome doppio; T B F a mano.
+- **Giocatore non riconosciuto**: soprannome o cognome doppio; T B F a mano,
+  in *Regola a mano chi gioca*.
 - **"Via" per sbaglio**: annulla in Ultimi movimenti.
-- **Modulo che non convince**: guarda Gli altri moduli; sotto mezzo punto fai
-  di testa tua.
+- **Modulo che non convince**: guarda Scegli il modulo; sotto mezzo punto fai
+  di testa tua, toccando la riga.
 - **Versione vecchia**: Impostazioni → Controlla aggiornamenti, o chiudi e
   riapri l'app dal multitasking.

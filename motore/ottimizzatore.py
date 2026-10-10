@@ -221,14 +221,52 @@ def costo_errore(val, ruolo, indice):
     return con_lui - senza, sostituto
 
 
-def consiglia(rosa):
+def consiglia(rosa, modulo=None):
+    """La formazione migliore; con `modulo` la migliore in quel modulo
+    (e' quello che fa l'app quando Marco tocca un modulo)."""
     disponibili = [g for g in rosa if g.p > 0]
     valutazioni = [v for v in (valuta_modulo(disponibili, m) for m in MODULI) if v]
     if not valutazioni:
         raise ValueError("Rosa incompleta: non basta per nessun modulo.")
     valutazioni.sort(key=lambda v: -v["totale"])
     s = valutazioni[0]
+    if modulo:
+        trovati = [v for v in valutazioni if v["modulo"] == modulo]
+        if not trovati:
+            raise ValueError(f"Con questa rosa il {modulo} non si puo' schierare.")
+        s = trovati[0]
+    return completa(s, [v for v in valutazioni if v is not s], rosa)
 
+
+def valuta_scelta(rosa, modulo, nomi):
+    """Una formazione scelta a mano: gli undici per nome, nel modulo dato.
+    Stesso conto del consiglio (esiti dei dubbi, sostituzioni, modificatore
+    atteso), cosi' Marco vede quanto vale la sua idea accanto a quella del
+    motore. Torna None se gli undici non riempiono il modulo."""
+    disponibili = [g for g in rosa if g.p > 0]
+    nd, nc, na = MODULI[modulo]
+    nomi = set(nomi)
+    reparti = {}
+    for r, n in zip(RUOLI, (1, nd, nc, na)):
+        per_ruolo = ordina([g for g in disponibili if g.ruolo == r])
+        scelti = [g for g in per_ruolo if g.nome in nomi]
+        if len(scelti) != n:
+            return None
+        reparti[r] = valuta_reparto(per_ruolo, scelti)
+    mod_atteso = modificatore_atteso(reparti["P"]["esiti"], reparti["D"]["esiti"])
+    totale = reparti["P"]["somma"] + reparti["D"]["somma"] + reparti["C"]["somma"] + reparti["A"]["somma"] + mod_atteso
+    mod, media = modificatore_difesa(reparti["P"]["scelti"][0].voto, [g.voto for g in reparti["D"]["scelti"]])
+    s = {"modulo": modulo, "totale": totale, "modificatore": mod, "media_difesa": media,
+         "mod_atteso": mod_atteso, "reparti": reparti, "scelta": True}
+    # accanto alla scelta a mano restano, per confronto, i moduli in automatico
+    valutazioni = sorted([v for v in (valuta_modulo(disponibili, m) for m in MODULI) if v],
+                         key=lambda v: -v["totale"])
+    return completa(s, valutazioni, rosa)
+
+
+def completa(s, alternative, rosa):
+    """Dalla valutazione di un modulo alla risposta intera: undici con i
+    costi, panchina, altri moduli, gol, dubbi."""
     s["undici"] = []
     for r in RUOLI:
         for i, x in enumerate(s["reparti"][r]["attesi"]):
@@ -240,7 +278,7 @@ def consiglia(rosa):
     s["fuori"] = [g for g in rosa if g.p <= 0]
     s["alternative"] = [{"modulo": v["modulo"], "totale": v["totale"], "modificatore": v["modificatore"],
                          "media_difesa": v["media_difesa"], "mod_atteso": v["mod_atteso"]}
-                        for v in valutazioni[1:]]
+                        for v in alternative]
     s["gol"] = gol_da_punti(s["totale"])
     s["al_gol_dopo"] = punti_per_gol_successivo(s["totale"])
     s["dubbi"] = sorted([x for x in s["undici"] if x["p"] < 1], key=lambda x: -x["costo"])
@@ -251,7 +289,7 @@ def come_json(s):
     """La stessa forma che produce l'app, per confrontare le due implementazioni."""
     return {
         "modulo": s["modulo"], "totale": s["totale"], "mod": s["modificatore"], "media": s["media_difesa"],
-        "modAtteso": s["mod_atteso"],
+        "modAtteso": s["mod_atteso"], "scelta": bool(s.get("scelta")),
         "undici": [{"n": x["g"].nome, "r": x["ruolo"], "p": x["p"], "atteso": x["atteso"],
                     "votoAtteso": x["voto_atteso"], "costo": x["costo"], "sostituto": x["sostituto"]}
                    for x in s["undici"]],

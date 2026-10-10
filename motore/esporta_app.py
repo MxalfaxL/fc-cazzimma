@@ -12,6 +12,7 @@ Uso:
 
 import json
 import sys
+import time
 from pathlib import Path
 
 RADICE = Path(__file__).resolve().parent.parent
@@ -22,8 +23,8 @@ USCITA = RADICE / "report" / "settimana.json"
 def stato_da_probabilita(p):
     """L'app ragiona per stati, non per decimali: e' piu' veloce da correggere
     con un dito la sera prima della partita."""
-    if p >= 0.8:
-        return "T"      # titolare
+    if p >= 0.9:
+        return "T"      # titolare (sotto il 90% resta un dubbio, e l'app deve saperlo)
     if p > 0:
         return "B"      # ballottaggio
     return "F"          # fuori
@@ -39,17 +40,25 @@ def esporta(giornata):
     for v in voci:
         if str(v.get("nome", "")).startswith("Esempio"):
             continue
-        giocatori.append({
+        p = float(v.get("p", 1.0))
+        voce = {
             "nome": v["nome"],
             "fv": round(float(v.get("fv", 6.0)), 2),
             "voto": round(float(v.get("voto", 6.0)), 2),
-            "st": stato_da_probabilita(float(v.get("p", 1.0))),
-        })
+            "st": stato_da_probabilita(p),
+        }
+        if 0 < p < 1:
+            voce["pb"] = round(p, 2)     # la percentuale del ballottaggio, che l'app usa al posto del 50%
+        if v.get("nota"):
+            voce["nota"] = str(v["nota"])[:160]
+        giocatori.append(voce)
 
     if not giocatori:
         raise SystemExit("Nessun giocatore vero in rosa.json: ci sono solo le righe di esempio.")
 
-    return {"giornata": giornata, "giocatori": giocatori}
+    # il marcatore di tempo: l'app applica il blocco una volta sola, quando e'
+    # piu' recente dell'ultimo che ha applicato (viaggia dentro listone.json)
+    return {"giornata": giornata, "aggiornata": int(time.time() * 1000), "giocatori": giocatori}
 
 
 if __name__ == "__main__":

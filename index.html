@@ -129,6 +129,11 @@ body.bloccata > .stemma-def{display:block!important}
 
 /* ---------------------------------------------------------------- blocchi */
 .blocco{background:var(--carta);border:1px solid var(--linea);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--ombra)}
+/* un blocco che si apre toccando il titolo: niente triangolo, e il margine
+   sotto il titolo solo da aperto, altrimenti da chiuso resta un buco */
+details.blocco>summary{list-style:none;cursor:pointer;margin-bottom:0}
+details.blocco>summary::-webkit-details-marker{display:none}
+details.blocco[open]>summary{margin-bottom:10px}
 .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--grigio);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .eyebrow small{letter-spacing:.06em;text-transform:none;font-size:10.5px}
 .nota{font-size:12.5px;color:var(--grigio);margin-top:10px;line-height:1.5}
@@ -155,6 +160,9 @@ input::placeholder,textarea::placeholder{color:var(--grigio);opacity:.8}
 .azione.secondaria{background:transparent;color:var(--testo);border:1px solid var(--linea);font-weight:600;padding:11px}
 .azione.chiave{background:var(--azzurro);color:#fff}
 .azione+.azione{margin-top:10px}
+/* due bottoni affiancati quando c'è posto, uno sotto l'altro sul telefono */
+.bottoni-form{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.bottoni-form .azione{flex:1 1 200px;margin:0}
 
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{border:1px solid var(--linea);background:var(--carta-2);color:var(--testo-2);border-radius:999px;padding:7px 12px;
@@ -385,6 +393,21 @@ input.mini{width:64px;flex:0 0 64px;padding:8px 6px;text-align:center;font-famil
 .confronto .riga span:last-child{color:var(--grigio);white-space:nowrap}
 .confronto .riga span:last-child b{color:var(--testo);font-weight:600}
 .confronto .riga .m{font-weight:600}
+/* si sceglie il modulo toccando la riga; quella mostrata è evidenziata */
+.confronto .riga[data-modulo]{cursor:pointer}
+.confronto .riga.attuale{background:var(--azzurro-tinta);border-radius:8px;margin-inline:-8px;padding-inline:8px;border-bottom-color:transparent}
+.confronto .riga.attuale .m{color:var(--azzurro-cupo)}
+.verdetto .mandata{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--scuro-muto);margin-top:6px;line-height:1.5}
+.tessera[data-id]{cursor:pointer}
+/* il cambio dal campetto: chi può entrare al posto di un titolare */
+.cambi{margin:0;padding:0;list-style:none}
+.cambi li{border-top:1px solid var(--linea-2)}
+.cambi li:first-child{border-top:0}
+.cambi button.n{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:10px 0;color:inherit;font-family:inherit}
+.cambi .chi{min-width:0;font-weight:600;font-size:14.5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cambi .chi small{display:block;font-weight:400;font-size:11px;color:var(--grigio);font-family:"IBM Plex Mono",monospace;overflow:hidden;text-overflow:ellipsis}
+.cambi .fv{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--grigio);text-align:right;white-space:nowrap}
+.cambi .fv b{display:block;color:var(--testo);font-size:14px}
 
 table.dati{width:100%;border-collapse:collapse;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
 table.dati th{text-align:left;font-weight:600;color:var(--grigio);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-bottom:6px}
@@ -414,6 +437,14 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 .lega .reparto div{display:flex;justify-content:space-between;gap:8px;padding:2px 0;color:var(--testo-2);border-bottom:1px solid var(--linea)}
 .lega .reparto div:last-child{border-bottom:0}
 .lega .reparto div span:last-child{font-family:"IBM Plex Mono",monospace;color:var(--testo)}
+.lega .reparto div span.muto{color:var(--grigio);font-size:11px}
+/* gli avversari nella scheda Asta: la riga della lega, in sola lettura */
+.avv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:10px 12px;margin-bottom:8px;background:var(--carta-2);border:1px solid var(--linea-2);border-radius:var(--r2)}
+.avv b{font-size:14px;overflow-wrap:anywhere}
+.avv>small{grid-column:1;color:var(--grigio);font-size:12px}
+.avv>small.slot{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.02em}
+.avv .cr{grid-column:2;grid-row:1 / span 3;align-self:center;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:700;line-height:1.1}
+.avv .cr small{display:block;font-size:10px;font-weight:400;color:var(--grigio)}
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:var(--azione);color:var(--azione-testo);
   padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
@@ -460,6 +491,23 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   .pannello.largo>.col-sx,.pannello.largo>.col-dx{display:block;min-width:0}
   #p-formazione{grid-template-columns:minmax(340px,460px) minmax(0,1fr)}
   #p-rosa{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+  /* la colonna destra della Formazione era un lenzuolo: undici e panchina su
+     due colonne, righe più basse. I nomi lunghi si troncano, non sfondano. */
+  #p-formazione .undici,#p-formazione #panchina{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px}
+  #p-formazione .undici>.eyebrow,#p-formazione #panchina>:not(.giocatore){grid-column:1 / -1}
+  #p-formazione .undici .giocatore,#p-formazione #panchina .giocatore{padding:6px 0;font-size:13.5px;min-width:0;gap:8px}
+  #p-formazione .undici .giocatore:last-child,#p-formazione #panchina .giocatore:last-of-type{border-bottom:1px solid var(--linea-2)}
+  #p-formazione .undici .nome,#p-formazione #panchina .nome{font-size:13.5px;white-space:nowrap;text-overflow:ellipsis}
+  #p-formazione .undici .val,#p-formazione #panchina .val{min-width:0;font-size:10.5px}
+  #p-formazione .undici .val b,#p-formazione #panchina .val b{font-size:13px}
+  /* "probabile" lo dice già il verdetto (N/11 ufficiali): nelle colonne strette
+     lascia il posto alla percentuale del ballottaggio, che invece conta */
+  #p-formazione .undici .probabile-tag{display:none}
+}
+/* sugli schermi da 1000 a 1100 (iPad vecchi di traverso, 1024) il campetto
+   cede un po' di posto: con 460px le liste su due colonne avrebbero nomi da 70px */
+@media (min-width:1000px) and (max-width:1099px){
+  #p-formazione{grid-template-columns:minmax(320px,380px) minmax(0,1fr)}
 }
 /* col mouse (Mac): un segno al passaggio, che sul touch non serve */
 @media (hover:hover){
@@ -469,8 +517,11 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   .chips button:hover:not([aria-pressed="true"]),.riga-filtro button:hover:not([aria-pressed="true"]),.stato button:hover:not([aria-pressed="true"]),.assegna button:hover:not([aria-pressed="true"]){border-color:var(--azzurro);color:var(--azzurro)}
   .esito-l button.prendi:hover{background:var(--azzurro)}
   .esito-l button.via:hover,.elimina:hover,.movimento .annulla:hover,.foglio .chiudi:hover{background:var(--linea-2);color:var(--testo)}
-  .esito-l .nome:hover,.an-riga .nome:hover{color:var(--azzurro)}
+  .esito-l .nome:hover,.an-riga .nome:hover,.cambi button.n:hover .chi{color:var(--azzurro)}
   .lega summary:hover{background:var(--carta)}
+  .confronto .riga[data-modulo]:not(.attuale):hover{background:var(--carta-2);border-radius:8px;margin-inline:-8px;padding-inline:8px}
+  details.blocco>summary:hover{color:var(--testo-2)}
+  .tessera[data-id]:hover .maglia{transform:scale(1.08)}
   .pilla:hover{border-color:var(--testo-2);color:var(--testo-2)}
 }
 
@@ -580,7 +631,10 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <div class="blocco">
     <div class="eyebrow">L'undici</div>
     <div class="undici" id="undici"></div>
-    <button class="azione chiave" id="btnCopiaForm" style="margin-top:12px">Copia la formazione</button>
+    <div class="bottoni-form">
+      <button class="azione chiave" id="btnCopiaForm">Copia la formazione</button>
+      <button class="azione chiave" id="btnConfermaForm">Conferma: questa l'ho mandata</button>
+    </div>
   </div>
 
   <div class="blocco">
@@ -590,12 +644,15 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   </div>
 
   <div class="blocco">
-    <div class="eyebrow">Gli altri moduli</div>
+    <div class="eyebrow">Scegli il modulo</div>
     <div class="confronto" id="confronto"></div>
+    <p class="nota">Tocca un modulo: ti preparo il meglio con quel modulo. Tocca un giocatore sul campetto per cambiarlo con uno della panchina.</p>
+    <button class="azione secondaria" id="btnConsiglioAuto" hidden style="margin-top:10px">Torna al consiglio automatico</button>
   </div>
 
-  <div class="blocco">
-    <div class="eyebrow"><span>Chi gioca questa giornata</span></div>
+  <details class="blocco ripiegato">
+    <summary class="eyebrow"><span>Regola a mano chi gioca</span><small>di solito non serve</small></summary>
+    <p class="nota" style="margin:0 0 12px">Gli stati arrivano dal Mac con i dati della settimana: <b>T</b> titolare, <b>B</b> ballottaggio (con la percentuale delle probabili, secondo tocco su B per cambiarla), <b>F</b> fuori. Qui li correggi solo se esce una notizia all'ultimo. Le squadre segnate come ufficiali mettono la spunta verde a chi non può più tradirti.</p>
     <div class="duecol" style="margin-bottom:12px">
       <button class="azione secondaria" id="btnTuttiT">Tutti titolari</button>
       <label class="campo" style="margin:0"><span>Giornata</span>
@@ -603,18 +660,18 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     </div>
     <div class="eyebrow" style="margin-bottom:6px"><span>Formazioni ufficiali già uscite</span></div>
     <div class="chips" id="ufficiali"></div>
-    <p class="nota" style="margin-top:8px;margin-bottom:4px">Alla deadline sono certe solo le squadre che hanno già dato la formazione. Segna quelle e vedrai la spunta verde su chi non ti può più tradire.</p>
     <div id="disponibilita"></div>
-  </div>
+  </details>
 
-  <div class="blocco">
+  <!-- nascosti il 10/10/2026: i dati della settimana arrivano col listone (applicaSettimana); da qui si incolla solo in emergenza -->
+  <div class="blocco" hidden>
     <div class="eyebrow">Leggi le probabili formazioni</div>
     <textarea id="inProbabili" placeholder="Copia il testo della pagina delle probabili formazioni e incollalo qui. Riconosco i tuoi giocatori fra titolari, ballottaggi con percentuale, indisponibili e squalificati."></textarea>
     <button class="azione secondaria" id="btnLeggiProbabili" style="margin-top:10px">Leggi e aggiorna gli stati</button>
     <div id="esitoProbabili" class="nota"></div>
   </div>
 
-  <div class="blocco">
+  <div class="blocco" hidden>
     <div class="eyebrow">Dati della settimana dal Mac</div>
     <textarea id="inIncolla" placeholder='Incolla qui il blocco prodotto da esporta_app.py'></textarea>
     <button class="azione secondaria" id="btnImporta" style="margin-top:10px">Aggiorna i valori attesi</button>
@@ -641,10 +698,6 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       </div>
     </div>
     <div class="avviso ok" id="avviso">Rosa vuota. Si parte dai portieri.</div>
-    <div class="interruttore" style="margin-top:6px;padding-bottom:0">
-      <span>Tieni lo schermo acceso<small>Per la sera dell'asta. Si spegne da solo quando chiudi l'app.</small></span>
-      <button class="levetta" id="levettaSchermo" role="switch" aria-checked="false" aria-label="Tieni lo schermo acceso"></button>
-    </div>
   </div>
 
   <div class="blocco" id="bloccoMiaSquadra">
@@ -683,11 +736,6 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     </div>
   </div>
 
-  <div class="blocco" id="bloccoMovimenti" hidden>
-    <div class="eyebrow"><span>Ultimi movimenti</span></div>
-    <div id="movimenti"></div>
-  </div>
-
   <div class="blocco">
     <div class="eyebrow"><span>Aggiudicato</span><small id="aChiRiassunto"></small></div>
     <label class="campo"><span>Giocatore</span>
@@ -704,12 +752,18 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <p class="nota">Di solito lasci <b>FC Cazzimma</b>. Se vuoi tenere il conto anche degli altri, scegli chi ha comprato: i nomi sono quelli del riquadro <b>Gli avversari</b> qui sotto. Da <b>via</b> nel listone il nome arriva già compilato.</p>
   </div>
 
+  <div class="blocco" id="bloccoMovimenti" hidden>
+    <div class="eyebrow"><span>Ultimi movimenti</span></div>
+    <div id="movimenti"></div>
+  </div>
 
   <div class="blocco">
     <div class="eyebrow"><span>Gli avversari</span><small>crediti e slot</small></div>
     <div id="avversari"></div>
+    <!-- tolto il 10/10/2026, serviva solo in asta: da rimettere l'anno prossimo
     <button class="azione secondaria" id="btnResetAvv">Riporta tutti a 500</button>
-    <p class="nota">I crediti scendono da soli quando segni un acquisto con <b>via</b>. Dopo la fase centrocampisti il conteggio diventa pubblico: se qualcosa non torna, correggi qui.</p>
+    -->
+    <p class="nota">Nomi e squadre arrivano col listone privato; i crediti rimasti sono quelli letti sulla piattaforma dopo l'asta. Per cambiarli si passa dal Mac.</p>
   </div>
 </section>
 
@@ -758,6 +812,11 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     </div>
     <button class="azione secondaria" id="btnGiornata">Registra la giornata</button>
     <div id="storico" style="margin-top:12px"></div>
+  </div>
+
+  <div class="blocco">
+    <div class="eyebrow"><span>Le formazioni mandate</span><small id="formazioniConta"></small></div>
+    <div id="formazioniStorico"></div>
   </div>
 
   <div class="blocco">
@@ -844,6 +903,10 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <button data-tema="scuro">scuro</button>
     </div>
     <p class="nota">Lo scuro è pensato per la sera dell'asta: meno luce in faccia, numeri più leggibili.</p>
+    <div class="interruttore" style="margin-top:12px;padding-bottom:0;border-top:1px solid var(--linea-2)">
+      <span>Tieni lo schermo acceso<small>Per la sera dell'asta. Si spegne da solo quando chiudi l'app.</small></span>
+      <button class="levetta" id="levettaSchermo" role="switch" aria-checked="false" aria-label="Tieni lo schermo acceso"></button>
+    </div>
   </div>
 
   <div class="blocco">
@@ -1058,13 +1121,50 @@ function costoErrore(val, ruolo, indice){
   return {costo: conLui - senza, sostituto: rep.panca[0] ? rep.panca[0].n : null};
 }
 
-function consiglia(rosa){
+/* La formazione migliore; con `modulo` la migliore in quel modulo (è quello
+   che succede quando si tocca un modulo nell'elenco). */
+function consiglia(rosa, modulo){
   const disponibili = rosa.filter(g=>g.st !== 'F');
   const valutazioni = Object.keys(MODULI).map(m=>valutaModulo(disponibili, m)).filter(Boolean);
   if(!valutazioni.length) return null;
   valutazioni.sort((a,b)=>b.totale - a.totale);
-  const s = valutazioni[0];
+  let s = valutazioni[0];
+  if(modulo){
+    s = valutazioni.find(v=>v.modulo === modulo);
+    if(!s) return null;
+  }
+  return completa(s, valutazioni.filter(v=>v !== s), rosa);
+}
 
+/* Una formazione scelta a mano: gli undici per id, nel modulo dato. Stesso
+   conto del consiglio (esiti dei dubbi, sostituzioni, modificatore atteso),
+   così si vede quanto vale la propria idea accanto a quella del motore.
+   Torna null se gli undici non riempiono il modulo. */
+function valutaScelta(rosa, modulo, ids){
+  if(!MODULI[modulo]) return null;
+  const disponibili = rosa.filter(g=>g.st !== 'F');
+  const [nd, nc, na] = MODULI[modulo];
+  const quanti = {P:1, D:nd, C:nc, A:na};
+  const dentro = new Set(ids);
+  const reparti = {};
+  for(const r of ORDINE){
+    const perRuolo = ordina(disponibili.filter(g=>g.r===r));
+    const scelti = perRuolo.filter(g=>dentro.has(g.id));
+    if(scelti.length !== quanti[r]) return null;
+    reparti[r] = valutaReparto(perRuolo, scelti);
+  }
+  const modAtteso = modificatoreAtteso(reparti.P.esiti, reparti.D.esiti);
+  const totale = reparti.P.somma + reparti.D.somma + reparti.C.somma + reparti.A.somma + modAtteso;
+  const m = modificatore(reparti.P.scelti[0].voto, reparti.D.scelti.map(g=>g.voto));
+  const s = {modulo, totale, mod:m.punti, media:m.media, modAtteso, reparti, scelta:true};
+  // accanto alla scelta a mano restano, per confronto, i moduli in automatico
+  const valutazioni = Object.keys(MODULI).map(mo=>valutaModulo(disponibili, mo)).filter(Boolean).sort((a,b)=>b.totale - a.totale);
+  return completa(s, valutazioni, rosa);
+}
+
+/* Dalla valutazione di un modulo alla risposta intera: undici con i costi,
+   panchina, altri moduli, gol, dubbi. */
+function completa(s, alternative, rosa){
   s.undici = ORDINE.flatMap(r => s.reparti[r].attesi.map((x,i)=>{
     const c = costoErrore(s, r, i);
     return {g:x.g, r, p:x.p, atteso:x.atteso, votoAtteso:x.votoAtteso, costo:c.costo, sostituto:c.sostituto};
@@ -1072,7 +1172,7 @@ function consiglia(rosa){
   s.panchina = ORDINE.flatMap(r => s.reparti[r].panca);
   s.ricambi = Object.fromEntries(ORDINE.map(r=>[r, s.reparti[r].ricambio]));
   s.fuori = rosa.filter(g=>g.st === 'F');
-  s.alternative = valutazioni.slice(1).map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media, modAtteso:v.modAtteso}));
+  s.alternative = alternative.map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media, modAtteso:v.modAtteso}));
   s.gol = golDaPunti(s.totale);
   s.alGolDopo = alGolDopo(s.totale);
   s.dubbi = s.undici.filter(x=>x.p < 1).sort((a,b)=>b.costo - a.costo);
@@ -1085,13 +1185,15 @@ const NOME = {P:'Portieri', D:'Difensori', C:'Centrocampisti', A:'Attaccanti'};
 const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
-const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema', CHIAVE_SCHEDA = 'fccazzimma:scheda';
-const VERSIONE_APP = '2026.10.10c';
+const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
+const VERSIONE_APP = '2026.10.10d';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
   avversari: Array.from({length:9},(_,i)=>({n:'Avversario '+(i+1), c:BUDGET})),
-  giornate: [], giornata: 1, venduti: [], ufficiali: [], v: 1
+  giornate: [], giornata: 1, venduti: [], ufficiali: [], v: 1,
+  // la formazione scelta a mano (null = il consiglio) e quelle mandate, per giornata
+  scelta: null, formazioni: {}
 });
 let stato = statoIniziale();
 let cfg = {utente:'', repo:'fc-cazzimma-dati', percorso:'stato.json', token:''};
@@ -1140,6 +1242,11 @@ function normalizza(){
   if(!stato.piano) stato.piano = 'equilibrio';
   if(typeof stato.v !== 'number') stato.v = 1;
   if(typeof stato.giornata !== 'number') stato.giornata = 1;
+  // scelta a mano: {giornata, modulo, undici: null | [11 id]}; tutto il resto vale "consiglio"
+  const sc = stato.scelta;
+  if(!sc || typeof sc !== 'object' || !MODULI[sc.modulo]) stato.scelta = null;
+  else if(sc.undici !== null && !Array.isArray(sc.undici)) sc.undici = null;
+  if(!stato.formazioni || typeof stato.formazioni !== 'object' || Array.isArray(stato.formazioni)) stato.formazioni = {};
 }
 const nuovoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
@@ -1195,6 +1302,9 @@ async function sincronizza(modo){
       locale.scrivi(CHIAVE, JSON.stringify(stato));
       aggiornaCampi(); disegnaTutto();
       await sincronizzaListone();
+      // la copia del cloud puo' essere di un dispositivo che non aveva ancora
+      // applicato i dati della settimana: si applicano qui, una volta sola
+      if(applicaSettimana()){ salva(); disegnaTutto(); }
       return esitoSync('presa la versione più recente dal cloud');
     }
     if(vl > vr){
@@ -1285,7 +1395,9 @@ async function sincronizzaListone(){
     if(remMs > locMs){
       listone = normalizzaListone(dati);
       locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
-      if(applicaLega()){ salva(); }
+      // tutte e due, sempre: con || la seconda salterebbe quando la prima cambia qualcosa
+      const a = applicaLega(), b = applicaSettimana();
+      if(a || b) salva();
       disegnaTutto();
     } else if(locMs > remMs){
       await inviaListone(shaListone);
@@ -1353,9 +1465,47 @@ function animaNumero(el, valore){
 const classeCosto = c => c < 0.6 ? 'basso' : c < 1.5 ? 'medio' : 'alto';
 const percento = p => Math.round(p*100) + '%';
 
+/* La formazione mostrata: quella scelta a mano per questa giornata (solo il
+   modulo, o anche gli undici), altrimenti il consiglio. Se la scelta non sta
+   più in piedi (un giocatore messo F, la rosa cambiata) si torna al consiglio
+   da soli e lo si dice: meglio un consiglio giusto che una scelta rotta.
+   Una scelta di un'altra giornata non si cancella, si ignora: cambiando il
+   numero della giornata a mano e tornando indietro la si ritrova. */
+const sceltaAttiva = () => !!(stato.scelta && stato.scelta.giornata === stato.giornata && MODULI[stato.scelta.modulo]);
+function formazioneCorrente(){
+  if(sceltaAttiva()){
+    const sc = stato.scelta;
+    const s = Array.isArray(sc.undici) && sc.undici.length
+      ? valutaScelta(stato.rosa, sc.modulo, sc.undici)
+      : consiglia(stato.rosa, sc.modulo);
+    if(s) return s;
+    stato.scelta = null;
+    salva();
+    toast('La tua formazione non sta più in piedi: torno al consiglio');
+  }
+  return consiglia(stato.rosa);
+}
+
+// una differenza di punti con il segno; sotto il mezzo centesimo e' "pari", non "−0.00"
+const scartoTesto = d => Math.abs(d) < 0.005 ? 'pari' : (d > 0 ? '+' : '−') + f2(Math.abs(d));
+const dataOra = ms => { const d = new Date(ms);
+  return d.toLocaleDateString('it-IT', {weekday:'short', day:'numeric', month:'short'}) + ' alle ' + d.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'}); };
+
+/* La formazione di adesso contro quella confermata per la giornata: se nel
+   frattempo sono cambiati i dati o la scelta, Marco deve saperlo prima
+   della scadenza, perché sulla piattaforma c'è ancora quella vecchia. */
+function differenzaMandata(s, f){
+  const ora = s.undici.map(x=>x.g.n).sort().join('|'), prima = (f.undici || []).map(x=>x.n).sort().join('|');
+  if(s.modulo !== f.modulo || ora !== prima) return 'diversa da quella mandata';
+  if(s.panchina.map(g=>g.n).join('|') !== (f.panchina || []).map(g=>g.n).join('|')) return 'panchina diversa da quella mandata';
+  return '';
+}
+
 function disegnaFormazione(){
-  const s = consiglia(stato.rosa);
+  const s = formazioneCorrente();
+  const aMano = sceltaAttiva();
   const vd = $('verdetto'), prato = $('prato');
+  $('btnConsiglioAuto').hidden = !aMano;
 
   if(!s){
     vd.className = 'blocco';
@@ -1369,23 +1519,35 @@ function disegnaFormazione(){
     return;
   }
 
-  const secondo = s.alternative[0];
-  const margine = secondo ? (s.totale - secondo.totale) : 0;
+  // le alternative sono in ordine di totale: la prima è il consiglio, o il
+  // secondo modulo se quello mostrato è già il consiglio
+  const primo = s.alternative[0];
+  let paragone = '';
+  if(primo){
+    const margine = s.totale - primo.totale;
+    if(margine > -0.005) paragone = s.scelta
+      ? `vale quanto il consiglio (<b>${primo.modulo}</b>)`
+      : `davanti al <b>${primo.modulo}</b> di ${f2(Math.max(0, margine))}${margine < 0.5 ? ' · margine sottile, decidi tu' : ''}`;
+    else paragone = `il consiglio è il <b>${primo.modulo}</b>: ${f2(-margine)} punti in più`;
+  }
   const certi = s.undici.filter(x=>ufficiale(x.g)).length;
   const nd = MODULI[s.modulo][0];
+  const mandata = stato.formazioni[stato.giornata];
+  const diversa = mandata ? differenzaMandata(s, mandata) : '';
 
   vd.className = 'verdetto';
   vd.innerHTML = `
-    <div class="eyebrow"><span>Giornata ${stato.giornata} · schiera</span><span title="giocatori confermati dalle formazioni ufficiali">${certi}/11 ufficiali</span></div>
+    <div class="eyebrow"><span>Giornata ${stato.giornata} · ${aMano ? 'la tua scelta' : 'consiglio'}</span><span title="giocatori confermati dalle formazioni ufficiali">${certi}/11 ufficiali</span></div>
     <div class="riga-top">
       <div class="modulo">${s.modulo}</div>
       <div class="punti"><b>${f2(s.totale)}</b>punti attesi<br><b><em>${s.gol}</em></b>gol</div>
     </div>
     ${disegnaMetro(s, nd)}
     <div class="sotto">
-      ${secondo ? `davanti al <b>${secondo.modulo}</b> di ${f2(margine)}${margine < 0.5 ? ' · margine sottile, decidi tu' : ''}<br>` : ''}
+      ${paragone ? paragone + '<br>' : ''}
       al gol successivo mancano <b>${s.alGolDopo}</b> punti
-    </div>`;
+    </div>
+    ${mandata ? `<div class="mandata">mandata il ${esc(dataOra(mandata.quando))} · ${esc(mandata.modulo)}${diversa ? ` · <b>${diversa}</b>` : ''}</div>` : ''}`;
 
   prato.innerHTML = disegnaPrato(s);
 
@@ -1423,13 +1585,22 @@ function disegnaFormazione(){
       + (s.fuori.length ? `<p class="nota">Fuori questa giornata: ${s.fuori.map(g=>esc(g.n) + (squadraDi(g) ? ` (${esc(squadraDi(g))})` : '')).join(', ')}.</p>` : '')
     : '<div class="vuoto">Nessuno in panchina.</div>';
 
-  const peggio = Math.max(0.01, ...s.alternative.map(a=>s.totale - a.totale));
-  $('confronto').innerHTML = [`<div class="riga"><span class="m">${s.modulo}</span><div class="b"><i class="top" style="width:100%"></i></div><span><b>${f2(s.totale)}</b>${s.mod ? ' · mod +'+s.mod : ''}</span></div>`]
-    .concat(s.alternative.map(a=>{
-      const d = s.totale - a.totale;
-      return `<div class="riga"><span class="m">${a.modulo}</span><div class="b"><i style="width:${Math.max(4, 100 - d/peggio*100)}%"></i></div>
-        <span><b>${f2(a.totale)}</b> (−${f2(d)})${a.mod ? ' · mod +'+a.mod : ''}</span></div>`;
-    })).join('');
+  /* Scegli il modulo: in cima quello mostrato, poi tutti gli altri in
+     automatico. Con una formazione fatta a mano la prima riga è "la tua
+     scelta" e sotto ci sono tutti e sette i moduli, il suo compreso: toccarlo
+     riparte dal meglio in quel modulo. La barra oro è il totale più alto. */
+  const voce = (a, attuale, etichetta) => ({modulo:a.modulo, totale:a.totale, mod:a.mod, attuale, etichetta, tocca: !s.scelta || !attuale});
+  const righe = [voce(s, true, s.scelta ? 'la tua scelta' : '')].concat(s.alternative.map(a=>voce(a, false, '')));
+  const alto = Math.max(...righe.map(r=>r.totale)), basso = Math.min(...righe.map(r=>r.totale));
+  const ampiezza = Math.max(0.01, alto - basso);
+  $('confronto').innerHTML = righe.map(r=>{
+    const d = r.totale - s.totale;
+    const scarto = r.attuale ? '' : ` (${scartoTesto(d)})`;
+    const larghezza = Math.max(4, 100 - (alto - r.totale)/ampiezza*100);
+    const tocca = r.tocca ? ` data-modulo="${r.modulo}" role="button" tabindex="0" aria-label="Schiera il ${r.modulo}"` : '';
+    return `<div class="riga${r.attuale ? ' attuale' : ''}"${tocca}${r.attuale ? ' aria-current="true"' : ''}><span class="m">${r.modulo}</span><div class="b"><i class="${r.totale > alto - 0.005 ? 'top' : ''}" style="width:${larghezza}%"></i></div>
+      <span><b>${f2(r.totale)}</b>${scarto}${r.etichetta ? ' · ' + r.etichetta : ''}${r.mod ? ' · mod +'+r.mod : ''}</span></div>`;
+  }).join('');
 
   disegnaDisponibilita();
 }
@@ -1460,14 +1631,14 @@ function disegnaPrato(s){
   const fila = r => `<div class="fila">${s.undici.filter(x=>x.r===r).map(x=>{
     const g = x.g, dubbio = x.p < 1;
     const sq = squadraDi(g);
-    return `<div class="tessera ${r} ${dubbio ? 'dubbio' : ''}" title="${esc(g.n)}${sq ? ' · ' + esc(sq) : ''} · fv ${f2(g.fv)} · voto ${f2(g.voto)}">
+    return `<div class="tessera ${r} ${dubbio ? 'dubbio' : ''}" data-id="${esc(g.id)}" role="button" tabindex="0" aria-label="Cambia ${esc(g.n)}" title="${esc(g.n)}${sq ? ' · ' + esc(sq) : ''} · fv ${f2(g.fv)} · voto ${f2(g.voto)} · tocca per cambiarlo">
       <div class="maglia">${r}${dubbio ? `<span class="marca">${Math.round(x.p*100)}</span>` : ''}${ufficiale(g) ? '<span class="ok">✓</span>' : ''}</div>
       <div class="tnome">${esc(g.n)}</div>
       ${sq ? `<div class="tsq">${esc(sq)}</div>` : ''}
       <div class="tval">${f2(g.fv)}</div>
     </div>`;
   }).join('')}</div>`;
-  return `<div class="prato" role="img" aria-label="Schieramento ${s.modulo}">
+  return `<div class="prato" role="group" aria-label="Schieramento ${s.modulo}: tocca un giocatore per cambiarlo">
     <svg class="linee" viewBox="0 0 300 390" preserveAspectRatio="none">
       <rect x="8" y="8" width="284" height="374" rx="2"/>
       <line x1="8" y1="195" x2="292" y2="195"/><circle cx="150" cy="195" r="34"/><circle cx="150" cy="195" r="1.5" fill="rgba(255,255,255,.6)"/>
@@ -1545,8 +1716,55 @@ $('inGiornata').addEventListener('input', e=>{
   disegnaFormazione(); salva();
 });
 
+/* Scegliere un modulo: il meglio in quel modulo. Se è proprio quello che
+   il motore consiglierebbe da solo, non è una scelta: si torna al consiglio,
+   così l'etichetta "la tua scelta" compare solo quando lo è davvero. */
+function scegliModulo(modulo){
+  const auto = consiglia(stato.rosa);
+  stato.scelta = (auto && auto.modulo === modulo) ? null : {giornata: stato.giornata, modulo, undici: null};
+  disegnaFormazione(); salva();
+}
+$('confronto').addEventListener('click', e=>{
+  const r = e.target.closest('.riga[data-modulo]'); if(r) scegliModulo(r.dataset.modulo);
+});
+$('confronto').addEventListener('keydown', e=>{
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const r = e.target.closest('.riga[data-modulo]'); if(!r) return;
+  e.preventDefault(); scegliModulo(r.dataset.modulo);
+});
+$('btnConsiglioAuto').addEventListener('click', ()=>{
+  stato.scelta = null;
+  disegnaFormazione(); salva();
+  toast('Torno al consiglio automatico');
+});
+$('prato').addEventListener('click', e=>{
+  const t = e.target.closest('.tessera[data-id]'); if(t) apriCambio(t.dataset.id);
+});
+$('prato').addEventListener('keydown', e=>{
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const t = e.target.closest('.tessera[data-id]'); if(!t) return;
+  e.preventDefault(); apriCambio(t.dataset.id);
+});
+
+/* Lo storico: la formazione che Marco ha davvero mandato sulla piattaforma,
+   una per giornata (confermare di nuovo la sovrascrive). È anche il modo per
+   accorgersi, nel verdetto, che quella mostrata nel frattempo è cambiata. */
+$('btnConfermaForm').addEventListener('click', ()=>{
+  const s = formazioneCorrente();
+  if(!s) return;
+  stato.formazioni[stato.giornata] = {
+    modulo: s.modulo, totale: Math.round(s.totale*100)/100, mod: s.mod,
+    undici: s.undici.map(x=>({n:x.g.n, r:x.r, sq: squadraDi(x.g) || ''})),
+    panchina: s.panchina.map(g=>({n:g.n, r:g.r})),
+    quando: Date.now()
+  };
+  salva();
+  toast(`Formazione della giornata ${stato.giornata} salvata`);
+  disegnaStagione(); disegnaFormazione();
+});
+
 $('btnCopiaForm').addEventListener('click', async ()=>{
-  const s = consiglia(stato.rosa);
+  const s = formazioneCorrente();
   if(!s) return;
   const testo = `FC CAZZIMMA — giornata ${stato.giornata}\n${s.modulo} · ${f2(s.totale)} punti attesi · ${s.gol} gol${s.mod ? ' · mod +'+s.mod : ''}\n\n`
     + s.undici.map(x=>`${x.r}  ${x.g.n}${x.p < 1 ? '  (?)' : ''}`).join('\n')
@@ -1662,6 +1880,51 @@ $('btnLeggiProbabili').addEventListener('click', ()=>{
 });
 
 /* ======================= importazione settimanale ======================= */
+/* I dati della settimana dal Mac (esporta_app.py): fantavoto, voto puro,
+   stato e percentuale del ballottaggio di ogni giocatore della rosa. Dal
+   10/10/2026 arrivano da soli dentro il listone (applicaSettimana); il
+   blocco incollato a mano resta per l'emergenza e passa di qui anche lui.
+   Accetta anche il formato vecchio, con la probabilità p al posto di st.
+   Una giornata nuova azzera ufficiali e scelta a mano: valgono per una sola. */
+function applicaBloccoSettimana(dati){
+  const voci = Array.isArray(dati) ? dati : ((dati && dati.giocatori) || []);
+  if(dati && dati.giornata && +dati.giornata !== stato.giornata){
+    stato.giornata = +dati.giornata; stato.ufficiali = []; stato.scelta = null;
+    $('inGiornata').value = stato.giornata;
+  }
+  let aggiornati = 0; const mancanti = [];
+  voci.forEach(v=>{
+    const nome = v.nome || v.n || '';
+    const g = stato.rosa.find(x=>normNome(x.n) === normNome(nome));
+    if(!g){ if(nome) mancanti.push(nome); return; }
+    if(v.fv !== undefined) g.fv = +v.fv;
+    if(v.voto !== undefined) g.voto = +v.voto;
+    if(v.sq || v.squadra) g.sq = v.sq || v.squadra;
+    if(v.st) g.st = v.st;
+    else if(v.p !== undefined) g.st = v.p >= 1 ? 'T' : (v.p > 0 ? 'B' : 'F');
+    // la percentuale vale solo dentro (0,1): fuori da li' e' un titolare o un fuori
+    const pb = v.pb !== undefined ? +v.pb : (v.p !== undefined ? +v.p : NaN);
+    if(pb > 0 && pb < 1) g.pb = pb; else delete g.pb;
+    aggiornati++;
+  });
+  return {aggiornati, mancanti};
+}
+
+/* Il blocco della settimana arrivato col listone si applica una volta sola:
+   quando e' piu' recente dell'ultimo applicato (stato.settimanaApplicata,
+   che viaggia con lo stato, cosi' gli altri dispositivi non lo rifanno sopra
+   le correzioni fatte a mano). Con la rosa vuota si aspetta. */
+function applicaSettimana(){
+  const w = listone.settimana;
+  if(!w || !Array.isArray(w.giocatori) || !stato.rosa.length) return false;
+  const marca = +w.aggiornata || 0;
+  if(!(marca > (stato.settimanaApplicata || 0))) return false;
+  const {aggiornati} = applicaBloccoSettimana(w);
+  stato.settimanaApplicata = marca;
+  toast(`Dati della giornata ${stato.giornata} dal Mac: ${aggiornati} giocatori aggiornati`);
+  return true;
+}
+
 $('btnImporta').addEventListener('click', ()=>{
   const out = $('esitoImport');
   const grezzo = $('inIncolla').value.trim();
@@ -1672,20 +1935,9 @@ $('btnImporta').addEventListener('click', ()=>{
 
   const voci = Array.isArray(dati) ? dati : (dati.giocatori || []);
   if(!voci.length){ out.textContent = 'Nel blocco non ci sono giocatori.'; return; }
-  if(dati.giornata){ stato.giornata = +dati.giornata; stato.ufficiali = []; $('inGiornata').value = stato.giornata; }
-
-  let aggiornati = 0; const mancanti = [];
-  voci.forEach(v=>{
-    const g = stato.rosa.find(x=>normNome(x.n) === normNome(v.nome || v.n || ''));
-    if(!g){ mancanti.push(v.nome || v.n); return; }
-    if(v.fv !== undefined) g.fv = +v.fv;
-    if(v.voto !== undefined) g.voto = +v.voto;
-    if(v.sq || v.squadra) g.sq = v.sq || v.squadra;
-    if(v.st) g.st = v.st;
-    else if(v.p !== undefined) g.st = v.p >= 1 ? 'T' : (v.p > 0 ? 'B' : 'F');
-    if(v.p !== undefined && v.p > 0 && v.p < 1) g.pb = +v.p; else if(v.pb !== undefined) g.pb = +v.pb;
-    aggiornati++;
-  });
+  const {aggiornati, mancanti} = applicaBloccoSettimana(dati);
+  // lo stesso blocco, se poi arriva anche col listone, non va riapplicato
+  if(+dati.aggiornata > (stato.settimanaApplicata || 0)) stato.settimanaApplicata = +dati.aggiornata;
 
   out.innerHTML = `Aggiornati ${aggiornati} giocatori.`
     + (mancanti.length ? ` Non trovati in rosa: ${mancanti.map(esc).join(', ')}.` : '');
@@ -1744,6 +1996,8 @@ function normalizzaListone(dati){
   const out = {piani:{}, voci:[], caricato: (dati && dati.caricato) || Date.now()};
   if(dati && dati.lega && typeof dati.lega === 'object') out.lega = dati.lega;
   if(dati && dati.dossier && dati.dossier.giocatori && typeof dati.dossier.giocatori === 'object') out.dossier = dati.dossier;
+  // i dati della giornata per la rosa (fv, voto, stato), dal Mac: li applica applicaSettimana
+  if(dati && dati.settimana && typeof dati.settimana === 'object' && Array.isArray(dati.settimana.giocatori)) out.settimana = dati.settimana;
   // le righe di strategia per reparto arrivano dal Mac, nel listone privato
   if(dati && dati.consigli && typeof dati.consigli === 'object'){
     out.consigli = {piano: String(dati.consigli.piano || '')};
@@ -2059,12 +2313,63 @@ $('risultatiAnalisi').addEventListener('click', e=>{ const b = e.target.closest(
 let notaAperta = null;
 function apriFoglio(k){
   const g = trovaVoce(k); if(!g) return;
-  apertoAnalisi = k; notaAperta = null;
+  apertoAnalisi = k; notaAperta = null; cambioDi = null;
   disegnaFoglio(g);
+  $('foglio').setAttribute('aria-label', 'Scheda giocatore');
   $('velo').hidden = false; $('foglio').hidden = false;
   document.body.style.overflow = 'hidden';
 }
-function chiudiFoglio(){ $('velo').hidden = true; $('foglio').hidden = true; apertoAnalisi = null; document.body.style.overflow = ''; }
+/* lo stesso foglio serve a due cose: la scheda di un giocatore (Analisi) e il
+   cambio dal campetto (Formazione); chiudendolo si dimenticano entrambe */
+function chiudiFoglio(){ $('velo').hidden = true; $('foglio').hidden = true; apertoAnalisi = null; cambioDi = null; document.body.style.overflow = ''; }
+
+/* Il cambio dal campetto: tocchi un titolare, sale l'elenco di chi può
+   prendere il suo posto (stesso ruolo, non in campo, non fuori), dal
+   fantavoto più alto. Un tocco e la formazione diventa "la tua scelta". */
+let cambioDi = null;
+function apriCambio(id){
+  const s = formazioneCorrente(); if(!s) return;
+  const x = s.undici.find(u=>u.g.id === id); if(!x) return;
+  apertoAnalisi = null; notaAperta = null; cambioDi = id;
+  disegnaCambio(s, x);
+  $('foglio').setAttribute('aria-label', 'Cambia ' + x.g.n);
+  $('velo').hidden = false; $('foglio').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function disegnaCambio(s, x){
+  const inCampo = new Set(s.undici.map(u=>u.g.id));
+  const candidati = ordina(stato.rosa.filter(g=>g.r === x.r && g.st !== 'F' && !inCampo.has(g.id)));
+  const sq = squadraDi(x.g);
+  const lista = candidati.length
+    ? `<ul class="cambi">${candidati.map(g=>{
+        const st = g.st === 'B' ? `B ${percento(probabilita(g))}` : 'T';
+        const sqg = squadraDi(g);
+        return `<li><button class="n" data-cambio="${esc(g.id)}" aria-label="Metti ${esc(g.n)}, ${st}, fantavoto ${f2(g.fv)}"><span class="sigla ${g.r}">${g.r}</span>
+          <span class="chi">${esc(g.n)}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}<small>${sqg ? esc(sqg) + ' · ' : ''}${st}</small></span>
+          <span class="fv"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</span></button></li>`;
+      }).join('')}</ul>`
+    : `<p class="nota">Nessun altro ${{P:'portiere', D:'difensore', C:'centrocampista', A:'attaccante'}[x.r]} disponibile: gli altri del ruolo sono in campo o segnati F.</p>`;
+  $('foglio').innerHTML = `<div class="maniglia"></div>
+    <div class="testa"><div class="sigla ${x.r}">${x.r}</div><div><h3>Al posto di ${esc(x.g.n)}</h3><small>${sq ? esc(sq) + ' · ' : ''}fv ${f2(x.g.fv)} · atteso ${f2(x.atteso)}${x.p < 1 ? ' · ' + percento(x.p) : ''}</small></div><button class="chiudi" aria-label="Chiudi">×</button></div>
+    ${lista}
+    <p class="nota">Il totale si rifà con lo stesso conto del consiglio, dubbi e modificatore compresi. Per tornare indietro: <b>Torna al consiglio automatico</b>, sotto Scegli il modulo.</p>`;
+}
+function faiCambio(nuovoId){
+  const s = formazioneCorrente(); if(!s || !cambioDi) return;
+  const vecchio = stato.rosa.find(g=>g.id === cambioDi), nuovo = stato.rosa.find(g=>g.id === nuovoId);
+  // la prima modifica a mano parte dalla formazione mostrata, consiglio o modulo scelto
+  if(!sceltaAttiva() || !Array.isArray(stato.scelta.undici) || !stato.scelta.undici.length)
+    stato.scelta = {giornata: stato.giornata, modulo: s.modulo, undici: s.undici.map(x=>x.g.id)};
+  const i = stato.scelta.undici.indexOf(cambioDi);
+  if(i >= 0) stato.scelta.undici[i] = nuovoId;
+  chiudiFoglio();
+  disegnaFormazione(); salva();
+  const dopo = formazioneCorrente();
+  if(dopo && vecchio && nuovo){
+    const d = dopo.totale - s.totale;
+    toast(`${nuovo.n} al posto di ${vecchio.n}: ${f2(dopo.totale)} attesi (${scartoTesto(d)})`);
+  }
+}
 function disegnaFoglio(g){
   const d = dossierDi(g) || {st:'ok', v:[], n:[]};
   const f = forma(d), m = mediaVoti(d), c = consiglioDi(d), pres = presenze(d);
@@ -2089,6 +2394,8 @@ function disegnaFoglio(g){
 $('velo').addEventListener('click', chiudiFoglio);
 $('foglio').addEventListener('click', e=>{
   if(e.target.closest('.chiudi')){ chiudiFoglio(); return; }
+  const c = e.target.closest('button[data-cambio]');
+  if(c){ faiCambio(c.dataset.cambio); return; }
   const b = e.target.closest('button[data-nota]'); if(!b) return;
   const i = +b.dataset.nota; notaAperta = notaAperta === i ? null : i;
   const g = trovaVoce(apertoAnalisi); if(g) disegnaFoglio(g);
@@ -2228,17 +2535,26 @@ $('movimenti').addEventListener('input', e=>{
 const spesoAvv = i => stato.venduti.filter(v=>v.a === i && v.p).reduce((s,v)=>s+v.p, 0);
 const presiAvv = (i, r) => stato.venduti.filter(v=>v.a === i && v.r === r).length;
 
+/* Gli avversari in sola lettura: dopo l'asta i nomi si sanno e arrivano col
+   listone privato (lega.squadre, chiave il cognome con cui l'avversario e'
+   nominato qui); se mancano resta il cognome. Fino al 10/10/2026 nome e
+   crediti erano campi da scrivere: in asta servivano, ora solo per sbagliare. */
 function disegnaAvversari(){
+  const info = (listone.lega && listone.lega.squadre) || {};
   $('avversari').innerHTML = stato.avversari.map((a,i)=>{
+    const chi = info[a.n] || {};
+    const persona = [chi.persona, chi.piattaforma].filter(Boolean).join(' · ');
     const sp = spesoAvv(i), slot = ORDINE.map(r=>`${r}${presiAvv(i,r)}`).join(' ');
-    const stimato = BUDGET - sp;
-    return `<div class="avversario">
-      <input type="text" value="${esc(a.n)}" data-avv-n="${i}" aria-label="Nome avversario ${i+1}">
-      <input type="number" inputmode="numeric" value="${a.c}" data-avv-c="${i}" aria-label="Crediti avversario ${i+1}">
-      <small>${slot} · ${sp ? `segnati ${sp} FM spesi, ne avrebbe ${stimato}` : 'nessun acquisto segnato'}${a.c !== stimato && sp ? ` · tu hai scritto ${a.c}` : ''}</small>
+    return `<div class="avv">
+      <b>${esc(chi.squadra || a.n)}</b>
+      <span class="cr">${a.c}<small>restano</small></span>
+      ${persona ? `<small>${esc(persona)}</small>` : ''}
+      <small class="slot">${slot} · ${sp ? `spesi ${sp}` : 'nessun acquisto segnato'}</small>
     </div>`;
   }).join('');
 }
+/* tolto il 10/10/2026, serviva solo in asta: da rimettere l'anno prossimo
+   (insieme ai campi in disegnaAvversari e al bottone btnResetAvv nell'HTML)
 $('avversari').addEventListener('input', e=>{
   const n = e.target.dataset.avvN, c = e.target.dataset.avvC;
   if(n !== undefined){ stato.avversari[+n].n = e.target.value; disegnaAChi(); }
@@ -2248,6 +2564,7 @@ $('avversari').addEventListener('input', e=>{
 $('btnResetAvv').addEventListener('click', ()=>{
   stato.avversari.forEach(a=>a.c = BUDGET); disegnaAvversari(); salva();
 });
+*/
 
 /* La lega: tutte le squadre, la mia per prima. Nome della squadra e persona
    arrivano dal listone privato (lega.squadre, chiave il cognome con cui
@@ -2505,7 +2822,36 @@ function disegnaStagione(){
             <button class="elimina" data-gdel="${x.g}" aria-label="Togli giornata ${x.g}">×</button></td></tr>`;
         }).join('') + `</table>`
     : '';
+  disegnaFormazioniMandate();
   disegnaRoseAvversari();
+}
+
+/* Le formazioni confermate, dalla più recente: modulo, totale atteso, quando
+   è stata mandata e, se la giornata è registrata, com'è andata davvero. */
+function disegnaFormazioniMandate(){
+  const giornate = Object.keys(stato.formazioni || {}).map(Number).filter(n=>n > 0 && stato.formazioni[n]).sort((a,b)=>b-a);
+  $('formazioniConta').textContent = giornate.length ? `${giornate.length} ${giornate.length === 1 ? 'giornata' : 'giornate'}` : '';
+  if(!giornate.length){
+    $('formazioniStorico').innerHTML = '<div class="vuoto">Nessuna formazione confermata. Dalla scheda Formazione, quando l\'hai mandata sulla piattaforma, tocca <b>Conferma</b>.</div>';
+    return;
+  }
+  $('formazioniStorico').innerHTML = `<div class="lega">${giornate.map(n=>{
+    const f = stato.formazioni[n];
+    const esito = stato.giornate.find(x=>x.g === n);
+    const quando = f.quando ? 'mandata il ' + dataOra(f.quando) : '';
+    const fatti = esito ? `fatti ${esito.pf} punti, avversario ${esito.ps}` : '';
+    const undici = f.undici || [], panchina = f.panchina || [];
+    return `<details>
+      <summary><b>Giornata ${n} · ${esc(f.modulo)}</b><span class="cr">${f2(f.totale)}<small>attesi</small></span>
+        <small>${esc([quando, fatti].filter(Boolean).join(' · '))}</small></summary>
+      <div class="reparto">${ORDINE.map(r=>{
+        const gs = undici.filter(x=>x.r === r);
+        return gs.length ? `<h4><span>${SINGOLARE[r]}</span><span>${gs.length}</span></h4>`
+          + gs.map(x=>`<div><span>${esc(x.n)}</span><span class="muto">${esc(x.sq || '')}</span></div>`).join('') : '';
+      }).join('')}${panchina.length ? `<h4><span>Panchina</span><span>${panchina.length}</span></h4>`
+          + panchina.map((g,i)=>`<div><span>${i+1}. ${esc(g.n)}</span><span class="muto">${esc(g.r)}</span></div>`).join('') : ''}</div>
+    </details>`;
+  }).join('')}</div>`;
 }
 
 $('btnGiornata').addEventListener('click', ()=>{
@@ -2685,8 +3031,6 @@ function mostra(nome){
   document.querySelectorAll('.schede button').forEach(x=>x.setAttribute('aria-selected', x.dataset.p === nome));
   document.querySelectorAll('.pannello').forEach(p=>p.hidden = (p.id !== 'p-'+nome));
   window.scrollTo(0,0);
-  // alla prossima apertura si riparte da qui (le impostazioni no: non sono un posto dove stare)
-  if(nome !== 'sync') locale.scrivi(CHIAVE_SCHEDA, nome);
 }
 document.querySelectorAll('.schede button').forEach(b=>b.addEventListener('click', ()=>mostra(b.dataset.p)));
 $('pillaSync').addEventListener('click', ()=>mostra('sync'));
@@ -2753,13 +3097,14 @@ function entra(){
   document.body.classList.remove('bloccata');
   carica();
   caricaListone();
+  if(applicaSettimana()) salva();
   aggiornaCampi();
   const f = faseCorrente(); if(f) inRuolo.value = f;
   if(applicaLega()) salva();
   disegnaTutto();
-  // si riapre sull'ultima scheda usata; la prima volta: Asta finche' la rosa non e' completa, poi Formazione
-  const ultima = locale.leggi(CHIAVE_SCHEDA);
-  mostra(ultima && document.getElementById('p-' + ultima) ? ultima : (stato.rosa.length < slotTot() ? 'asta' : 'formazione'));
+  // si apre sempre su Formazione (Asta solo finche' la rosa non e' completa):
+  // dal 10/10/2026 niente piu' "ultima scheda usata", l'asta e' finita
+  mostra(stato.rosa.length < slotTot() ? 'asta' : 'formazione');
   $('versione').textContent = `FC Cazzimma · versione ${VERSIONE_APP}`;
   $('cfgUtente').value = cfg.utente;
   $('cfgRepo').value = cfg.repo;

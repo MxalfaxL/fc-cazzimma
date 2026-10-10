@@ -96,6 +96,13 @@ if __name__ == "__main__":
         for g in blocco["listone"]:
             if g["n"] in fasce:
                 g["sos"] = fasce[g["n"]]
+    # i dati della settimana (fantavoto, voto, stato di ogni giocatore della
+    # rosa per la giornata in corso) non si incollano piu' a mano: viaggiano
+    # qui dentro e l'app li applica da sola quando sono piu' recenti
+    # (decisione di Marco del 10/10/2026: "lo fai tu e li salvi tu")
+    settimana = RADICE / "report" / "settimana.json"
+    if settimana.exists():
+        blocco["settimana"] = json.loads(settimana.read_text(encoding="utf-8"))
     # il marcatore di tempo e' quello che l'app confronta: piu' recente vince
     blocco["caricato"] = int(time.time() * 1000)
     contenuto = base64.b64encode(json.dumps(blocco, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).decode("ascii")
@@ -122,6 +129,8 @@ if __name__ == "__main__":
               f"{sum(1 for v in blocco['listone'] if v.get('gz'))} con segnale Gazzetta.")
         if blocco.get("lega"):
             print(f"  con la lega: {blocco['lega'].get('lega')} · asta {blocco['lega'].get('asta_testo')} · {len(blocco['lega'].get('avversari', []))} avversari")
+        if blocco.get("settimana"):
+            print(f"  con i dati della giornata {blocco['settimana'].get('giornata')}: {len(blocco['settimana'].get('giocatori', []))} giocatori")
         print("  L'app lo prende alla prossima apertura, su tutti i dispositivi collegati.\n")
     finally:
         if precedente and precedente != UTENTE:
