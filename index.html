@@ -106,7 +106,6 @@ body.bloccata > .stemma-def{display:block!important}
 .testata svg{width:48px;height:48px;flex:0 0 48px;filter:drop-shadow(0 2px 4px rgba(14,19,25,.25))}
 .testata>div{flex:1;min-width:0}
 .marchio{font-family:Anton,Impact,sans-serif;font-size:26px;letter-spacing:.02em;line-height:1;text-transform:uppercase;font-weight:400}
-.claim{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--grigio);margin-top:4px}
 .pilla{border:1px solid var(--linea);background:var(--carta);color:var(--grigio);border-radius:999px;
   padding:8px 12px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.06em;white-space:nowrap;
   display:flex;align-items:center;gap:6px}
@@ -561,7 +560,6 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <svg viewBox="0 0 512 512" role="img" aria-label="Stemma FC Cazzimma"><use href="#stemma"/></svg>
   <div>
     <h1 class="marchio">FC Cazzimma</h1>
-    <div class="claim">Fantacalcio Venezia · 2026/27</div>
   </div>
   <button class="pilla" id="pillaSync" aria-label="Sincronizzazione e impostazioni">solo locale</button>
 </header>
@@ -1088,7 +1086,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema', CHIAVE_SCHEDA = 'fccazzimma:scheda';
-const VERSIONE_APP = '2026.10.10b';
+const VERSIONE_APP = '2026.10.10c';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1790,8 +1788,6 @@ function applicaLega(){
   (l.avversari || []).slice(0, 9).forEach((nome, i)=>{
     if(stato.avversari[i] && /^Avversario \d$/.test(stato.avversari[i].n) && nome){ stato.avversari[i].n = nome; cambiato = true; }
   });
-  const claim = document.querySelector('.claim');
-  if(claim && l.lega) claim.textContent = `${l.lega}${l.asta_testo ? ' · asta ' + l.asta_testo : ''}`;
   return cambiato;
 }
 
