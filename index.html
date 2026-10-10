@@ -624,6 +624,13 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <div class="col-dx">
 
   <div class="blocco">
+    <div class="eyebrow">Scegli il modulo</div>
+    <div class="confronto" id="confronto"></div>
+    <p class="nota">Tocca un modulo: ti preparo il meglio con quel modulo. Tocca un giocatore sul campetto per cambiarlo con uno della panchina.</p>
+    <button class="azione secondaria" id="btnConsiglioAuto" hidden style="margin-top:10px">Torna al consiglio automatico</button>
+  </div>
+
+  <div class="blocco">
     <div class="eyebrow"><span>I dubbi di questa giornata</span><small id="dubbiRiassunto"></small></div>
     <div id="dubbi"></div>
   </div>
@@ -641,13 +648,6 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <div class="eyebrow">Panchina, in quest'ordine</div>
     <div id="panchina"></div>
     <p class="nota">Ruolo per ruolo entra il primo che ha giocato: per questo ogni reparto è ordinato per fantavoto, non per certezza. Se nessuno del ruolo è disponibile si scala e cambia modulo.</p>
-  </div>
-
-  <div class="blocco">
-    <div class="eyebrow">Scegli il modulo</div>
-    <div class="confronto" id="confronto"></div>
-    <p class="nota">Tocca un modulo: ti preparo il meglio con quel modulo. Tocca un giocatore sul campetto per cambiarlo con uno della panchina.</p>
-    <button class="azione secondaria" id="btnConsiglioAuto" hidden style="margin-top:10px">Torna al consiglio automatico</button>
   </div>
 
   <details class="blocco ripiegato">
@@ -773,7 +773,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <div class="blocco">
     <div class="eyebrow"><span>La rosa</span><small>fantavoto · voto puro</small></div>
     <div id="rosa"></div>
-    <p class="nota"><b>FV</b> è il fantavoto atteso, bonus compresi. <b>Voto</b> è il voto puro: alimenta il modificatore difesa, quindi su portiere e difensori conta quanto il primo. La squadra serve per riconoscere le formazioni ufficiali e le probabili.</p>
+    <p class="nota"><b>FV</b> è il fantavoto atteso, bonus compresi. <b>Voto</b> è il voto puro: alimenta il modificatore difesa, quindi su portiere e difensori conta quanto il primo. Valori, stati e squadre arrivano dal Mac ogni settimana: qui si guarda, non si tocca.</p>
   </div>
   </div>
   <div class="col-dx">
@@ -794,7 +794,8 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <label class="campo"><span>Attaccanti</span><input type="number" id="tgA" inputmode="numeric"></label>
     </div>
     <div class="righetta" id="sommaTarget"></div>
-    <button class="azione secondaria" id="btnAzzera" style="margin-top:12px">Svuota tutto e ricomincia</button>
+    <!-- nascosto il 10/10/2026: a rosa fatta e' solo un rischio; da rimettere per l'asta dell'anno prossimo -->
+    <button class="azione secondaria" id="btnAzzera" hidden style="margin-top:12px">Svuota tutto e ricomincia</button>
   </div>
   </div>
 </section>
@@ -1186,7 +1187,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.10d';
+const VERSIONE_APP = '2026.10.10e';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1392,7 +1393,11 @@ async function sincronizzaListone(){
     const testo = remoto.content ? daB64(remoto.content) : await leggiFileGrezzo('listone.json');
     const dati = JSON.parse(testo);
     const remMs = dati.caricato || 0;
-    if(remMs > locMs){
+    // i dati della settimana contano a parte: una copia salvata da una versione
+    // vecchia dell'app li aveva persi pur avendo lo stesso marcatore (10/10/2026)
+    const remW = (dati.settimana && +dati.settimana.aggiornata) || 0;
+    const locW = (listone.settimana && +listone.settimana.aggiornata) || 0;
+    if(remMs > locMs || remW > locW){
       listone = normalizzaListone(dati);
       locale.scrivi(CHIAVE_LISTONE, JSON.stringify(listone));
       // tutte e due, sempre: con || la seconda salterebbe quando la prima cambia qualcosa
@@ -2723,13 +2728,13 @@ function disegnaRosa(){
     const gs = stato.rosa.filter(g=>g.r===r);
     html += `<div class="eyebrow" style="margin-top:12px"><span>${NOME[r]} · ${gs.length}/${SLOT[r]}</span><small>${spesoR(r)} FM</small></div>`;
     if(!gs.length){ html += '<div class="vuoto">Ancora nessuno.</div>'; return; }
-    html += gs.map(g=>`<div class="giocatore" style="flex-wrap:wrap">
+    // sola lettura dal 10/10/2026 (Marco: «le modifiche le farò tramite te, magari
+    // sbaglio a cambiare qualcosa»): fantavoto, voto e squadra arrivano dal Mac.
+    // I gestori input/change/click qui sotto restano per quando servira' riaprire.
+    html += gs.map(g=>`<div class="giocatore">
         <div class="sigla ${r}">${r}</div>
-        <div class="nome">${esc(g.n)}<small>${g.p} FM</small></div>
-        <input class="mini" type="number" step="0.05" inputmode="decimal" value="${f2(g.fv)}" data-fv="${g.id}" aria-label="Fantavoto atteso di ${esc(g.n)}">
-        <input class="mini" type="number" step="0.05" inputmode="decimal" value="${f2(g.voto)}" data-voto="${g.id}" aria-label="Voto atteso di ${esc(g.n)}">
-        <button class="elimina" data-del="${g.id}" aria-label="Togli ${esc(g.n)}">×</button>
-        <select data-sq="${g.id}" aria-label="Squadra di ${esc(g.n)}" style="flex:1 1 100%;padding:7px 10px;font-size:13px;margin-left:38px;width:auto;margin-top:-2px">${opzioniSquadre(g.sq)}</select>
+        <div class="nome">${esc(g.n)}${g.st === 'F' ? '<span class="dubbio-tag" style="background:var(--rosso-tinta);color:var(--rosso-testo)">fuori</span>' : g.st === 'B' ? `<span class="dubbio-tag">${percento(probabilita(g))}</span>` : ''}<small>${esc(squadraDi(g) || 'squadra?')} · ${g.p} FM</small></div>
+        <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
       </div>`).join('');
   });
   $('rosa').innerHTML = html;

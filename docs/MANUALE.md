@@ -101,6 +101,10 @@ annulla. Alla fine *Rosa → Svuota tutto e ricomincia*: il listone resta.
 
 ## 5. Dopo l'asta: la rosa
 
+Dal 10 ottobre la scheda è **in sola lettura**: fantavoto, voto, stato e squadra di
+ogni giocatore arrivano dal Mac ogni settimana. Se qualcosa va cambiato, lo dici
+a Claude. "Svuota tutto e ricomincia" è nascosto fino all'asta prossima.
+
 Per ogni giocatore tre cose, una volta sola: **FV** (fantavoto atteso, bonus
 compresi), **voto puro** (senza bonus, è quello che entra nel modificatore,
 su portiere e difensori conta quanto il primo), e la **squadra** (si compila
