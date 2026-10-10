@@ -422,22 +422,70 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 
 @media (max-width:360px){ .cifra{font-size:64px} .tessera{width:66px} .tessera .maglia{width:36px;height:36px} }
 
-/* ---------------------------------------------------------------- iPad in orizzontale
+/* ---------------------------------------------------------------- schermo largo: iPad e Mac
+   Due impaginati soli. Sotto i 760px (iPhone) una colonna e le schede in
+   basso, sotto il pollice. Dai 760px in su (iPad in ogni verso, Chrome sul
+   Mac) l'app si impagina come un programma da scrivania: le schede in una
+   barra verticale a sinistra con lo stemma e le Impostazioni in fondo, il
+   contenuto nel resto. Dai 1000px in su Formazione, Rosa e Stagione vanno su
+   due colonne (campetto e verdetto a sinistra, liste a destra) e l'Asta tiene
+   il listone fermo a sinistra. Le colonne sono due <div> che sotto i 1000px
+   non esistono (display:contents): gli id dentro restano gli stessi. */
+.col-sx,.col-dx{display:contents}
+.rail-stemma,.schede button.solo-largo{display:none}
+@media (min-width:760px){
+  body{max-width:none;margin:0;padding:calc(18px + env(safe-area-inset-top)) 24px 48px calc(96px + 24px)}
+  .testata{max-width:1320px;margin:0 auto 18px}
+  .pannello{max-width:860px;margin-inline:auto;animation:none}
+  .schede{top:0;bottom:0;right:auto;width:96px;padding:calc(16px + env(safe-area-inset-top)) 8px calc(14px + env(safe-area-inset-bottom));
+    flex-direction:column;align-items:stretch;justify-content:flex-start;border-right:1px solid rgba(255,255,255,.06)}
+  .schede>div{flex-direction:column;gap:6px;max-width:none;height:100%}
+  .schede button{flex:0 0 auto;padding:11px 4px 9px;font-size:9px;gap:5px}
+  .schede button svg{width:24px;height:24px}
+  .schede button.solo-largo{display:flex;margin-top:auto}
+  .rail-stemma{display:block;width:46px;height:46px;margin:0 auto 14px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+  .blocco{padding:18px}
+  .verdetto .modulo{font-size:72px}
+  .toast{left:calc(96px + (100vw - 96px)/2);bottom:28px}
+  .velo{left:96px}
+  /* il foglio del giocatore non sale dal basso: sta al centro come una finestra */
+  .foglio{left:calc(96px + (100vw - 96px)/2);right:auto;bottom:auto;top:50%;width:min(720px,calc(100vw - 96px - 48px));
+    transform:translate(-50%,-50%);border-radius:18px;max-height:84vh;animation:dissolve .18s ease-out;padding:18px 20px 20px}
+  .foglio .maniglia{display:none}
+}
+@keyframes dissolve{from{opacity:0}to{opacity:1}}
+/* iPad in verticale: una colonna larga, ma il campetto non deve diventare un lenzuolo */
+@media (min-width:760px) and (max-width:999px){ #prato{max-width:600px;margin-inline:auto} }
+@media (min-width:1000px){
+  .pannello.largo{max-width:1320px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;align-items:start}
+  .pannello.largo>.col-sx,.pannello.largo>.col-dx{display:block;min-width:0}
+  #p-formazione{grid-template-columns:minmax(340px,460px) minmax(0,1fr)}
+  #p-rosa{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+}
+/* col mouse (Mac): un segno al passaggio, che sul touch non serve */
+@media (hover:hover){
+  .schede button:hover:not([aria-selected="true"]){background:rgba(255,255,255,.08);color:#fff}
+  .azione:hover:not(:disabled){filter:brightness(1.06)}
+  .azione.secondaria:hover{background:var(--carta-2);filter:none}
+  .chips button:hover:not([aria-pressed="true"]),.riga-filtro button:hover:not([aria-pressed="true"]),.stato button:hover:not([aria-pressed="true"]),.assegna button:hover:not([aria-pressed="true"]){border-color:var(--azzurro);color:var(--azzurro)}
+  .esito-l button.prendi:hover{background:var(--azzurro)}
+  .esito-l button.via:hover,.elimina:hover,.movimento .annulla:hover,.foglio .chiudi:hover{background:var(--linea-2);color:var(--testo)}
+  .esito-l .nome:hover,.an-riga .nome:hover{color:var(--azzurro)}
+  .lega summary:hover{background:var(--carta)}
+  .pilla:hover{border-color:var(--testo-2);color:var(--testo-2)}
+}
+
+/* ---------------------------------------------------------------- l'Asta su due colonne
    All'asta si sta sull'iPad di traverso: lo schermo largo si usa tutto. Nella
    scheda Asta il listone va a sinistra, fermo e con la sua barra di scorrimento,
    mentre a destra scorrono offerta, modulo, movimenti, budget e avversari.
    Righe e bottoni del listone piu' grandi, da toccare senza mirare. */
-@media (min-width:1000px) and (orientation:landscape){
-  body{max-width:1440px;padding-left:20px;padding-right:20px}
-  .schede>div{max-width:820px}
-  .pannello:not(#p-asta){max-width:900px;margin-inline:auto}
-  .foglio{left:max(0px,calc(50% - 380px));right:max(0px,calc(50% - 380px))}
-
-  #p-asta{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(380px,1fr);column-gap:16px;align-items:start}
+@media (min-width:1000px){
+  #p-asta{max-width:1320px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(380px,1fr);column-gap:16px;align-items:start}
   #p-asta>.blocco{grid-column:2;min-width:0}
-  #p-asta>#bloccoListone{grid-column:1;grid-row:1 / span 20;position:sticky;top:calc(12px + env(safe-area-inset-top));
-    height:calc(100vh - 116px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    height:calc(100dvh - 116px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  #p-asta>#bloccoListone{grid-column:1;grid-row:1 / span 20;position:sticky;top:calc(18px + env(safe-area-inset-top));
+    height:calc(100vh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:0;margin-bottom:0}
   #bloccoListone>.eyebrow{padding-top:16px}
   /* ricerca e reparti restano in cima mentre la lista scorre sotto */
@@ -519,9 +567,12 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 </header>
 
 <!-- ============ FORMAZIONE ============ -->
-<section class="pannello" id="p-formazione" hidden>
+<section class="pannello largo" id="p-formazione" hidden>
+  <div class="col-sx">
   <div id="verdetto"></div>
   <div id="prato"></div>
+  </div>
+  <div class="col-dx">
 
   <div class="blocco">
     <div class="eyebrow"><span>I dubbi di questa giornata</span><small id="dubbiRiassunto"></small></div>
@@ -570,6 +621,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <textarea id="inIncolla" placeholder='Incolla qui il blocco prodotto da esporta_app.py'></textarea>
     <button class="azione secondaria" id="btnImporta" style="margin-top:10px">Aggiorna i valori attesi</button>
     <div id="esitoImport" class="nota"></div>
+  </div>
   </div>
 </section>
 
@@ -664,12 +716,15 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 </section>
 
 <!-- ============ ROSA ============ -->
-<section class="pannello" id="p-rosa" hidden>
+<section class="pannello largo" id="p-rosa" hidden>
+  <div class="col-sx">
   <div class="blocco">
     <div class="eyebrow"><span>La rosa</span><small>fantavoto · voto puro</small></div>
     <div id="rosa"></div>
     <p class="nota"><b>FV</b> è il fantavoto atteso, bonus compresi. <b>Voto</b> è il voto puro: alimenta il modificatore difesa, quindi su portiere e difensori conta quanto il primo. La squadra serve per riconoscere le formazioni ufficiali e le probabili.</p>
   </div>
+  </div>
+  <div class="col-dx">
   <div class="blocco">
     <div class="eyebrow">Mercato di riparazione</div>
     <div id="svincoli"></div>
@@ -689,10 +744,12 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <div class="righetta" id="sommaTarget"></div>
     <button class="azione secondaria" id="btnAzzera" style="margin-top:12px">Svuota tutto e ricomincia</button>
   </div>
+  </div>
 </section>
 
 <!-- ============ STAGIONE ============ -->
-<section class="pannello" id="p-stagione" hidden>
+<section class="pannello largo" id="p-stagione" hidden>
+  <div class="col-sx">
   <div class="blocco">
     <div class="eyebrow">Il campionato</div>
     <div id="classifica"></div>
@@ -709,6 +766,8 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
     <div class="eyebrow"><span>La lega</span><small id="legaConta"></small></div>
     <div id="roseAvversari"></div>
   </div>
+  </div>
+  <div class="col-dx">
 
   <div class="blocco">
     <div class="eyebrow">Modificatore difesa</div>
@@ -733,7 +792,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
   <div class="blocco">
     <div class="eyebrow">Da tenere a mente</div>
     <dl>
-      <dt>Formazione</dt><dd>Entro 15 minuti dal fischio d'inizio della prima partita. Se te ne dimentichi resta quella della giornata precedente.</dd>
+      <dt>Formazione</dt><dd>La piattaforma chiude 15 minuti <b>prima</b> del fischio d'inizio della prima partita (verificato sul conto alla rovescia il 10/10/2026). Se te ne dimentichi resta quella della giornata precedente.</dd>
       <dt>Partite valide</dt><dd>Da venerdì a lunedì sera. Nei turni infrasettimanali da martedì a giovedì.</dd>
       <dt>Panchina</dt><dd>Libera nel numero e nell'ordine. 5 sostituzioni, portiere compreso, ruolo per ruolo.</dd>
       <dt>Ultimo attaccante</dt><dd>Se sfori il budget o non riesci a completare la rosa perdi il diritto d'asta su quel giocatore, che torna fra gli svincolati.</dd>
@@ -741,6 +800,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <dt>Rinvii</dt><dd>In coppa scatta il 6 politico se non si recupera prima della giornata dopo. In campionato si aspetta il recupero.</dd>
       <dt>Penalità</dt><dd>Accordi alla vigilia: 3 punti a testa. Combine in asta: si perdono i giocatori più 5 punti.</dd>
     </dl>
+  </div>
   </div>
 </section>
 
@@ -796,6 +856,7 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
 </section>
 
 <nav class="schede" role="tablist" aria-label="Sezioni">
+  <svg class="rail-stemma" viewBox="0 0 512 512" aria-hidden="true"><use href="#stemma"/></svg>
   <div>
     <button role="tab" aria-selected="false" data-p="formazione">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/><circle cx="12" cy="12" r="2.6"/></svg>Formazione</button>
@@ -807,6 +868,8 @@ dl{margin:0;font-size:13.5px} dt{font-weight:700;margin-top:10px} dd{margin:2px 
       <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-5 3 3 5-7"/></svg>Analisi</button>
     <button role="tab" aria-selected="false" data-p="stagione">
       <svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/><path d="M12 13v4M8 21h8M10 17h4"/></svg>Stagione</button>
+    <button role="tab" aria-selected="false" data-p="sync" class="solo-largo">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Impostazioni</button>
   </div>
 </nav>
 
@@ -1024,8 +1087,8 @@ const NOME = {P:'Portieri', D:'Difensori', C:'Centrocampisti', A:'Attaccanti'};
 const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
-const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.10';
+const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema', CHIAVE_SCHEDA = 'fccazzimma:scheda';
+const VERSIONE_APP = '2026.10.10b';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -2626,6 +2689,8 @@ function mostra(nome){
   document.querySelectorAll('.schede button').forEach(x=>x.setAttribute('aria-selected', x.dataset.p === nome));
   document.querySelectorAll('.pannello').forEach(p=>p.hidden = (p.id !== 'p-'+nome));
   window.scrollTo(0,0);
+  // alla prossima apertura si riparte da qui (le impostazioni no: non sono un posto dove stare)
+  if(nome !== 'sync') locale.scrivi(CHIAVE_SCHEDA, nome);
 }
 document.querySelectorAll('.schede button').forEach(b=>b.addEventListener('click', ()=>mostra(b.dataset.p)));
 $('pillaSync').addEventListener('click', ()=>mostra('sync'));
@@ -2696,8 +2761,9 @@ function entra(){
   const f = faseCorrente(); if(f) inRuolo.value = f;
   if(applicaLega()) salva();
   disegnaTutto();
-  // prima dell'asta si vive nella scheda Asta, dopo nella Formazione
-  mostra(stato.rosa.length < slotTot() ? 'asta' : 'formazione');
+  // si riapre sull'ultima scheda usata; la prima volta: Asta finche' la rosa non e' completa, poi Formazione
+  const ultima = locale.leggi(CHIAVE_SCHEDA);
+  mostra(ultima && document.getElementById('p-' + ultima) ? ultima : (stato.rosa.length < slotTot() ? 'asta' : 'formazione'));
   $('versione').textContent = `FC Cazzimma · versione ${VERSIONE_APP}`;
   $('cfgUtente').value = cfg.utente;
   $('cfgRepo').value = cfg.repo;

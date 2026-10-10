@@ -35,12 +35,16 @@ memoria separata da Safari.
 
 ## 2. Com'è fatta
 
-Cinque schede in basso: **Formazione**, **Asta**, **Rosa**, **Analisi**,
-**Stagione**. In
+Cinque schede: **Formazione**, **Asta**, **Rosa**, **Analisi**,
+**Stagione**. Su iPhone stanno in basso, sotto il pollice; su iPad e sul Mac
+stanno in una barra verticale a sinistra, con lo stemma in cima e
+**Impostazioni** in fondo, e Formazione, Rosa e Stagione si aprono su due
+colonne (campetto a sinistra, liste a destra). In
 alto a destra la **pillola** dice se l'app è allineata con GitHub
 (*sincronizzato*, *da inviare*, *errore*) e toccandola entri nelle
 impostazioni. Tutto si salva da solo e si ritrova sugli altri dispositivi.
-Finché la rosa non è completa l'app si apre su Asta, poi su Formazione.
+L'app si riapre sull'ultima scheda che stavi guardando; la prima volta su
+Asta finché la rosa non è completa, poi su Formazione.
 
 ## 3. Caricare il listone
 

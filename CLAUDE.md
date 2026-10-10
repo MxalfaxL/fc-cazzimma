@@ -89,8 +89,10 @@ duplicarle altrove.
 - **Fasce gol**: primo gol a 66 punti, poi uno ogni 4.
 - Sette moduli: 3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-4-1, 5-3-2.
 - Panchina libera nell'ordine, **5 sostituzioni** ruolo per ruolo.
-- Formazione entro **15 minuti dalla prima partita** della giornata. Chi si
-  dimentica si ritrova schierata quella della giornata precedente.
+- Formazione entro **15 minuti prima della prima partita** della giornata:
+  la piattaforma chiude lì (conto alla rovescia verificato il 10 ottobre
+  2026: Genoa-Fiorentina alle 15, chiusura 14:45). Chi si dimentica si
+  ritrova schierata quella della giornata precedente.
 - Svincolo a metà prezzo per chi resta in Serie A, prezzo pieno per chi va
   all'estero o si ritira. L'arrotondamento va confermato con lo staff.
 
@@ -111,8 +113,8 @@ duplicarle altrove.
 ```
 
 **Il motore di scelta della formazione sta nel telefono, non sul Mac.** Le
-probabili definitive escono un'ora prima delle partite e la deadline è 15 minuti
-dopo il primo fischio: un report generato al Mac il giovedì è già vecchio. Il
+probabili definitive escono un'ora prima delle partite e la piattaforma chiude 15 minuti
+prima del primo fischio: un report generato al Mac il giovedì è già vecchio. Il
 problema è piccolo — 3 portieri per un massimo di 56 combinazioni di difensori —
 e gira in un millisecondo in JavaScript.
 
