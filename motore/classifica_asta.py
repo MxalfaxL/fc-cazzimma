@@ -50,8 +50,11 @@ COMPRATI = {r: SLOT[r] * SQUADRE_PER_LEGA for r in SLOT}
 # Voto atteso a priori: dal peggiore al migliore del ruolo (per prezzo).
 VOTO_PRIORI = {"P": (5.7, 6.4), "D": (5.8, 6.4), "C": (5.8, 6.5), "A": (5.7, 6.5)}
 # Bonus a priori per giornata, dal peggiore al migliore del ruolo. I portieri
-# hanno il malus dei gol subiti, che qui vale come bonus negativo medio.
-BONUS_PRIORI = {"P": (-1.4, -0.8), "D": (0.0, 0.5), "C": (0.1, 1.0), "A": (0.3, 1.7)}
+# hanno il malus dei gol subiti, che qui vale come bonus negativo medio, piu' il
+# +1 della porta inviolata (dal 13/10/2026): circa una volta su dieci per le
+# difese peggiori, una su due e mezza per le migliori (giornate 1-6). Era
+# (-1.4, -0.8), senza l'imbattuto.
+BONUS_PRIORI = {"P": (-1.3, -0.4), "D": (0.0, 0.5), "C": (0.1, 1.0), "A": (0.3, 1.7)}
 # Disponibilita' a priori: chi costa e' titolare, chi vale 1 e' una scommessa.
 DISP_PRIORI = (0.35, 0.9)
 # Il rigorista designato: nel 2025/26 79 rigori segnati in 380 partite, cioe'

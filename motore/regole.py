@@ -43,6 +43,11 @@ BONUS = {
     "Esp": -1.0,    # espulsione
     "Gs": -1.0,     # gol subito (conta solo per i portieri)
 }
+# Il portiere che non prende gol fa +1. Non e' una colonna del file dei voti:
+# si ricava da Gs = 0 su un portiere che ha il voto. Scoperto il 13/10/2026:
+# la 6ª veniva 76,5 da noi e 77,5 sull'app Leghe, Meret aveva la porta
+# inviolata; Marco l'ha confermato dalle impostazioni della lega.
+PORTIERE_IMBATTUTO = 1.0
 
 
 def fantavoto(voto, eventi, ruolo):
@@ -55,6 +60,8 @@ def fantavoto(voto, eventi, ruolo):
         if chiave == "Gs" and ruolo != "P":
             continue
         totale += peso * float(eventi.get(chiave) or 0)
+    if ruolo == "P" and not float(eventi.get("Gs") or 0):
+        totale += PORTIERE_IMBATTUTO
     return round(totale, 2)
 
 # --- modificatore difesa: (soglia superiore esclusa, punti) ---

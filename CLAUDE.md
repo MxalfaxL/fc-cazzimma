@@ -87,6 +87,8 @@ duplicarle altrove.
   ≤6.25 → 1, ≤6.50 → 2, ≤6.75 → 3, ≤7 → 4, >7 → 5. È la regola più importante
   di tutto il progetto: vale fino a 5 punti a giornata, più di un gol intero.
 - **Fasce gol**: primo gol a 66 punti, poi uno ogni 4.
+- **Bonus e malus** quelli di Leghe, piu' **portiere imbattuto +1** (confermato da
+  Marco il 13 ottobre 2026: la 6ª veniva un punto sotto la piattaforma).
 - Sette moduli: 3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-4-1, 5-3-2.
 - Panchina libera nell'ordine, **5 sostituzioni** ruolo per ruolo.
 - Formazione entro **15 minuti prima della prima partita** della giornata:

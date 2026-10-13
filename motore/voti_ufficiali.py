@@ -89,6 +89,10 @@ def racconta(eventi, ruolo):
             pezzi.append(parola)
         else:
             pezzi.append(f"{quanti} {PLURALE.get(parola, parola)}")
+    # il +1 del portiere imbattuto (regole.PORTIERE_IMBATTUTO) non ha una
+    # colonna nel file: senza questa parola il 7 di un 6 restava un mistero
+    if ruolo == "P" and not int(eventi.get("Gs") or 0):
+        pezzi.append("porta inviolata")
     return ", ".join(pezzi)
 
 
