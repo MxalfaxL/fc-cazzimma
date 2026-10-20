@@ -53,6 +53,12 @@ INIZIO_GIORNATA = {
     # (calendario in dati/calendario-2026-27.json, letto il 24/9)
     6: "2026-10-09",
     7: "2026-10-15",
+    # la 9ª e' un turno infrasettimanale (27-29/10), poi sosta fino al 20/11
+    8: "2026-10-22",
+    9: "2026-10-26",
+    10: "2026-10-30",
+    11: "2026-11-05",
+    12: "2026-11-20",
 }
 
 GIORNATE = ["prima", "seconda", "terza", "quarta", "quinta", "sesta", "settima", "ottava",
