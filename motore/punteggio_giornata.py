@@ -26,7 +26,8 @@ Come si fanno i conti (regolamento, punti 5, 7.1, 8.2 e 9):
   campo (titolari con voto e difensori entrati), solo se sono almeno 4;
 - gol dalle fasce: primo a 66, poi uno ogni 4.
 
-`stato.json` del repository privato si LEGGE soltanto: ci scrive solo l'app.
+`stato.json` del repository privato qui si LEGGE soltanto (l'unica scrittura dal
+Mac e' la Conferma, in conferma_formazione.py, quando Marco la chiede).
 
 Uso:
     python3 motore/punteggio_giornata.py 6

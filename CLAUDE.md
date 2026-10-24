@@ -158,6 +158,7 @@ motore/guida_asta.py       le fasce della guida all'asta di SOS Fanta accanto ai
 motore/rose_lega.py        controlla le rose della lega ricopiate dagli screenshot (ruoli, crediti, listone)
 motore/punteggio_giornata.py  i fantapunti veri di una giornata: formazione confermata (stato.json, sola lettura) ai voti ufficiali, scrive report/risultati.json
 motore/nostri.py           i nostri 25 squadra per squadra verso la prossima giornata: cosa dicono fonti e tecnici, voti, dossier → report/NOSTRI.md
+motore/conferma_formazione.py  la Conferma della formazione in stato.json, solo su richiesta esplicita di Marco
 Gazzetta dello sport/      i PDF del giornale che Marco carica ogni giorno (gitignored)
 dati/                      input grezzi (gitignored tranne gli esempi e le prove)
 dati/piani.json            i piani di spesa di Marco (gitignored)
@@ -186,7 +187,11 @@ pubblico ma innocuo: non ci sono segreti nel codice.
   scrive solo l'app attraverso l'API di GitHub: se ci mettessimo le mani da
   qui, le versioni si pesterebbero i piedi. L'unica eccezione, dal 12
   settembre 2026, è `listone.json`: lo scrive `motore/invia_listone.py` dal
-  Mac e l'app lo prende se è più recente del suo. Niente altro.
+  Mac e l'app lo prende se è più recente del suo. Seconda eccezione, dal 24
+  ottobre 2026: la **Conferma della formazione** (`stato.formazioni[N]`) con
+  `motore/conferma_formazione.py N --vai`, **solo quando Marco lo chiede
+  esplicitamente**. Mai di iniziativa: se la conferma manca, glielo si
+  ricorda e basta. Niente altro.
 - **Nessun token, nessuna credenziale in un file.** Il token dell'app vive solo
   sul dispositivo, cifrato con la password che Marco sceglie nella schermata
   di accesso (PBKDF2 + AES-GCM, tutto nel browser). Se ti serve autenticarti
