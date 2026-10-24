@@ -13,6 +13,7 @@ Uso:
     python3 motore/leggi_gazzetta.py                       # tutti i PDF della cartella non ancora letti
     python3 motore/leggi_gazzetta.py "Gazzetta dello sport/x.pdf"   # uno solo, anche se gia' letto
     python3 motore/leggi_gazzetta.py --controlla            # giorno per giorno: PDF, estratto, letto?
+    python3 motore/leggi_gazzetta.py --pulisci [--vai]      # PDF letti e vecchi di 7+ giorni nel Cestino
     ... --tutte                                            # salva ogni pagina, anche quelle vuote
 
 Tutto resta in dati/, che git ignora: e' un giornale comprato, uso personale.
@@ -38,6 +39,10 @@ MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio",
 
 # Sotto questa densita' la pagina non parla di Serie A (o ne parla di striscio).
 SOGLIA_GIOCATORI = 4
+
+# Quanti giorni di PDF tenere: il testo estratto resta per sempre, il PDF serve
+# solo per rileggere tabelle e immagini nei giorni subito dopo (regola del 24/10).
+GIORNI_DA_TENERE = 7
 # Cognomi cortissimi ("Rui", "Pau") trovano omonimi ovunque: contano solo se
 # accompagnati da altri segnali, non da soli.
 LUNGHEZZA_MINIMA = 4
@@ -254,9 +259,62 @@ def controlla():
     print(f"\n{buchi} giorni da sistemare." if buchi else "\nTutto letto.")
 
 
+def nel_cestino(pdf):
+    """Nel Cestino del Mac col Finder, cosi' "Ripristina" lo rimette al suo
+    posto; se il Finder non risponde, a mano in ~/.Trash."""
+    esito = subprocess.run(["osascript", "-e", f'tell application "Finder" to delete POSIX file "{pdf}"'],
+                           capture_output=True, text=True)
+    if esito.returncode != 0:
+        cestino = Path.home() / ".Trash"
+        destinazione = cestino / pdf.name
+        if destinazione.exists():
+            destinazione = cestino / f"{pdf.stem} {int(pdf.stat().st_mtime)}{pdf.suffix}"
+        shutil.move(str(pdf), str(destinazione))
+
+
+def pulisci(vai=False):
+    """I PDF piu' vecchi di GIORNI_DA_TENERE nel Cestino, ma solo quelli gia'
+    letti: estratti (indice.md) e passati da un lettore (note*.json). Il testo
+    estratto e le note restano in dati/gazzetta/, 20 MB contro un giga di PDF
+    (regola di Marco del 24/10/2026). Un giornale non letto non si tocca, a
+    qualunque eta': prima si legge."""
+    import datetime
+    oggi = datetime.date.today()
+    via, tenuti, non_letti = [], 0, []
+    for pdf in sorted(CARTELLA_PDF.glob("*.pdf")) + sorted(CARTELLA_PDF.glob("*.PDF")):
+        k = data_del_giornale(pdf)
+        try:
+            eta = (oggi - datetime.date.fromisoformat(k)).days
+        except ValueError:
+            print(f"  {pdf.name}: data non riconosciuta ({k}), lo lascio")
+            continue
+        cartella = CARTELLA_TESTO / k
+        letto = (cartella / "indice.md").exists() and any(cartella.glob("note*.json"))
+        if not letto:
+            non_letti.append(f"{k} ({pdf.name})")
+        elif eta >= GIORNI_DA_TENERE:
+            via.append(pdf)
+        else:
+            tenuti += 1
+    peso = sum(p.stat().st_size for p in via) / 1e6
+    print(f"{len(via)} PDF letti e piu' vecchi di {GIORNI_DA_TENERE} giorni ({peso:.0f} MB), "
+          f"{tenuti} recenti da tenere.")
+    if non_letti:
+        print("NON LETTI, restano finche' un lettore non li fa:\n  " + "\n  ".join(non_letti))
+    if not vai:
+        print("Prova: non ho spostato niente. Con --pulisci --vai vanno nel Cestino.")
+        return
+    for pdf in via:
+        nel_cestino(pdf)
+    print(f"Spostati nel Cestino {len(via)} PDF.")
+
+
 def main(argv):
     if "--controlla" in argv:
         controlla()
+        return
+    if "--pulisci" in argv:
+        pulisci("--vai" in argv)
         return
     tutte = "--tutte" in argv
     espliciti = [Path(a) for a in argv[1:] if not a.startswith("--")]
