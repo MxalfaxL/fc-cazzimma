@@ -319,9 +319,13 @@ def stampa(s):
         avviso = f"   ← dubbio {x['p']:.0%}, se perde costa {x['costo']:.2f}" if x["p"] < 1 else ""
         print(f"    {g.nome:<18} {g.fv:>5.2f}   voto {g.voto:>4.2f}   atteso {x['atteso']:>5.2f}{avviso}")
 
-    print("\n  Panchina, in quest'ordine (ruolo per ruolo, per fantavoto)")
-    for i, g in enumerate(s["panchina"], 1):
-        dubbio = f"   {g.p:.0%}" if g.p < 1 else ""
+    # Sulla piattaforma la panchina e' di 14 e va riempita tutta: gli
+    # indisponibili chiudono il loro reparto, cosi' Marco copia la lista com'e'
+    # (26/10: dati 12 nomi senza Mandragora e Ilic, e la panchina restava a meta').
+    print("\n  Panchina completa, in quest'ordine (ruolo per ruolo, per fantavoto; i fuori in fondo al reparto)")
+    completa_14 = [g for r in RUOLI for g in s["reparti"][r]["panca"] + [f for f in s["fuori"] if f.ruolo == r]]
+    for i, g in enumerate(completa_14, 1):
+        dubbio = "   FUORI" if g.p <= 0 else (f"   {g.p:.0%}" if g.p < 1 else "")
         print(f"    {i:>2}. {g.nome:<18} {g.ruolo}   {g.fv:>5.2f}{dubbio}")
 
     print("\n  Ricambio atteso per ruolo: " + "   ".join(
