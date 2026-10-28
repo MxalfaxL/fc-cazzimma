@@ -133,9 +133,16 @@ def pezzi_voto(testo):
     """Da 'Carnesecchi 6,5; Bellanova 5,5 (68' Bernasconi 6)' alle coppie
     (nome, voto). I subentrati stanno fra parentesi col minuto davanti."""
     fuori = []
-    for minuto, nome, voto in re.findall(r"\((\d+)'\s*([^)\d]+?)\s+(\d{1,2}(?:[,.]\d)?|sv)\)", testo):
-        fuori.append((nome.strip(), voto))
-    senza_parentesi = re.sub(r"\([^)]*\)", " ", testo)
+    # Un subentrato a sua volta sostituito apre una parentesi dentro l'altra:
+    # "Perrone 5 (58' Addai 6 (78' Ricci S. sv))". Il 27/10 cosi' sparivano sia
+    # Perrone sia Addai: le parentesi si tolgono dalla piu' interna in fuori.
+    interna = re.compile(r"\(([^()]*)\)")
+    senza_parentesi = testo
+    while (m := interna.search(senza_parentesi)):
+        s = re.match(r"^\s*(\d+)'\s*([^\d]+?)\s+(\d{1,2}(?:[,.]\d)?|sv)\s*$", m.group(1))
+        if s:
+            fuori.append((s.group(2).strip(), s.group(3)))
+        senza_parentesi = senza_parentesi[:m.start()] + " " + senza_parentesi[m.end():]
     # si separa sul punto e virgola e sulle virgole che dividono i giocatori,
     # MAI su quella dei mezzi voti: "Bijlow 6,5; Marcandalli 5,5" tagliato
     # anche sul decimale diventa "Bijlow 6" e perde mezzo voto a mezza rosa
@@ -177,8 +184,14 @@ def leggi_partita(blocco, squadre):
             continue
         for nome in m.group(1).split(","):
             nome = nome.strip(" .-")
+            evento = e.lower()
+            # nella riga dei gol l'autorete e' "aut. Sutalo": e' un -2, non un +3
+            # (27/10: "autsutalo" non si abbinava e l'autogol spariva)
+            autorete = re.match(r"^aut\.?\s+(.+)$", nome, re.I)
+            if autorete:
+                nome, evento = autorete.group(1), "autogol"
             if nome and nome != "-":
-                eventi.setdefault(norm(nome), []).append(e.lower())
+                eventi.setdefault(norm(nome), []).append(evento)
     return (casa, ospite), per_squadra, eventi
 
 
@@ -211,6 +224,20 @@ def leggi_articolo(percorso, per_squadra_listone, esatti, data_cartella, squadre
         if not letto:
             continue
         _, per_squadra, eventi = letto
+        # nella riga degli eventi a volte manca l'iniziale ("aut. Sutalo" per
+        # "Sutalo J."): si accetta il cognome solo se in quella partita e' di uno solo
+        tutti = [norm(g) for elenco in per_squadra.values() for g, _ in pezzi_voto(elenco)]
+
+        def eventi_di(grezzo, nome):
+            ev = eventi.get(norm(grezzo)) or eventi.get(norm(nome))
+            if ev:
+                return ev
+            chiave = norm(grezzo)
+            for k, v in eventi.items():
+                if len(k) >= 4 and chiave.startswith(k) and sum(t.startswith(k) for t in tutti) == 1:
+                    return v
+            return None
+
         for squadra, elenco in per_squadra.items():
             for grezzo, voto in pezzi_voto(elenco):
                 if voto == "sv":
@@ -222,7 +249,7 @@ def leggi_articolo(percorso, per_squadra_listone, esatti, data_cartella, squadre
                     continue
                 voce = {"nome": nome, "giornata": giornata,
                         "voto": float(voto.replace(",", ".")), "fantavoto": None}
-                ev = eventi.get(norm(grezzo)) or eventi.get(norm(nome))
+                ev = eventi_di(grezzo, nome)
                 if ev:
                     voce["eventi"] = ", ".join(sorted(set(ev)))
                 voti.append(voce)
