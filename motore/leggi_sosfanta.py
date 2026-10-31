@@ -29,9 +29,10 @@ import re
 import sys
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from email.utils import parsedate_to_datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import registro as reg
@@ -42,7 +43,9 @@ FEED = "https://www.sosfanta.com/feed/"
 CARTELLA = RADICE / "dati" / "sosfanta"
 VISTI = CARTELLA / "visti.json"
 NS = {"content": "http://purl.org/rss/1.0/modules/content/", "dc": "http://purl.org/dc/elements/1.1/"}
-ROMA = timezone(timedelta(hours=2))   # ora legale; d'inverno sbaglia di un'ora, non importa
+# Il fuso vero: col +2 fisso, d'inverno ogni articolo risultava un'ora piu' tardi
+# e quelli fra le 23 e mezzanotte finivano nella cartella del giorno dopo
+ROMA = ZoneInfo("Europe/Rome")
 
 
 def scarica():

@@ -13,12 +13,14 @@ Uso da riga di comando:
 """
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 RADICE = Path(__file__).resolve().parent.parent
 FILE = RADICE / "dati" / "estrazioni.json"
-ROMA = timezone(timedelta(hours=2))
+# Il fuso vero, non +2 fisso: dal 25/10 l'ora solare spostava tutto avanti di un'ora
+ROMA = ZoneInfo("Europe/Rome")
 STORIA_MAX = 20
 
 
