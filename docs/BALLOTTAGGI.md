@@ -28,7 +28,19 @@ oppure la scrivi a mano toccando una seconda volta il bottone **B**.
 Nella vostra lega le sostituzioni sono ruolo per ruolo e la panchina è
 libera nell'ordine. Se un difensore non gioca entra il primo difensore in
 panchina **che ha giocato**; se nemmeno lui ha giocato, il secondo; e così
-via. Se nessuno del ruolo ha giocato la casella resta vuota e vale zero.
+via. Se nessuno del ruolo ha giocato scatta il **cambio modulo** (regolamento,
+art. 5): entra il primo della panchina, di qualunque altro ruolo, che ha
+giocato e lascia un modulo ammesso. Solo se non c'è nemmeno lui la casella
+resta vuota e vale zero.
+
+**L'ordine dei reparti in panchina** (dal 6 novembre 2026) decide chi entra
+col cambio modulo. Dal 4-3-3 senza attaccanti: se in panchina vengono prima i
+centrocampisti si passa al 4-4-2, se vengono prima i difensori al 5-3-2. Il
+motore prova tutti e sei gli ordini di difensori, centrocampisti e attaccanti
+(i portieri stanno in testa: entrano solo per il portiere), tiene quello che
+rende di più e lo scrive sotto la panchina. Gli attaccanti in testa non
+servono mai: al posto di un difensore o di un centrocampista darebbero un
+3-3-4 o un 4-2-4, che non esistono.
 
 **L'ordine di panchina dentro un ruolo è per fantavoto**, non per
 certezza. Sembra strano mettere davanti un giocatore in dubbio, ma se non
@@ -118,8 +130,13 @@ sopra. Il rosso è la scelta della giornata.
 
 - Le **5 sostituzioni** massime non sono modellate: servirebbe che sei
   titolari saltassero nella stessa giornata.
-- Il **cambio modulo** quando un ruolo è scoperto non è modellato: la
-  casella vuota vale zero, che è la cosa più prudente.
+- Il **cambio modulo** è modellato dal 6 novembre 2026, con due semplificazioni:
+  prima si fanno tutti i cambi nello stesso ruolo, poi quelli fra ruoli con chi
+  avanza (la piattaforma li fa titolare per titolare: cambia qualcosa solo se
+  mancano due reparti insieme); un difensore entrato al posto di un attaccante
+  non rientra nel conto del modificatore. I giocatori dentro un modulo si
+  scelgono senza il cambio modulo: lo contano il confronto fra moduli, l'ordine
+  della panchina e il costo dei dubbi.
 - I ballottaggi sono trattati come **indipendenti** fra loro. Se due tuoi
   giocatori sono in ballottaggio l'uno con l'altro (i due portieri del
   Napoli), il modello non lo sa: pensa che possano saltare entrambi.

@@ -292,6 +292,12 @@ Fatto e funzionante:
   la percentuale del ballottaggio, e dice chi non ha trovato o su chi non è
   sicuro. Nessuno scraper.
 
+- **Cambio modulo** (6 novembre 2026): se un reparto resta senza ricambi
+  con un voto entra il primo della panchina che lascia un modulo ammesso
+  (regolamento, art. 5). Il consigliere lo conta e sceglie l'ordine dei
+  reparti in panchina; `punteggio_giornata.py` lo applica ai punti veri.
+  Metodo in `docs/BALLOTTAGGI.md`, Python e JS verificati uguali.
+
 - **Schermata di accesso** (5 settembre 2026): chi apre il link vede solo
   utente e password. Primo accesso per dispositivo con il token, verificato
   contro GitHub prima di accettarlo; poi il token sta in `localStorage`

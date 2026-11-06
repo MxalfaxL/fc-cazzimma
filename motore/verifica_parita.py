@@ -46,6 +46,7 @@ const forma = s => s ? {
   modulo: s.modulo, totale: s.totale, mod: s.mod, media: s.media, modAtteso: s.modAtteso, scelta: !!s.scelta,
   undici: s.undici.map(x => ({n: x.g.n, r: x.r, p: x.p, atteso: x.atteso, votoAtteso: x.votoAtteso, costo: x.costo, sostituto: x.sostituto})),
   panchina: s.panchina.map(g => g.n),
+  cambioModulo: s.cambioModulo, ordinePanchina: s.ordinePanchina.join(''),
   alternative: s.alternative.map(a => ({modulo: a.modulo, totale: a.totale, mod: a.mod, modAtteso: a.modAtteso})),
   gol: s.gol, alGolDopo: s.alGolDopo,
 } : null;
@@ -117,6 +118,9 @@ def confronta(py, js):
             num(f"{a['n']} costo", a["costo"], b["costo"])
             if a["sostituto"] != b["sostituto"]:
                 differenze.append(f"{a['n']} sostituto: python {a['sostituto']} · js {b['sostituto']}")
+    num("cambio modulo", py["cambioModulo"], js["cambioModulo"])
+    if py["ordinePanchina"] != js["ordinePanchina"]:
+        differenze.append(f"ordine dei reparti in panchina: python {py['ordinePanchina']} · js {js['ordinePanchina']}")
     if py["panchina"] != js["panchina"]:
         differenze.append(f"panchina: python {py['panchina']} · js {js['panchina']}")
     if [a["modulo"] for a in py["alternative"]] != [a["modulo"] for a in js["alternative"]]:

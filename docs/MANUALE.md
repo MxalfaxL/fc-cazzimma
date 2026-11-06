@@ -148,6 +148,15 @@ confermato). Dalla 2026.10.10f il campetto si legge come sull'app di Leghe:
 due colonne), **Scegli il modulo** con la distanza. Se il margine è sotto
 mezzo punto, decidi tu.
 
+**La panchina va copiata nell'ordine esatto, reparti compresi** (dalla
+2026.11.06). Se un reparto resta senza ricambi con un voto, la piattaforma fa
+entrare il primo della panchina che ha un voto e lascia un modulo ammesso, e
+cambia modulo da sola: per questo l'app mette i reparti nell'ordine che rende
+di più (per esempio portieri, centrocampisti, difensori, attaccanti col 4-3-3:
+se manca un attaccante si passa al 4-4-2 e non al 5-3-2) e lo scrive sotto la
+panchina, insieme a quanto vale il cambio modulo. I conti dei moduli lo
+contano già.
+
 **Regola a mano chi gioca**, in fondo, è chiuso: di solito non serve. Aprilo
 se esce una notizia all'ultimo: i bottoni **T B F** per ogni giocatore
 (secondo tocco su B: la percentuale), il numero della giornata, **Tutti
@@ -170,15 +179,14 @@ vecchio *Registra la giornata* non c'e' piu', dal 10/10/2026).
    **punti attesi in grigio**, *in attesa dei voti ufficiali*.
 2. Il lunedi' metti il file dei voti di Fantacalcio.it in `Voti Fantacalcio/`
    sul Mac: il Mac applica la formazione confermata ai voti con le regole
-   della lega (sostituzioni ruolo per ruolo in ordine di panchina, massimo 5;
-   modificatore; fasce gol) e manda i punti all'app col listone.
+   della lega (sostituzioni ruolo per ruolo in ordine di panchina, massimo 5,
+   cambio modulo se un ruolo resta scoperto; modificatore; fasce gol) e manda i punti all'app col listone.
 3. Alla prossima apertura la giornata mostra i **punti veri**, i gol e il
    modificatore. Toccala: i reparti con la sigla colorata, per ognuno chi ha
    giocato con voto, bonus e **fantavoto**; chi e' entrato dalla panchina ha
    *entrato per …* in verde; chi e' rimasto senza voto e senza ricambio e'
-   **in rosso** (vale 0: la piattaforma li' cambierebbe modulo, noi no, quindi
-   il nostro conto puo' essere un filo piu' basso). Sotto la panchina numerata
-   e il conto del modificatore.
+   **in rosso** (vale 0: nessuno con un voto in panchina, neanche col cambio
+   modulo). Sotto la panchina numerata e il conto del modificatore.
 
 In cima quattro numeri: giornate giocate, media punti, gol fatti, migliore
 giornata.

@@ -1054,11 +1054,93 @@ function esitiReparto(scelti, panca, forza){
     const gioca = g => probDi(g) >= 1 || giocano.has(g.id);
     const riserve = panca.filter(gioca);
     const caselle = scelti.map(g => gioca(g) ? g : (riserve.length ? riserve.shift() : null));
-    esiti.push({p: prob, caselle,
+    // chi ha giocato e non è entrato: è lui che il cambio modulo può mandare
+    // a coprire una casella vuota di un altro reparto
+    esiti.push({p: prob, caselle, avanzi: riserve,
       fv: caselle.reduce((s,g)=> s + (g ? g.fv : 0), 0),
       voti: caselle.filter(g=>g).map(g=>g.voto)});
   }
   return esiti;
+}
+
+/* Il cambio modulo (regolamento della lega, art. 5): «le sostituzioni
+   vengono fatte ruolo per ruolo, se non possibile, in base all'ordine di
+   posizionamento in panchina, con cambio modulo». Quando un reparto finisce
+   i ricambi entra il primo della panchina, di qualunque ruolo, che ha un voto
+   e dà un modulo ammesso. Fino al 6 novembre 2026 la casella restava vuota e
+   valeva zero: i moduli con un reparto dai ricambi deboli sembravano più
+   rischiosi di quanto sono. L'ordine dei reparti in panchina decide chi
+   entra: il motore prova tutti e sei gli ordini e tiene il migliore. I
+   portieri stanno sempre in testa, tanto entrano solo al posto del portiere. */
+const ORDINI_PANCHINA = [['D','C','A'],['D','A','C'],['C','D','A'],['C','A','D'],['A','D','C'],['A','C','D']];
+
+/* Per il cambio modulo di un reparto contano solo quante caselle restano
+   vuote e chi avanza in panchina, in ordine: gli esiti uguali per questo si
+   sommano, così l'incrocio fra i tre reparti resta piccolo. */
+function statiCambio(esiti){
+  const stati = new Map();
+  for(const e of esiti){
+    const vuoti = e.caselle.filter(g => !g).length;
+    const chiave = vuoti + '|' + e.avanzi.map(g => g.n).join('|');
+    if(stati.has(chiave)) stati.get(chiave).p += e.p;
+    else stati.set(chiave, {p: e.p, vuoti, avanzi: e.avanzi});
+  }
+  return [...stati.values()];
+}
+
+/* Quanto rende in media il cambio modulo: per ogni incrocio degli esiti di
+   difesa, centrocampo e attacco con almeno una casella vuota, si scorre
+   l'undici dalla difesa all'attacco e per ogni casella vuota entra il primo
+   che avanza nei reparti dell'`ordine`, se il modulo che ne esce è ammesso.
+   Approssimazioni dichiarate: il tetto di 5 sostituzioni non c'è (come nel
+   resto del motore) e un difensore entrato così non rientra nel modificatore. */
+function guadagnoCambio(stati, ordine, quanti){
+  let totale = 0;
+  for(const sd of stati.D) for(const sc of stati.C) for(const sa of stati.A){
+    if(sd.vuoti + sc.vuoti + sa.vuoti === 0) continue;
+    let conta = {D: quanti[0], C: quanti[1], A: quanti[2]};
+    const avanzi = {D: sd.avanzi, C: sc.avanzi, A: sa.avanzi};
+    const usati = {D: 0, C: 0, A: 0};
+    let resa = 0;
+    for(const [r, st] of [['D', sd], ['C', sc], ['A', sa]]){
+      for(let k = 0; k < st.vuoti; k++){
+        for(const q of ordine){
+          if(q === r || usati[q] >= avanzi[q].length) continue;
+          const prova = {...conta};
+          prova[r]--; prova[q]++;
+          if(MODULI[`${prova.D}-${prova.C}-${prova.A}`]){
+            conta = prova; resa += avanzi[q][usati[q]].fv; usati[q]++;
+            break;
+          }
+        }
+      }
+    }
+    totale += sd.p * sc.p * sa.p * resa;
+  }
+  return totale;
+}
+
+/* L'ordine dei reparti in panchina che rende di più col cambio modulo, e
+   quanto rende. A parità resta il primo provato, D-C-A. */
+function cambioModulo(reparti){
+  const quanti = ['D','C','A'].map(r => reparti[r].scelti.length);
+  const stati = {D: statiCambio(reparti.D.esiti), C: statiCambio(reparti.C.esiti), A: statiCambio(reparti.A.esiti)};
+  let migliore = ORDINI_PANCHINA[0], resa = null;
+  for(const ordine of ORDINI_PANCHINA){
+    const g = guadagnoCambio(stati, ordine, quanti);
+    if(resa === null || g > resa + 1e-12){ migliore = ordine; resa = g; }
+  }
+  return {ordine: migliore, resa};
+}
+
+/* Sul totale di un modulo già scelto: il cambio modulo e l'ordine dei
+   reparti in panchina che lo fa rendere di più. */
+function aggiungiCambioModulo(s){
+  const c = cambioModulo(s.reparti);
+  s.totale += c.resa;
+  s.cambioModulo = c.resa;
+  s.ordinePanchina = c.ordine;
+  return s;
 }
 
 /* Il modificatore mediato su tutti gli esiti di portiere e difesa: con i
@@ -1097,16 +1179,22 @@ function miglioreReparto(disponibili, n){
   return migliore;
 }
 
-/* Il totale atteso di una formazione già scelta: i quattro reparti più il
-   modificatore atteso. Serve al costo dell'errore. */
-function totaleFormazione(reparti, forza){
+/* Il totale atteso di una formazione già scelta: i quattro reparti, il
+   modificatore atteso e, con l'ordine della panchina, il cambio modulo.
+   Serve al costo dell'errore. */
+function totaleFormazione(reparti, forza, ordine){
   const esiti = {};
   let somma = 0;
   for(const r of ORDINE){
     esiti[r] = esitiReparto(reparti[r].scelti, reparti[r].panca, forza);
     somma += esiti[r].reduce((s,e)=>s + e.p*e.fv, 0);
   }
-  return somma + modificatoreAtteso(esiti.P, esiti.D);
+  let totale = somma + modificatoreAtteso(esiti.P, esiti.D);
+  if(ordine){
+    const quanti = ['D','C','A'].map(r => reparti[r].scelti.length);
+    totale += guadagnoCambio({D: statiCambio(esiti.D), C: statiCambio(esiti.C), A: statiCambio(esiti.A)}, ordine, quanti);
+  }
+  return totale;
 }
 
 function valutaModulo(disponibili, nomeModulo){
@@ -1133,7 +1221,9 @@ function valutaModulo(disponibili, nomeModulo){
       }
     }
   }
-  return migliore;
+  // i giocatori si scelgono senza il cambio modulo; il confronto fra moduli
+  // e il costo dei dubbi lo contano
+  return aggiungiCambioModulo(migliore);
 }
 
 /* Quanto costa se un titolare in dubbio non gioca: il totale atteso con lui
@@ -1142,8 +1232,8 @@ function valutaModulo(disponibili, nomeModulo){
    compreso). È il numero da guardare prima di schierarlo. */
 function costoErrore(val, ruolo, indice){
   const rep = val.reparti[ruolo], g = rep.attesi[indice].g;
-  const conLui = totaleFormazione(val.reparti, {[g.id]: 1});
-  const senza  = totaleFormazione(val.reparti, {[g.id]: 0});
+  const conLui = totaleFormazione(val.reparti, {[g.id]: 1}, val.ordinePanchina);
+  const senza  = totaleFormazione(val.reparti, {[g.id]: 0}, val.ordinePanchina);
   return {costo: conLui - senza, sostituto: rep.panca[0] ? rep.panca[0].n : null};
 }
 
@@ -1182,7 +1272,7 @@ function valutaScelta(rosa, modulo, ids){
   const modAtteso = modificatoreAtteso(reparti.P.esiti, reparti.D.esiti);
   const totale = reparti.P.somma + reparti.D.somma + reparti.C.somma + reparti.A.somma + modAtteso;
   const m = modificatore(reparti.P.scelti[0].voto, reparti.D.scelti.map(g=>g.voto));
-  const s = {modulo, totale, mod:m.punti, media:m.media, modAtteso, reparti, scelta:true};
+  const s = aggiungiCambioModulo({modulo, totale, mod:m.punti, media:m.media, modAtteso, reparti, scelta:true});
   // accanto alla scelta a mano restano, per confronto, i moduli in automatico
   const valutazioni = Object.keys(MODULI).map(mo=>valutaModulo(disponibili, mo)).filter(Boolean).sort((a,b)=>b.totale - a.totale);
   return completa(s, valutazioni, rosa);
@@ -1195,7 +1285,7 @@ function completa(s, alternative, rosa){
     const c = costoErrore(s, r, i);
     return {g:x.g, r, p:x.p, atteso:x.atteso, votoAtteso:x.votoAtteso, costo:c.costo, sostituto:c.sostituto};
   }));
-  s.panchina = ORDINE.flatMap(r => s.reparti[r].panca);
+  s.panchina = ['P', ...s.ordinePanchina].flatMap(r => s.reparti[r].panca);
   s.ricambi = Object.fromEntries(ORDINE.map(r=>[r, s.reparti[r].ricambio]));
   s.fuori = rosa.filter(g=>g.st === 'F');
   s.alternative = alternative.map(v=>({modulo:v.modulo, totale:v.totale, mod:v.mod, media:v.media, modAtteso:v.modAtteso}));
@@ -1212,7 +1302,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.10.10f';
+const VERSIONE_APP = '2026.11.06';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1535,6 +1625,15 @@ function differenzaMandata(s, f){
   return '';
 }
 
+/* L'ordine dei reparti in panchina non è estetica: se un reparto resta senza
+   ricambi, la piattaforma fa entrare il primo con voto in quell'ordine e
+   cambia modulo (regolamento, art. 5). Va detto, perché Marco lo copia. */
+const REPARTI_PANCA = {D:'difensori', C:'centrocampisti', A:'attaccanti'};
+function notaCambioModulo(s){
+  const ordine = s.ordinePanchina.map(r => REPARTI_PANCA[r]).join(', poi ');
+  return `Reparti in panchina in quest'ordine: portieri, poi ${ordine}. Se un reparto resta senza ricambi entra il primo con voto in quest'ordine e il modulo cambia (cambio modulo: +${f2(s.cambioModulo)} attesi).`;
+}
+
 function disegnaFormazione(){
   const s = formazioneCorrente();
   const aMano = sceltaAttiva();
@@ -1616,6 +1715,7 @@ function disegnaFormazione(){
         <div class="nome">${i+1}. ${esc(g.n)}${g.st==='B' ? `<span class="dubbio-tag">${percento(probabilita(g))}</span>` : ''}${ufficiale(g) ? '<span class="spunta">✓</span>' : ''}${squadraDi(g) ? `<small>${esc(squadraDi(g))}</small>` : ''}</div>
         <div class="val"><b>${f2(g.fv)}</b>voto ${f2(g.voto)}</div>
       </div>`).join('')
+      + `<p class="nota">${notaCambioModulo(s)}</p>`
       + (s.fuori.length ? `<p class="nota">Fuori questa giornata: ${s.fuori.map(g=>esc(g.n) + (squadraDi(g) ? ` (${esc(squadraDi(g))})` : '')).join(', ')}.</p>` : '')
     : '<div class="vuoto">Nessuno in panchina.</div>';
 
@@ -1804,7 +1904,7 @@ $('btnCopiaForm').addEventListener('click', async ()=>{
   if(!s) return;
   const testo = `FC CAZZIMMA — giornata ${stato.giornata}\n${s.modulo} · ${f2(s.totale)} punti attesi · ${s.gol} gol${s.mod ? ' · mod +'+s.mod : ''}\n\n`
     + s.undici.map(x=>`${x.r}  ${x.g.n}${x.p < 1 ? '  (?)' : ''}`).join('\n')
-    + `\n\nPANCHINA\n` + s.panchina.map((g,i)=>`${i+1}. ${g.n} (${g.r})`).join('\n');
+    + `\n\nPANCHINA (reparti: P-${s.ordinePanchina.join('-')}, conta per il cambio modulo)\n` + s.panchina.map((g,i)=>`${i+1}. ${g.n} (${g.r})`).join('\n');
   try{ await navigator.clipboard.writeText(testo); toast('Formazione copiata'); }
   catch(e){ toast('Copia non riuscita: selezionala a mano'); }
 });

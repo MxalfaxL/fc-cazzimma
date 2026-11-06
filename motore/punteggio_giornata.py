@@ -19,9 +19,10 @@ Come si fanno i conti (regolamento, punti 5, 7.1, 8.2 e 9):
   panchina DELLO STESSO RUOLO che ha un voto, nell'ordine della panchina;
   massimo 5 sostituzioni in tutto, portiere compreso. Si scorre l'undici da
   portiere ad attacco, come lo scrive l'app;
-- il regolamento prevede anche il cambio modulo quando in panchina manca il
-  ruolo: NON lo modelliamo. La casella resta vuota, vale 0, e lo diciamo forte
-  (in quel caso il punteggio della piattaforma puo' essere piu' alto del nostro);
+- se in panchina non c'e' nessuno di quel ruolo con un voto, cambio modulo
+  (regolamento, art. 5, dal 6/11/2026 anche qui): entra il primo della
+  panchina, di qualunque altro ruolo, che ha un voto e lascia un modulo
+  ammesso. Solo se non c'e' nemmeno lui la casella resta vuota e vale 0;
 - modificatore difesa sui voti PURI del portiere e dei difensori davvero in
   campo (titolari con voto e difensori entrati), solo se sono almeno 4;
 - gol dalle fasce: primo a 66, poi uno ogni 4.
@@ -35,7 +36,8 @@ Uso:
 
 Scrive (o aggiorna, una giornata alla volta) `report/risultati.json`:
     {"giornate": {"6": {"giornata", "modulo", "totale", "gol", "mod", "media",
-      "attesi", "undici": [{"n", "r", "sq", "voto", "fv", "eventi",
+      "attesi", "modulo_finale" (dopo un eventuale cambio modulo),
+      "undici": [{"n", "r", "sq", "voto", "fv", "eventi",
       "entrato_per", "vuoto"}], "sostituzioni": [{"fuori", "dentro"}],
       "senza_voto": [chi e' rimasto senza voto E senza ricambio], "calcolato"}}}
 """
@@ -184,6 +186,8 @@ def calcola(giornata, formazione, voti, squadre):
                           "non la partita saltata")
 
     in_campo, sostituzioni, senza_voto, usati = [], [], [], set()
+    # il modulo di adesso: cambia se un ricambio entra da un altro reparto
+    conta = dict(zip(["D", "C", "A"], MODULI[modulo])) if modulo in MODULI else {"D": 0, "C": 0, "A": 0}
     # da portiere ad attacco, nell'ordine dell'undici: e' l'ordine in cui la
     # piattaforma scorre i titolari quando cerca i ricambi
     titolari = sorted(undici_conf, key=lambda g: ORDINE.index(g["r"]) if g.get("r") in ORDINE else 9)
@@ -202,18 +206,39 @@ def calcola(giornata, formazione, voti, squadre):
                 if sb is not None:
                     ricambio = (i, b, sb)
                     break
+        # cambio modulo (regolamento, art. 5: «ruolo per ruolo, se non possibile,
+        # in base all'ordine di posizionamento in panchina, con cambio modulo»):
+        # entra il primo della panchina con un voto che lascia un modulo ammesso.
+        # Fino al 6/11/2026 qui la casella restava vuota e il conto era per difetto.
+        cambio = None
+        if not ricambio and len(sostituzioni) < SOSTITUZIONI and g["r"] != "P":
+            for i, b in enumerate(panchina):
+                if i in usati or b.get("r") in ("P", g["r"]) or b.get("r") not in conta:
+                    continue
+                prova = dict(conta)
+                prova[g["r"]] -= 1
+                prova[b["r"]] += 1
+                if f"{prova['D']}-{prova['C']}-{prova['A']}" not in MODULI:
+                    continue
+                sb = voti.scheda(b)
+                if sb is not None:
+                    ricambio, cambio = (i, b, sb), prova
+                    break
         if ricambio:
             i, b, sb = ricambio
             usati.add(i)
             sostituzioni.append({"fuori": g["n"], "dentro": b["n"]})
             in_campo.append({"n": b["n"], "r": b["r"], "sq": squadre.get(b["n"], ""), **sb,
                              "entrato_per": g["n"]})
+            if cambio:
+                conta = cambio
+                avvisi.append(f"{g['n']} ({g['r']}) senza voto e nessun {g['r']} in panchina con un voto: "
+                              f"entra {b['n']} ({b['r']}), cambio modulo -> {conta['D']}-{conta['C']}-{conta['A']}")
         else:
             perche = ("finite le 5 sostituzioni" if len(sostituzioni) >= SOSTITUZIONI
-                      else "nessuno in panchina nel suo ruolo con un voto")
+                      else "nessuno in panchina con un voto, neanche col cambio modulo")
             senza_voto.append(g["n"])
-            avvisi.append(f"{g['n']} ({g['r']}) senza voto e senza ricambio ({perche}): casella vuota, 0 punti. "
-                          "La piattaforma qui cambierebbe modulo se puo': il nostro conto e' per difetto")
+            avvisi.append(f"{g['n']} ({g['r']}) senza voto e senza ricambio ({perche}): casella vuota, 0 punti")
             in_campo.append({"n": g["n"], "r": g["r"], "sq": sq, "voto": None, "fv": 0,
                              "eventi": "senza voto, nessun ricambio", "entrato_per": None, "vuoto": True})
 
@@ -230,7 +255,8 @@ def calcola(giornata, formazione, voti, squadre):
     somma = round(sum(x["fv"] for x in in_campo), 2)
     totale = round(somma + mod, 2)
     risultato = {
-        "giornata": giornata, "modulo": modulo, "totale": totale, "gol": gol_da_punti(totale),
+        "giornata": giornata, "modulo": modulo,
+        "modulo_finale": f"{conta['D']}-{conta['C']}-{conta['A']}", "totale": totale, "gol": gol_da_punti(totale),
         "mod": mod, "media": media, "attesi": formazione.get("totale"),
         "undici": in_campo, "sostituzioni": sostituzioni, "senza_voto": senza_voto,
         "calcolato": int(time.time() * 1000),

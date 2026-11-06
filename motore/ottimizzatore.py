@@ -123,10 +123,89 @@ def esiti_reparto(scelti, panca, forza=None):
                 caselle.append(riserve.pop(0))
             else:
                 caselle.append(None)
-        esiti.append({"p": prob, "caselle": caselle,
+        # chi ha giocato e non e' entrato: e' lui che il cambio modulo puo'
+        # mandare a coprire una casella vuota di un altro reparto
+        esiti.append({"p": prob, "caselle": caselle, "avanzi": riserve,
                       "fv": sum(g.fv for g in caselle if g is not None),
                       "voti": [g.voto for g in caselle if g is not None]})
     return esiti
+
+
+# Il cambio modulo (regolamento della lega, art. 5): «le sostituzioni vengono
+# fatte ruolo per ruolo, se non possibile, in base all'ordine di
+# posizionamento in panchina, con cambio modulo». Quando un reparto finisce i
+# ricambi entra il primo della panchina, di qualunque ruolo, che ha un voto e
+# da' un modulo ammesso. Fino al 6 novembre 2026 la casella restava vuota e
+# valeva zero: i moduli con un reparto dai ricambi deboli sembravano piu'
+# rischiosi di quanto sono (sull'11ª il 4-3-3 valeva 0,35 piu' del 4-4-2 e il
+# motore li dava pari). L'ordine dei reparti in panchina decide chi entra: il
+# motore prova tutti e sei gli ordini e tiene il migliore. I portieri stanno
+# sempre in testa, tanto entrano solo al posto del portiere.
+ORDINI_PANCHINA = (("D", "C", "A"), ("D", "A", "C"), ("C", "D", "A"),
+                   ("C", "A", "D"), ("A", "D", "C"), ("A", "C", "D"))
+
+
+def stati_cambio(esiti):
+    """Per il cambio modulo di un reparto contano solo quante caselle restano
+    vuote e chi avanza in panchina, in ordine: gli esiti uguali per questo si
+    sommano, cosi' l'incrocio fra i tre reparti resta piccolo."""
+    stati = {}
+    for e in esiti:
+        vuoti = sum(1 for g in e["caselle"] if g is None)
+        chiave = str(vuoti) + "|" + "|".join(g.nome for g in e["avanzi"])
+        if chiave in stati:
+            stati[chiave]["p"] += e["p"]
+        else:
+            stati[chiave] = {"p": e["p"], "vuoti": vuoti, "avanzi": e["avanzi"]}
+    return list(stati.values())
+
+
+def guadagno_cambio(stati, ordine, quanti):
+    """Quanto rende in media il cambio modulo: per ogni incrocio degli esiti di
+    difesa, centrocampo e attacco con almeno una casella vuota, si scorre
+    l'undici dalla difesa all'attacco e per ogni casella vuota entra il primo
+    che avanza nei reparti dell'`ordine`, se il modulo che ne esce e' ammesso.
+    Approssimazioni dichiarate: il tetto di 5 sostituzioni non c'e' (come nel
+    resto del motore) e un difensore entrato cosi' non rientra nel conto del
+    modificatore."""
+    totale = 0.0
+    for sd in stati["D"]:
+        for sc in stati["C"]:
+            for sa in stati["A"]:
+                if sd["vuoti"] + sc["vuoti"] + sa["vuoti"] == 0:
+                    continue
+                conta = {"D": quanti[0], "C": quanti[1], "A": quanti[2]}
+                avanzi = {"D": sd["avanzi"], "C": sc["avanzi"], "A": sa["avanzi"]}
+                usati = {"D": 0, "C": 0, "A": 0}
+                resa = 0.0
+                for r, st in (("D", sd), ("C", sc), ("A", sa)):
+                    for _ in range(st["vuoti"]):
+                        for q in ordine:
+                            if q == r or usati[q] >= len(avanzi[q]):
+                                continue
+                            prova = dict(conta)
+                            prova[r] -= 1
+                            prova[q] += 1
+                            if f"{prova['D']}-{prova['C']}-{prova['A']}" in MODULI:
+                                conta = prova
+                                resa += avanzi[q][usati[q]].fv
+                                usati[q] += 1
+                                break
+                totale += sd["p"] * sc["p"] * sa["p"] * resa
+    return totale
+
+
+def cambio_modulo(reparti):
+    """L'ordine dei reparti in panchina che rende di piu' col cambio modulo, e
+    quanto rende. A parita' resta il primo provato, D-C-A."""
+    quanti = tuple(len(reparti[r]["scelti"]) for r in ("D", "C", "A"))
+    stati = {r: stati_cambio(reparti[r]["esiti"]) for r in ("D", "C", "A")}
+    migliore, resa = ORDINI_PANCHINA[0], None
+    for ordine in ORDINI_PANCHINA:
+        g = guadagno_cambio(stati, ordine, quanti)
+        if resa is None or g > resa + 1e-12:
+            migliore, resa = ordine, g
+    return migliore, resa
 
 
 def modificatore_atteso(esiti_p, esiti_d):
@@ -170,15 +249,30 @@ def migliore_reparto(disponibili, n):
     return migliore
 
 
-def totale_formazione(reparti, forza=None):
-    """Il totale atteso di una formazione gia' scelta: i quattro reparti
-    piu' il modificatore atteso. Serve al costo dell'errore."""
+def totale_formazione(reparti, forza=None, ordine=None):
+    """Il totale atteso di una formazione gia' scelta: i quattro reparti,
+    il modificatore atteso e, con l'ordine della panchina, il cambio modulo.
+    Serve al costo dell'errore."""
     esiti = {}
     somma = 0.0
     for r in RUOLI:
         esiti[r] = esiti_reparto(reparti[r]["scelti"], reparti[r]["panca"], forza)
         somma += sum(e["p"] * e["fv"] for e in esiti[r])
-    return somma + modificatore_atteso(esiti["P"], esiti["D"])
+    totale = somma + modificatore_atteso(esiti["P"], esiti["D"])
+    if ordine:
+        quanti = tuple(len(reparti[r]["scelti"]) for r in ("D", "C", "A"))
+        totale += guadagno_cambio({r: stati_cambio(esiti[r]) for r in ("D", "C", "A")}, ordine, quanti)
+    return totale
+
+
+def aggiungi_cambio_modulo(s):
+    """Sul totale di un modulo gia' scelto: il cambio modulo e l'ordine dei
+    reparti in panchina che lo fa rendere di piu'."""
+    ordine, resa = cambio_modulo(s["reparti"])
+    s["totale"] += resa
+    s["cambio_modulo"] = resa
+    s["ordine_panchina"] = ordine
+    return s
 
 
 def valuta_modulo(disponibili, nome_modulo):
@@ -205,7 +299,9 @@ def valuta_modulo(disponibili, nome_modulo):
                 migliore = {"modulo": nome_modulo, "totale": totale, "modificatore": mod,
                             "media_difesa": media, "mod_atteso": mod_atteso,
                             "reparti": {"P": vp, "D": vd, "C": c, "A": a}}
-    return migliore
+    # i giocatori si scelgono senza il cambio modulo; il confronto fra moduli
+    # e il costo dei dubbi lo contano
+    return aggiungi_cambio_modulo(migliore)
 
 
 def costo_errore(val, ruolo, indice):
@@ -215,8 +311,8 @@ def costo_errore(val, ruolo, indice):
     modificatore compreso)."""
     rep = val["reparti"][ruolo]
     g = rep["attesi"][indice]["g"]
-    con_lui = totale_formazione(val["reparti"], {id(g): 1.0})
-    senza = totale_formazione(val["reparti"], {id(g): 0.0})
+    con_lui = totale_formazione(val["reparti"], {id(g): 1.0}, val["ordine_panchina"])
+    senza = totale_formazione(val["reparti"], {id(g): 0.0}, val["ordine_panchina"])
     sostituto = rep["panca"][0].nome if rep["panca"] else None
     return con_lui - senza, sostituto
 
@@ -256,8 +352,8 @@ def valuta_scelta(rosa, modulo, nomi):
     mod_atteso = modificatore_atteso(reparti["P"]["esiti"], reparti["D"]["esiti"])
     totale = reparti["P"]["somma"] + reparti["D"]["somma"] + reparti["C"]["somma"] + reparti["A"]["somma"] + mod_atteso
     mod, media = modificatore_difesa(reparti["P"]["scelti"][0].voto, [g.voto for g in reparti["D"]["scelti"]])
-    s = {"modulo": modulo, "totale": totale, "modificatore": mod, "media_difesa": media,
-         "mod_atteso": mod_atteso, "reparti": reparti, "scelta": True}
+    s = aggiungi_cambio_modulo({"modulo": modulo, "totale": totale, "modificatore": mod, "media_difesa": media,
+                                "mod_atteso": mod_atteso, "reparti": reparti, "scelta": True})
     # accanto alla scelta a mano restano, per confronto, i moduli in automatico
     valutazioni = sorted([v for v in (valuta_modulo(disponibili, m) for m in MODULI) if v],
                          key=lambda v: -v["totale"])
@@ -273,7 +369,7 @@ def completa(s, alternative, rosa):
             costo, sostituto = costo_errore(s, r, i)
             s["undici"].append({"g": x["g"], "ruolo": r, "p": x["p"], "atteso": x["atteso"],
                                 "voto_atteso": x["voto_atteso"], "costo": costo, "sostituto": sostituto})
-    s["panchina"] = [g for r in RUOLI for g in s["reparti"][r]["panca"]]
+    s["panchina"] = [g for r in ("P",) + s["ordine_panchina"] for g in s["reparti"][r]["panca"]]
     s["ricambi"] = {r: s["reparti"][r]["ricambio"] for r in RUOLI}
     s["fuori"] = [g for g in rosa if g.p <= 0]
     s["alternative"] = [{"modulo": v["modulo"], "totale": v["totale"], "modificatore": v["modificatore"],
@@ -294,6 +390,7 @@ def come_json(s):
                     "votoAtteso": x["voto_atteso"], "costo": x["costo"], "sostituto": x["sostituto"]}
                    for x in s["undici"]],
         "panchina": [g.nome for g in s["panchina"]],
+        "cambioModulo": s["cambio_modulo"], "ordinePanchina": "".join(s["ordine_panchina"]),
         "alternative": [{"modulo": a["modulo"], "totale": a["totale"], "mod": a["modificatore"],
                          "modAtteso": a["mod_atteso"]} for a in s["alternative"]],
         "gol": s["gol"], "alGolDopo": s["al_gol_dopo"],
@@ -322,11 +419,16 @@ def stampa(s):
     # Sulla piattaforma la panchina e' di 14 e va riempita tutta: gli
     # indisponibili chiudono il loro reparto, cosi' Marco copia la lista com'e'
     # (26/10: dati 12 nomi senza Mandragora e Ilic, e la panchina restava a meta').
-    print("\n  Panchina completa, in quest'ordine (ruolo per ruolo, per fantavoto; i fuori in fondo al reparto)")
-    completa_14 = [g for r in RUOLI for g in s["reparti"][r]["panca"] + [f for f in s["fuori"] if f.ruolo == r]]
+    reparti_panca = ("P",) + s["ordine_panchina"]
+    print("\n  Panchina completa, in quest'ordine (reparti " + "-".join(reparti_panca)
+          + ", dentro il reparto per fantavoto; i fuori in fondo al reparto)")
+    completa_14 = [g for r in reparti_panca for g in s["reparti"][r]["panca"] + [f for f in s["fuori"] if f.ruolo == r]]
     for i, g in enumerate(completa_14, 1):
         dubbio = "   FUORI" if g.p <= 0 else (f"   {g.p:.0%}" if g.p < 1 else "")
         print(f"    {i:>2}. {g.nome:<18} {g.ruolo}   {g.fv:>5.2f}{dubbio}")
+    nomi_reparto = {"D": "i difensori", "C": "i centrocampisti", "A": "gli attaccanti"}
+    print(f"  Cambio modulo: +{s['cambio_modulo']:.2f} attesi. Se un reparto resta senza ricambi entra il primo con"
+          f" voto fra {', poi '.join(nomi_reparto[r] for r in s['ordine_panchina'])}, se il modulo che ne esce e' ammesso.")
 
     print("\n  Ricambio atteso per ruolo: " + "   ".join(
         f"{r} {s['ricambi'][r]['fv']:.2f}" for r in RUOLI if s["ricambi"][r]["fv"]))
