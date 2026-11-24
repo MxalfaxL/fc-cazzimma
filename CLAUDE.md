@@ -83,10 +83,14 @@ duplicarle altrove.
   giocatore. L'app deve rendere questo errore impossibile.
 - Dopo la fase centrocampisti i crediti residui di tutti diventano pubblici.
 - **Modificatore difesa**: con 4 o più difensori schierati si fa la media fra il
-  voto puro del portiere e quelli dei 3 migliori difensori. Fasce: ≤6 → 0,
-  ≤6.25 → 1, ≤6.50 → 2, ≤6.75 → 3, ≤7 → 4, >7 → 5. È la regola più importante
+  voto puro del portiere e quelli dei 3 migliori difensori. Fasce: <6 → 0,
+  <6.25 → 1, <6.50 → 2, <6.75 → 3, <7 → 4, ≥7 → 5: **una media esattamente
+  sulla soglia sale di fascia** (6,50 tondo = +3), come fa la piattaforma
+  (verificato sulla 12ª il 24/11/2026; il regolamento PDF scrive il contrario). È la regola più importante
   di tutto il progetto: vale fino a 5 punti a giornata, più di un gol intero.
 - **Fasce gol**: primo gol a 66 punti, poi uno ogni 4.
+- **Voto d'ufficio (6* nel file dei voti) = SV**: la piattaforma non lo conta e fa entrare il
+  ricambio (Vojvoda nella 12ª, verificato il 24/11/2026).
 - **Bonus e malus** quelli di Leghe, piu' **portiere imbattuto +1** (confermato da
   Marco il 13 ottobre 2026: la 6ª veniva un punto sotto la piattaforma).
 - Sette moduli: 3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-4-1, 5-3-2.

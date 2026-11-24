@@ -145,13 +145,17 @@ class Voti:
         v = self.di(giocatore["n"])
         if v is None:
             return None
+        # Il "6*" del file (voto d'ufficio di chi entra per pochi minuti) per la
+        # piattaforma e' SV: nella 12ª Vojvoda aveva 6* nel file e "SV" nell'app
+        # Leghe (screenshot di Marco del 24/11/2026). Quindi niente voto, e se e'
+        # schierato entra il ricambio dalla panchina.
+        if v.get("ufficio"):
+            return None
         ruolo = giocatore["r"]
         if "colonne" in v:
             colonne = v["colonne"]
             fv = fantavoto(v["voto"], colonne, ruolo)
             eventi = racconta(colonne, ruolo)
-            if v.get("ufficio"):
-                eventi = (eventi + ", " if eventi else "") + "voto d'ufficio"
         else:
             # file scritto prima del 10/10/2026: il fantavoto e' gia' fatto con
             # le stesse regole ma con il ruolo del listone. Va quasi sempre bene,

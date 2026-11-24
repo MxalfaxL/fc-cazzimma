@@ -975,6 +975,9 @@ const SLOT = {P:3, D:8, C:8, A:6};
 const ORDINE = ['P','D','C','A'];
 const MODULI = {'3-4-3':[3,4,3], '3-5-2':[3,5,2], '4-3-3':[4,3,3], '4-4-2':[4,4,2],
                 '4-5-1':[4,5,1], '5-4-1':[5,4,1], '5-3-2':[5,3,2]};
+/* una media ESATTAMENTE su una soglia sale di fascia (6,50 tondo = +3): lo fa
+   la piattaforma, verificato sulla 12ª, anche se il regolamento scrive il
+   contrario. Stessa regola in motore/regole.py. */
 const FASCE_MOD = [[6.00,0],[6.25,1],[6.50,2],[6.75,3],[7.00,4]];
 const MOD_MAX = 5;
 const SOGLIA_GOL = 66, AMPIEZZA = 4;
@@ -984,7 +987,7 @@ function modificatore(votoP, votiD){
   if(votiD.length < 4) return {punti:0, media:null};
   const migliori = [...votiD].sort((a,b)=>b-a).slice(0,3);
   const media = (votoP + migliori.reduce((a,b)=>a+b,0)) / 4;
-  for(const [soglia, punti] of FASCE_MOD) if(media <= soglia) return {punti, media};
+  for(const [soglia, punti] of FASCE_MOD) if(media < soglia) return {punti, media};
   return {punti:MOD_MAX, media};
 }
 const golDaPunti = p => p < SOGLIA_GOL ? 0 : Math.floor((p - SOGLIA_GOL)/AMPIEZZA) + 1;
@@ -1302,7 +1305,7 @@ const SINGOLARE = {P:'Portiere', D:'Difesa', C:'Centrocampo', A:'Attacco'};
 const BASE = {P:[6.0,6.0], D:[6.0,6.0], C:[6.2,6.0], A:[6.5,6.0]};
 const OBIETTIVI_BASE = {P:42, D:105, C:158, A:195};
 const CHIAVE = 'fccazzimma:v2', CHIAVE_CFG = 'fccazzimma:cfg', CHIAVE_LISTONE = 'fccazzimma:listone', CHIAVE_TEMA = 'fccazzimma:tema';
-const VERSIONE_APP = '2026.11.06';
+const VERSIONE_APP = '2026.11.24';
 
 const statoIniziale = () => ({
   rosa: [], target: {...OBIETTIVI_BASE}, piano: 'equilibrio',
@@ -1752,7 +1755,7 @@ function disegnaMetro(s, nd){
   const sotto = s.mod > 0 ? soglie[s.mod] : null;
   let lettura = `media difesa <b>${m.toFixed(3)}</b> → modificatore <b>+${s.mod}</b> se giocano tutti`;
   if(Math.abs(s.modAtteso - s.mod) > 0.005) lettura += ` (atteso <b>+${s.modAtteso.toFixed(2)}</b> contando i dubbi)`;
-  if(prossima) lettura += ` · alla fascia +${s.mod+1} mancano ${(prossima - m + 0.0001).toFixed(2)}`;
+  if(prossima) lettura += ` · alla fascia +${s.mod+1} mancano ${(prossima - m).toFixed(2)}`;
   if(sotto) lettura += ` · scendi a +${s.mod-1} sotto ${sotto.toFixed(2)} (margine ${(m - sotto).toFixed(2)})`;
   return `<div class="metro">
     <div class="tracce">${tracce}</div>

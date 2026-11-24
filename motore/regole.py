@@ -64,7 +64,13 @@ def fantavoto(voto, eventi, ruolo):
         totale += PORTIERE_IMBATTUTO
     return round(totale, 2)
 
-# --- modificatore difesa: (soglia superiore esclusa, punti) ---
+# --- modificatore difesa: (soglia, punti sotto la soglia) ---
+# Una media che cade ESATTAMENTE su una soglia sale nella fascia di sopra:
+# 6,50 tondo vale +3, non +2. Il regolamento PDF (7.1) scrive il contrario
+# ("6.25 < MV <= 6.50 -> 2"), ma conta la piattaforma: nella 12ª la nostra
+# media era 6,500 e l'app Leghe ha dato +3 (78,5 contro il nostro 77,5,
+# screenshot di Marco del 24/11/2026). Verificato solo su 6,50: le altre
+# soglie si assumono uguali, come le fa un ">=" della piattaforma.
 FASCE_MODIFICATORE = [(6.00, 0), (6.25, 1), (6.50, 2), (6.75, 3), (7.00, 4)]
 MODIFICATORE_MAX = 5
 DIFENSORI_MINIMI_PER_MODIFICATORE = 4
@@ -82,7 +88,7 @@ def modificatore_difesa(voto_portiere, voti_difensori):
     migliori = sorted(voti_difensori, reverse=True)[:3]
     media = (voto_portiere + sum(migliori)) / 4
     for soglia, punti in FASCE_MODIFICATORE:
-        if media <= soglia:
+        if media < soglia:
             return punti, media
     return MODIFICATORE_MAX, media
 
